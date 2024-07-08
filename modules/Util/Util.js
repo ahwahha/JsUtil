@@ -81,8 +81,9 @@ Util.clone = function (input) {
 }
 
 Util.openBlob = function (blob) {
+	let url = null;
 	try {
-		let url = URL.createObjectURL(blob);
+		url = URL.createObjectURL(blob);
 		window.open(url, '_blank');
 	} catch (error) {
 		console.error('Error opening blob:', error);
@@ -94,8 +95,9 @@ Util.openBlob = function (blob) {
 }
 
 Util.downloadBlob = function (blob, filename = 'filename') {
+	let url = null;
 	try {
-		let url = URL.createObjectURL(blob);
+		url = URL.createObjectURL(blob);
 		let a = document.createElement('a');
 		a.href = url;
 		a.download = filename;
