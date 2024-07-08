@@ -1334,6 +1334,39 @@ Util.clone = function (input) {
     }
 }
 
+Util.openBlob = function (blob) {
+	let url = null;
+	try {
+		url = URL.createObjectURL(blob);
+		window.open(url, '_blank');
+	} catch (error) {
+		console.error('Error opening blob:', error);
+	} finally {
+		if (url) {
+			URL.revokeObjectURL(url);
+		}
+	}
+}
+
+Util.downloadBlob = function (blob, filename = 'filename') {
+	let url = null;
+	try {
+		url = URL.createObjectURL(blob);
+		let a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+	} catch (error) {
+		console.error('Error downloading blob:', error);
+	} finally {
+		if (url) {
+			URL.revokeObjectURL(url);
+		}
+	}
+}
+
 HTMLElement.prototype.hide = function () {
     if (this) {
         this.style.display = 'none';
