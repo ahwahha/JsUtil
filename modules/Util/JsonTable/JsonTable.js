@@ -30,6 +30,7 @@ function JsonTable(c = null) {
         end: 10,
         defaultEnd: 10,
         maxRows: 100,
+        tableClass: 'jsonTable',
         buttonClass: 'button',
         multiSelect: true,
         actionsGroupStyle: {},
@@ -653,17 +654,17 @@ function JsonTable(c = null) {
                         .appendContent(
                             Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(
-                                    Util.newElement('button', { class: tableSettings['buttonClass'] })
+                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                         .addEventListeners('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllFiltered)
                                 )
                                 .appendContent(
-                                    Util.newElement('button', { class: tableSettings['buttonClass'] })
+                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                         .addEventListeners('click', (event) => { setAllFilteredSelected(false); refreshTable(); })
                                         .appendContent(tableSettings.unselectAllFiltered)
                                 )
                                 .appendContentIf(
-                                    Util.newElement('button', { class: tableSettings['buttonClass'] })
+                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                         .addEventListeners('click', (event) => { setAllEditedSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllEdited)
                                     , edited
@@ -681,7 +682,7 @@ function JsonTable(c = null) {
         let output = null;
         if (tableSettings != null) {
             try {
-                output = Util.newElement('button', { class: tableSettings['buttonClass'] })
+                output = Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                     .addEventListeners('click', (event) => { resetFilters(); filterRows(); resetPageNumbers(); refreshTable(); })
                     .appendContent(tableSettings.resetFilters);
             } catch (err) {
@@ -705,12 +706,12 @@ function JsonTable(c = null) {
                     .appendContentIf(
                         Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
-                                Util.newElement('button', { class: tableSettings['buttonClass'] })
+                                Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                     .addEventListeners('click', (event) => { resetData(); refreshTable(); })
                                     .appendContent(tableSettings.resetData)
                             )
                             .appendContent(
-                                Util.newElement('button', { class: tableSettings['buttonClass'] })
+                                Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                     .addEventListeners('click', (event) => { resetSelectedData(); refreshTable(); })
                                     .appendContent(tableSettings.resetSelectedData)
                             )
@@ -734,13 +735,13 @@ function JsonTable(c = null) {
                                 Util.newElement('div', null)
                                     //toBeginingButton
                                     .appendContent(
-                                        Util.newElement('button', { class: tableSettings['buttonClass'] })
+                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                             .addEventListeners('click', (event) => { toBegining(); refreshTable(); })
                                             .appendContent(tableSettings['toBegining'])
                                     )
                                     //previousButton
                                     .appendContent(
-                                        Util.newElement('button', { class: tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
                                             .addEventListeners('click', (event) => { priviousPage(); refreshTable(); })
                                             .appendContent(tableSettings['previousPage'])
                                     )
@@ -785,13 +786,14 @@ function JsonTable(c = null) {
                                 Util.newElement('div', null)
                                     //toBeginingButton
                                     .appendContent(
-                                        Util.newElement('button', { class: tableSettings['buttonClass'] })
+                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                             .addEventListeners('click', (event) => { nextPage(); refreshTable(); })
                                             .appendContent(tableSettings['nextPage'])
                                     )
                                     //previousButton
                                     .appendContent(
-                                        Util.newElement('button', { class: tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                            .preventDefault('click')
                                             .addEventListeners('click', (event) => { toEnding(); refreshTable(); })
                                             .appendContent(tableSettings['toEnding'])
                                     )
@@ -978,7 +980,7 @@ function JsonTable(c = null) {
                                     .appendContent(
                                         Util.newElement('div', {
                                             style: Util.toStyleString(headerStyle),
-                                            class: 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
+                                            class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
                                             .addEventListeners('click', () => {
                                                 setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
