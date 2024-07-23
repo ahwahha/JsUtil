@@ -1146,7 +1146,7 @@ function JsonTable(c = null) {
             }
             return this;
         } catch (err) {
-            throw new Error("error caught @ fillTable(" + id + "): " + err);
+            throw new Error("error caught @ fillTable(): " + err);
         }
     }
 
