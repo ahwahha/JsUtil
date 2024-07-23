@@ -385,8 +385,8 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let a = (row[col['data']] === undefined ? '' : row[col['data']]).toString();
-                            let b = (col['filter'] === undefined ? '' : col['filter']).toString();
+                            let a = (row[col['data']] === undefined || row[col['data']] === null ? '' : row[col['data']]).toString();
+                            let b = (col['filter'] === undefined || row[col['filter']] === null ? '' : col['filter']).toString();
                             let matching = match(a, b, false);
                             if (!matching) {
                                 isFiltered = false;
@@ -415,8 +415,8 @@ function JsonTable(c = null) {
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
                 let sortedData = tableData.sort((a, b) => {
-                    let aValue = a[data] === undefined ? '' : a[data].toString();
-                    let bValue = b[data] === undefined ? '' : b[data].toString();
+                    let aValue = a[data] === undefined || a[data] === null ? '' : a[data].toString();
+                    let bValue = b[data] === undefined || b[data] === null ? '' : b[data].toString();
                     if (typeof aValue === 'boolean' || typeof bValue === 'boolean') {
                         if (aValue === bValue) {
                             return 0;
