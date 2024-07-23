@@ -383,8 +383,8 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let a = (row[col['data']] === undefined ? '' : row[col['data']]).toString();
-                            let b = (col['filter'] === undefined ? '' : col['filter']).toString();
+                            let a = (row[col['data']] === undefined || row[col['data']] === null ? '' : row[col['data']]).toString();
+                            let b = (col['filter'] === undefined || row[col['filter']] === null ? '' : col['filter']).toString();
                             let matching = match(a, b, false);
                             if (!matching) {
                                 isFiltered = false;
@@ -413,8 +413,8 @@ function JsonTable(c = null) {
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
                 let sortedData = tableData.sort((a, b) => {
-                    let aValue = a[data] === undefined ? '' : a[data].toString();
-                    let bValue = b[data] === undefined ? '' : b[data].toString();
+                    let aValue = a[data] === undefined || a[data] === null ? '' : a[data].toString();
+                    let bValue = b[data] === undefined || b[data] === null ? '' : b[data].toString();
                     if (typeof aValue === 'boolean' || typeof bValue === 'boolean') {
                         if (aValue === bValue) {
                             return 0;
@@ -1260,61 +1260,61 @@ function Util() {
 };
 
 Util.newElement = function (type, attributes) {
-	let e = document.createElement(type);
-	if (attributes !== null && typeof attributes === 'object') {
-		for (let key in attributes) {
-			if (attributes.hasOwnProperty(key)) {
-				e.setAttribute(key, attributes[key]);
-			}
-		}
-	}
-	return e;
+    let e = document.createElement(type);
+    if (attributes !== null && typeof attributes === 'object') {
+        for (let key in attributes) {
+            if (attributes.hasOwnProperty(key)) {
+                e.setAttribute(key, attributes[key]);
+            }
+        }
+    }
+    return e;
 };
 
 Util.toStyleString = function (obj) {
-	var output = null;
-	try {
-		output = '';
-		for (let key in (obj || {})) {
-			output += (output ? ' ' : '') + key + ':' + obj[key] + ';';
-		}
-	} catch (error) {
-		throw new Error("error caught @ toStyleString(" + obj + "): " + error);
-	}
-	return output;
+    var output = null;
+    try {
+        output = '';
+        for (let key in (obj || {})) {
+            output += (output ? ' ' : '') + key + ':' + obj[key] + ';';
+        }
+    } catch (error) {
+        throw new Error("error caught @ toStyleString(" + obj + "): " + error);
+    }
+    return output;
 };
 
 Util.downloadAsCsv = function (jsonData = null, fileName = 'data.csv', delimiter = ',') {
-	if (jsonData) {
+    if (jsonData) {
 
-		var jsonToCsv = function (jsonData) {
-			let csv = '';
-			let headers = Object.keys(jsonData[0]);
-			// Add the data
-			jsonData.forEach(function (row) {
-				let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
-				csv += (csv == '' ? '' : '\n') + data;
-			});
-			// Get the headers
-			csv = headers.join(delimiter) + '\n' + csv;
-			return csv;
-		}
+        var jsonToCsv = function (jsonData) {
+            let csv = '';
+            let headers = Object.keys(jsonData[0]);
+            // Add the data
+            jsonData.forEach(function (row) {
+                let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
+                csv += (csv == '' ? '' : '\n') + data;
+            });
+            // Get the headers
+            csv = headers.join(delimiter) + '\n' + csv;
+            return csv;
+        }
 
-		// Convert JSON data to CSV
-		let csvData = jsonToCsv(jsonData);
-		// Create a CSV file and allow the user to download it
-		let blob = new Blob([csvData], { type: 'text/csv' });
-		let url = window.URL.createObjectURL(blob);
-		let a = document.createElement('a');
-		a.href = url;
-		a.download = fileName;
-		document.body.appendChild(a);
-		a.click();
-		// Clean up
-		document.body.removeChild(a);
-		window.URL.revokeObjectURL(url);
+        // Convert JSON data to CSV
+        let csvData = jsonToCsv(jsonData);
+        // Create a CSV file and allow the user to download it
+        let blob = new Blob([csvData], { type: 'text/csv' });
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        // Clean up
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
 
-	}
+    }
 }
 
 Util.clone = function (input) {
@@ -1337,36 +1337,36 @@ Util.clone = function (input) {
 }
 
 Util.openBlob = function (blob) {
-	let url = null;
-	try {
-		url = URL.createObjectURL(blob);
-		window.open(url, '_blank');
-	} catch (error) {
-		console.error('Error opening blob:', error);
-	} finally {
-		if (url) {
-			URL.revokeObjectURL(url);
-		}
-	}
+    let url = null;
+    try {
+        url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+    } catch (error) {
+        console.error('Error opening blob:', error);
+    } finally {
+        if (url) {
+            URL.revokeObjectURL(url);
+        }
+    }
 }
 
 Util.downloadBlob = function (blob, filename = 'filename') {
-	let url = null;
-	try {
-		url = URL.createObjectURL(blob);
-		let a = document.createElement('a');
-		a.href = url;
-		a.download = filename;
-		document.body.appendChild(a);
-		a.click();
-		a.remove();
-	} catch (error) {
-		console.error('Error downloading blob:', error);
-	} finally {
-		if (url) {
-			URL.revokeObjectURL(url);
-		}
-	}
+    let url = null;
+    try {
+        url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    } catch (error) {
+        console.error('Error downloading blob:', error);
+    } finally {
+        if (url) {
+            URL.revokeObjectURL(url);
+        }
+    }
 }
 
 HTMLElement.prototype.hide = function () {
