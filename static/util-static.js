@@ -1021,7 +1021,7 @@ function JsonTable(c = null) {
                                 value: filterValue,
                                 placeholder: (col['filterPlaceholder'] || '')
                             });
-                            filters.appendContent(Util.newElement('td', null).appendContent(col['filterElement']));
+                            filters.appendContent(Util.newElement('td', null).appendContentIf(col['filterElement'], col['filterable']));
                         });
                         tbody.appendContent(filters);
                     }
