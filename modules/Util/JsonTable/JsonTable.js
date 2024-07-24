@@ -1018,12 +1018,12 @@ function JsonTable(c = null) {
                         tableSettings['columns'].forEach((col) => {
                             let filterStyle = Util.toStyleString({ ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) });
                             let filterValue = col['filter'] || '';
-                            let filterElement = Util.newElement('input', {
+                            col['filterElement'] = Util.newElement('input', {
                                 style: 'display:block; ' + filterStyle,
                                 value: filterValue,
                                 placeholder: (col['filterPlaceholder'] || '')
                             });
-                            filters.appendContent(Util.newElement('td', null).appendContentIf(filterElement, col['filterable']));
+                            filters.appendContent(Util.newElement('td', null).appendContent(col['filterElement']));
                         });
                         tbody.appendContent(filters);
                     }
