@@ -192,7 +192,6 @@ function JsonTable(c = null) {
             for (let i = 0; i < tableSettings['columns'].length; i++) {
                 tableSettings['columns'][i] = { ...tableDefaultSettings.columns[0], ...tableSettings['columns'][i] };
             }
-            console.log(tableSettings['columns']);
 
             return this;
         } catch (error) {
