@@ -83,7 +83,9 @@
 						"header": "Select",
 						"data": "###row-selected",
 						"rowsStyle": { "width": "1%", "padding": "0px 10px" },
-						"modifier": function (row) { return myTable.createSelectBox(row); }
+						"modifier": function (row) { return myTable.createSelectBox(row); },
+						"sortable": false,
+						"filterable": false
 					},
 					{
 						"header": "Name",
@@ -137,7 +139,9 @@
 						"header": "Remove",
 						"data": "###row-removed",
 						"rowsStyle": { "width": "1%", "padding": "0px 10px" },
-						"modifier": function (row) { return myTable.createRemoveBox(row); }
+						"modifier": function (row) { return myTable.createRemoveBox(row); },
+						"sortable": false,
+						"filterable": false
 					}
 				],
 				label: "[table label]",
@@ -150,15 +154,15 @@
 
 			// fill the table with data
 			myTable.fillTable();
-			document.getElementById('selected').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected()),'selected.csv',','); });
-			document.getElementById('filtered').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered()),'filtered.csv',','); });
-			document.getElementById('edited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getEdited()),'edited.csv',','); });
-			document.getElementById('selectedfiltered').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getFiltered())),'selectedFiltered.csv',','); });
-			document.getElementById('selectededited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getEdited())),'selectedEdited.csv',','); });
-			document.getElementById('filterededited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered(myTable.getEdited())),'filteredEdited.csv',','); });
-			document.getElementById('inserted').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getInserted()),'inserted.csv',','); });
-			document.getElementById('removed').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getRemoved()),'removed.csv',','); });
-			document.getElementById('insert').addEventListeners('click', ()=>{myTable.insertData({"name": "", "age": 0, "title": "", "location": "", "datetimeOfBirth": ""}).sortAsOriginal()});
+			document.getElementById('selected').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected()), 'selected.csv', ','); });
+			document.getElementById('filtered').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered()), 'filtered.csv', ','); });
+			document.getElementById('edited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getEdited()), 'edited.csv', ','); });
+			document.getElementById('selectedfiltered').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getFiltered())), 'selectedFiltered.csv', ','); });
+			document.getElementById('selectededited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getEdited())), 'selectedEdited.csv', ','); });
+			document.getElementById('filterededited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered(myTable.getEdited())), 'filteredEdited.csv', ','); });
+			document.getElementById('inserted').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getInserted()), 'inserted.csv', ','); });
+			document.getElementById('removed').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getRemoved()), 'removed.csv', ','); });
+			document.getElementById('insert').addEventListeners('click', () => { myTable.insertData({ "name": "", "age": 0, "title": "", "location": "", "datetimeOfBirth": "" }).sortAsOriginal() });
 
 		} catch (e) { console.log(e); }
 	</script>

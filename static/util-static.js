@@ -14,7 +14,7 @@ function JsonTable(c = null) {
                 header: "Header",
                 data: "",
                 filter: "",
-                filterPlaceholder: "placeholder",
+                filterPlaceholder: "---",
                 // modifier: (row) => { return 'data:' + JSON.stringify(row); }, //example
                 headerStyle: {},
                 filterStyle: {},
@@ -1015,16 +1015,14 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let filters = Util.newElement('tr', null);
                         tableSettings['columns'].forEach((col) => {
-                            if (col['filterable']) {
-                                let filterStyle = Util.toStyleString({ ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) });
-                                let filterValue = col['filter'] || '';
-                                col['filterElement'] = Util.newElement('input', {
-                                    style: 'display:block; ' + filterStyle,
-                                    value: filterValue,
-                                    placeholder: (col['filterPlaceholder'] || '')
-                                });
-                                filters.appendContent(Util.newElement('td', null).appendContent(col['filterElement']));
-                            }
+                            let filterStyle = Util.toStyleString({ ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) });
+                            let filterValue = col['filter'] || '';
+                            let filterElement = Util.newElement('input', {
+                                style: 'display:block; ' + filterStyle,
+                                value: filterValue,
+                                placeholder: (col['filterPlaceholder'] || '')
+                            });
+                            filters.appendContent(Util.newElement('td', null).appendContentIf(filterElement, col['filterable']));
                         });
                         tbody.appendContent(filters);
                     }
