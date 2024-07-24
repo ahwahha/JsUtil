@@ -17,10 +17,12 @@ function JsonTable(c = null) {
                 data: "",
                 filter: "",
                 filterPlaceholder: "placeholder",
-                modifier: (row) => { return 'data:' + JSON.stringify(row); },
+                // modifier: (row) => { return 'data:' + JSON.stringify(row); }, //example
                 headerStyle: {},
                 filterStyle: {},
                 rowsStyle: {},
+                sortable: true,
+                filterable: true
             }
         ],
         sortedBy: '###row-index',
@@ -32,6 +34,7 @@ function JsonTable(c = null) {
         maxRows: 100,
         tableClass: 'jsonTable',
         buttonClass: 'button',
+        showSelectingGroup: true,
         multiSelect: true,
         actionsGroupStyle: {},
         paginationGroupStyle: { 'width': '100%', 'text-align': 'center' },
@@ -187,6 +190,10 @@ function JsonTable(c = null) {
             tableSettings['editedStyle'] = { ...tableDefaultSettings['editedStyle'], ...newSettings['editedStyle'] };
             tableSettings['insertedStyle'] = { ...tableDefaultSettings['insertedStyle'], ...newSettings['insertedStyle'] };
             tableSettings['removedStyle'] = { ...tableDefaultSettings['removedStyle'], ...newSettings['removedStyle'] };
+
+            for (let i = 0; i < tableSettings['columns'].length; i++) {
+                tableSettings['columns'][i] = { ...tableDefaultSettings.columns[0], ...tableSettings['columns'][i] };
+            }
 
             return this;
         } catch (error) {
@@ -982,10 +989,10 @@ function JsonTable(c = null) {
                                             style: Util.toStyleString(headerStyle),
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
-                                            .addEventListeners('click', () => {
+                                            .addEventListenersIf('click', () => {
                                                 setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
                                                 refreshTable();
-                                            })
+                                            }, col['sortable'])
                                             .appendContent(
                                                 Util.newElement('div', { style: 'flex:1;' })
                                             )
@@ -1009,14 +1016,16 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let filters = Util.newElement('tr', null);
                         tableSettings['columns'].forEach((col) => {
-                            let filterStyle = Util.toStyleString({ ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) });
-                            let filterValue = col['filter'] || '';
-                            col['filterElement'] = Util.newElement('input', {
-                                style: 'display:block; ' + filterStyle,
-                                value: filterValue,
-                                placeholder: (col['filterPlaceholder'] || '')
-                            });
-                            filters.appendContent(Util.newElement('td', null).appendContent(col['filterElement']));
+                            if (col['filterable']) {
+                                let filterStyle = Util.toStyleString({ ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) });
+                                let filterValue = col['filter'] || '';
+                                col['filterElement'] = Util.newElement('input', {
+                                    style: 'display:block; ' + filterStyle,
+                                    value: filterValue,
+                                    placeholder: (col['filterPlaceholder'] || '')
+                                });
+                                filters.appendContent(Util.newElement('td', null).appendContent(col['filterElement']));
+                            }
                         });
                         tbody.appendContent(filters);
                     }
@@ -1111,7 +1120,7 @@ function JsonTable(c = null) {
                                 .appendContent(
                                     Util.newElement('div', { style: Util.toStyleString(tableSettings['actionsGroupStyle']) }).appendContent(
                                         Util.newElement('div', { style: Util.toStyleString({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
-                                            .appendContent(createSelectingGroup())
+                                            .appendContentIf(createSelectingGroup(), tableSettings['showSelectingGroup'])
                                             .appendContent(createEditedGroup())
                                             .appendContent(createResetFiltersButton())
                                     )

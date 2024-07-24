@@ -29,55 +29,59 @@ Util.toStyleString = function (obj) {
 };
 
 Util.downloadAsCsv = function (jsonData = null, fileName = 'data.csv', delimiter = ',') {
-	if (jsonData) {
+	try {
+		if (jsonData) {
 
-		var jsonToCsv = function (jsonData) {
-			let csv = '';
-			let headers = Object.keys(jsonData[0]);
-			// Add the data
-			jsonData.forEach(function (row) {
-				let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
-				csv += (csv == '' ? '' : '\n') + data;
-			});
-			// Get the headers
-			csv = headers.join(delimiter) + '\n' + csv;
-			return csv;
+			var jsonToCsv = function (jsonData) {
+				let csv = '';
+				let headers = Object.keys(jsonData[0]);
+				// Add the data
+				jsonData.forEach(function (row) {
+					let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
+					csv += (csv == '' ? '' : '\n') + data;
+				});
+				// Get the headers
+				csv = headers.join(delimiter) + '\n' + csv;
+				return csv;
+			}
+
+			// Convert JSON data to CSV
+			let csvData = jsonToCsv(jsonData);
+			// Create a CSV file and allow the user to download it
+			let blob = new Blob([csvData], { type: 'text/csv' });
+			let url = window.URL.createObjectURL(blob);
+			let a = document.createElement('a');
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+			a.click();
+			// Clean up
+			document.body.removeChild(a);
+			window.URL.revokeObjectURL(url);
+
 		}
-
-		// Convert JSON data to CSV
-		let csvData = jsonToCsv(jsonData);
-		// Create a CSV file and allow the user to download it
-		let blob = new Blob([csvData], { type: 'text/csv' });
-		let url = window.URL.createObjectURL(blob);
-		let a = document.createElement('a');
-		a.href = url;
-		a.download = fileName;
-		document.body.appendChild(a);
-		a.click();
-		// Clean up
-		document.body.removeChild(a);
-		window.URL.revokeObjectURL(url);
-
+	} catch (error) {
+		throw new Error("error caught @ downloadAsCsv: " + error);
 	}
 }
 
 Util.clone = function (input) {
-    if (Array.isArray(input)) {
-        return input.map(Util.clone);
-    } else if (typeof input === 'object' && input !== null) {
-        if (input instanceof Node) {
-            return input;
-        }
-        let output = {};
-        for (let key in input) {
-            if (input.hasOwnProperty(key)) {
-                output[key] = Util.clone(input[key]);
-            }
-        }
-        return output;
-    } else {
-        return input;
-    }
+	if (Array.isArray(input)) {
+		return input.map(Util.clone);
+	} else if (typeof input === 'object' && input !== null) {
+		if (input instanceof Node) {
+			return input;
+		}
+		let output = {};
+		for (let key in input) {
+			if (input.hasOwnProperty(key)) {
+				output[key] = Util.clone(input[key]);
+			}
+		}
+		return output;
+	} else {
+		return input;
+	}
 }
 
 Util.openBlob = function (blob) {

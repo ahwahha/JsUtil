@@ -41,6 +41,13 @@ HTMLElement.prototype.addEventListeners = function (events, func) {
     return this;
 };
 
+HTMLElement.prototype.addEventListenersIf = function (events, func, bool) {
+    if (bool) {
+        this.addEventListeners(events, func);
+    }
+    return this;
+};
+
 HTMLElement.prototype.appendContent = function (content) {
     try {
         if (content !== null && content !== undefined) {
@@ -195,3 +202,8 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
 
     return this;
 };
+
+HTMLElement.prototype.preventDefault = function (eventType) {
+    this.addEventListener(eventType, function (event) { event.preventDefault(); });
+    return this;
+}
