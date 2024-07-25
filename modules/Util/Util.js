@@ -34,7 +34,7 @@ Util.downloadAsCsv = function (jsonData = null, fileName = 'data.csv', delimiter
 
 			var jsonToCsv = function (jsonData) {
 				let csv = '';
-				let headers = Object.keys(jsonData[0]);
+				let headers = Object.keys(jsonData[0]).sort((a, b) => { return b - a; });
 				// Add the data
 				jsonData.forEach(function (row) {
 					let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
