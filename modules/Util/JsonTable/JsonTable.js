@@ -22,7 +22,7 @@ function JsonTable(c = null) {
                 filterStyle: {},
                 rowsStyle: {},
                 sortable: true,
-                filterable: true,
+                filterEditable: true,
                 class: ""
             }
         ],
@@ -1017,14 +1017,13 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let filters = Util.newElement('tr', null);
                         tableSettings['columns'].forEach((col) => {
-                            let filterStyle = Util.toStyleString({ ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) });
+                            let filterStyle = Util.toStyleString({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
                             let filterValue = col['filter'] || '';
                             col['filterElement'] = Util.newElement('input', {
-                                style: 'display:block; ' + filterStyle,
-                                value: filterValue,
-                                placeholder: (col['filterPlaceholder'] || '')
+                                ...{ style: 'display:block; ' + filterStyle, value: filterValue, placeholder: (col['filterPlaceholder'] || '') }
+                                , ...(col['filterEditable'] ? {} : { 'disabled': 'true' })
                             });
-                            filters.appendContent(Util.newElement('td', { class: col['class'] }).appendContentIf(col['filterElement'], col['filterable']));
+                            filters.appendContent(Util.newElement('td', { class: col['class'] }).appendContent(col['filterElement']));
                         });
                         tbody.appendContent(filters);
                     }
