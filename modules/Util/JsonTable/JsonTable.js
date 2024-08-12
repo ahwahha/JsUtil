@@ -22,7 +22,8 @@ function JsonTable(c = null) {
                 filterStyle: {},
                 rowsStyle: {},
                 sortable: true,
-                filterable: true
+                filterable: true,
+                class: ""
             }
         ],
         sortedBy: '###row-index',
@@ -762,7 +763,7 @@ function JsonTable(c = null) {
                                             style: Util.toStyleString({
                                                 'text-align': 'center',
                                                 'padding': '3px 8px',
-                                                'width': (Math.max(1, Math.ceil(Math.log10(tableData.length))) * 8 + 20) + 'px'
+                                                'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['start']
                                         }).addEventListeners('change', (event) => { setStart(event.target.value); refreshTable(); })
@@ -778,7 +779,7 @@ function JsonTable(c = null) {
                                             style: Util.toStyleString({
                                                 'text-align': 'center',
                                                 'padding': '3px 8px',
-                                                'width': (Math.max(1, Math.ceil(Math.log10(tableData.length))) * 8 + 20) + 'px'
+                                                'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['end']
                                         }).addEventListeners('change', (event) => { setEnd(event.target.value); refreshTable(); })
@@ -983,7 +984,7 @@ function JsonTable(c = null) {
                         tableSettings['columns'].forEach((col) => {
                             let headerStyle = { ...(tableSettings['headersStyle'] || {}), ...(col['headerStyle'] || {}) };
                             headers.appendContent(
-                                Util.newElement('td', null)
+                                Util.newElement('td', { class: col['class'] })
                                     .appendContent(
                                         Util.newElement('div', {
                                             style: Util.toStyleString(headerStyle),
@@ -1023,7 +1024,7 @@ function JsonTable(c = null) {
                                 value: filterValue,
                                 placeholder: (col['filterPlaceholder'] || '')
                             });
-                            filters.appendContent(Util.newElement('td', null).appendContentIf(col['filterElement'], col['filterable']));
+                            filters.appendContent(Util.newElement('td', { class: col['class'] }).appendContentIf(col['filterElement'], col['filterable']));
                         });
                         tbody.appendContent(filters);
                     }
@@ -1059,7 +1060,7 @@ function JsonTable(c = null) {
                                                 }
                                             }
                                             tableRow.appendContent(
-                                                Util.newElement('td', { style: Util.toStyleString({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                Util.newElement('td', { class: col['class'], style: Util.toStyleString({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                     .appendContent(cellData)
                                                     .appendContentIf(Util.newElement('br'), row['###row-edited'])
                                                     .appendContentIf(
@@ -1085,7 +1086,7 @@ function JsonTable(c = null) {
                                                     }
                                                 }
                                                 tableRow.appendContent(
-                                                    Util.newElement('td', { style: Util.toStyleString({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                    Util.newElement('td', { class: col['class'], style: Util.toStyleString({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                         .appendContent(
                                                             Util.newElement('span', { style: Util.toStyleString(tableSettings.removedStyle) })
                                                                 .appendContent(cellData)
@@ -1172,7 +1173,7 @@ function JsonTable(c = null) {
     }
 
     var loadFilterHandlers = function () {
-        var events = ['change', 'keyup', 'dragend', 'selectionchange'];
+        var events = ['change', 'keyup', 'dragend'];
         if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
             for (let col of tableSettings['columns']) {
                 let element = col['filterElement'];

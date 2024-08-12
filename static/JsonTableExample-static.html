@@ -42,6 +42,10 @@
 			background-image: linear-gradient(to bottom, #999999, #d8d8d8, #e8e8e8, #eeeeee, #e8e8e8, #d8d8d8, #999999);
 			outline: none;
 		}
+
+		.red * {
+			color: #F00;
+		}
 	</style>
 	<script src="./util-static.js" type="text/javascript"></script>
 </head>
@@ -92,7 +96,8 @@
 						"data": "name",
 						"modifier": function (row) {
 							return Util.newElement('input', { style: 'width:calc(100% - 10px);', disabled: '', value: row.name })
-						}
+						},
+						'class': 'red'
 					},
 					{
 						"header": "Birth At",
