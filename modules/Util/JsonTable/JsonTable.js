@@ -93,7 +93,8 @@ function JsonTable(c = null) {
         removedStyle: {
             "text-decoration": "line-through",
             "text-decoration-color": "hsl(0, 100%, 30%)"
-        }
+        },
+		filterDebounceDelay: 500
     };
     var tableSettings = tableDefaultSettings;
 
@@ -393,8 +394,8 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let a = (row[col['data']] === undefined || row[col['data']] === null ? '' : row[col['data']]).toString();
-                            let b = (col['filter'] === undefined || row[col['filter']] === null ? '' : col['filter']).toString();
+                            let a = row[col['data']] === undefined || row[col['data']] === null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']].toString();
+                            let b = col['filter'] === undefined || col['filter'] === null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'].toString();
                             let matching = match(a, b, false);
                             if (!matching) {
                                 isFiltered = false;
@@ -1177,7 +1178,7 @@ function JsonTable(c = null) {
             for (let col of tableSettings['columns']) {
                 let element = col['filterElement'];
                 if (element) {
-                    element.addEventListeners(events, () => {
+                    element.addEventListeners(events, Util.debounce(() => {
                         let selectionStart = element.selectionStart;
                         let selectionEnd = element.selectionEnd;
                         setFilter(tableSettings['columns'].indexOf(col), element.value);
@@ -1187,7 +1188,7 @@ function JsonTable(c = null) {
                         element = tableSettings['columns'][tableSettings['columns'].indexOf(col)]['filterElement'];
                         element.setSelectionRange(selectionStart, selectionEnd);
                         element.focus();
-                    });
+                    }, tableSettings.filterDebounceDelay));
                 }
             }
         }

@@ -3,6 +3,20 @@ import './HTMLElement/HTMLElement.js'
 function Util() {
 };
 
+Util.isObjectOrArray = function (arg) {
+	return arg !== null && ( typeof arg === 'object' || Array.isArray(arg) );
+}
+
+Util.debounce = function(func, delay) {
+	let timeout;
+	return async function (...args) {
+		clearTimeout(timeout);
+		timeout = setTimeout(function(){
+			func.apply(this, args);
+		}, delay);
+	};
+}
+
 Util.newElement = function (type, attributes) {
 	let e = document.createElement(type);
 	if (attributes !== null && typeof attributes === 'object') {

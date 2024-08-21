@@ -91,7 +91,8 @@ function JsonTable(c = null) {
         removedStyle: {
             "text-decoration": "line-through",
             "text-decoration-color": "hsl(0, 100%, 30%)"
-        }
+        },
+		filterDebounceDelay: 500
     };
     var tableSettings = tableDefaultSettings;
 
@@ -391,8 +392,8 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let a = (row[col['data']] === undefined || row[col['data']] === null ? '' : row[col['data']]).toString();
-                            let b = (col['filter'] === undefined || row[col['filter']] === null ? '' : col['filter']).toString();
+                            let a = row[col['data']] === undefined || row[col['data']] === null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']].toString();
+                            let b = col['filter'] === undefined || col['filter'] === null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'].toString();
                             let matching = match(a, b, false);
                             if (!matching) {
                                 isFiltered = false;
@@ -421,8 +422,8 @@ function JsonTable(c = null) {
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
                 let sortedData = tableData.sort((a, b) => {
-                    let aValue = a[data] === undefined || a[data] === null ? '' : a[data].toString();
-                    let bValue = b[data] === undefined || b[data] === null ? '' : b[data].toString();
+                    let aValue = a[data] === undefined || a[data] === null ? '' : Util.isObjectOrArray(a[data]) ? JSON.stringify(a[data]) : a[data].toString();
+                    let bValue = b[data] === undefined || b[data] === null ? '' : Util.isObjectOrArray(b[data]) ? JSON.stringify(b[data]) : b[data].toString();
                     if (typeof aValue === 'boolean' || typeof bValue === 'boolean') {
                         if (aValue === bValue) {
                             return 0;
@@ -1175,7 +1176,7 @@ function JsonTable(c = null) {
             for (let col of tableSettings['columns']) {
                 let element = col['filterElement'];
                 if (element) {
-                    element.addEventListeners(events, () => {
+                    element.addEventListeners(events, Util.debounce(() => {
                         let selectionStart = element.selectionStart;
                         let selectionEnd = element.selectionEnd;
                         setFilter(tableSettings['columns'].indexOf(col), element.value);
@@ -1185,7 +1186,7 @@ function JsonTable(c = null) {
                         element = tableSettings['columns'][tableSettings['columns'].indexOf(col)]['filterElement'];
                         element.setSelectionRange(selectionStart, selectionEnd);
                         element.focus();
-                    });
+                    }, tableSettings.filterDebounceDelay));
                 }
             }
         }
@@ -1265,6 +1266,20 @@ JsonTable.removeKeys = function (arr, keys) {
 
 function Util() {
 };
+
+Util.isObjectOrArray = function (arg) {
+	return arg !== null && ( typeof arg === 'object' || Array.isArray(arg) );
+}
+
+Util.debounce = function(func, delay) {
+	let timeout;
+	return async function (...args) {
+		clearTimeout(timeout);
+		timeout = setTimeout(function(){
+			func.apply(this, args);
+		}, delay);
+	};
+}
 
 Util.newElement = function (type, attributes) {
     let e = document.createElement(type);
