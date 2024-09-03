@@ -94,7 +94,8 @@ function JsonTable(c = null) {
             "text-decoration": "line-through",
             "text-decoration-color": "hsl(0, 100%, 30%)"
         },
-		filterDebounceDelay: 500
+		filterDebounceDelay: 500,
+        negationChar: "`"
     };
     var tableSettings = tableDefaultSettings;
 
@@ -904,7 +905,7 @@ function JsonTable(c = null) {
                     let inclusionSet = [];
 
                     for (let value of values) {
-                        if (value.startsWith("-")) {
+                        if (value.startsWith(tableSettings['negationChar'])) {
                             exclusionSet.push(value.substring(1));
                         } else {
                             inclusionSet.push(value);
