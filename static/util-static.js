@@ -654,13 +654,13 @@ function JsonTable(c = null) {
                 let selectedRows = tableData.filter(row => row['###row-selected']);
                 let noOfSelected = selectedRows.length;
                 if (tableSettings['multiSelect'] == true && haveSelection) {
-                    output = Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                    output = Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                         .appendContent(
                             Util.newElement('div', (noOfSelected > 0 ? {} : { style: 'display:none' }))
                                 .appendContent(tableSettings.noOfSelected + noOfSelected.toString())
                         )
                         .appendContent(
-                            Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                            Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(
                                     Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                         .addEventListeners('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
@@ -706,13 +706,13 @@ function JsonTable(c = null) {
             try {
                 let editedRows = tableData.filter(row => row['###row-edited']);
                 let noOfEdited = editedRows.length;
-                output = Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                output = Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                     .appendContentIf(
                         tableSettings.noOfEdited + noOfEdited
                         , edited
                     )
                     .appendContentIf(
-                        Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
                                 Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                     .addEventListeners('click', (event) => { resetData(); refreshTable(); })
@@ -736,9 +736,9 @@ function JsonTable(c = null) {
         let output = null;
         if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
             try {
-                output = Util.newElement('div', { style: Util.toStyleString(tableSettings['paginationGroupStyle']) })
+                output = Util.newElement('div', { style: Util.objToStyle(tableSettings['paginationGroupStyle']) })
                     .appendContent(
-                        Util.newElement('div', { style: Util.toStyleString({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.newElement('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
                                 Util.newElement('div', null)
                                     //toBeginingButton
@@ -760,7 +760,7 @@ function JsonTable(c = null) {
                                     .appendContent(
                                         Util.newElement('input', {
                                             type: 'text',
-                                            style: Util.toStyleString({
+                                            style: Util.objToStyle({
                                                 'text-align': 'center',
                                                 'padding': '3px 8px',
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
@@ -776,7 +776,7 @@ function JsonTable(c = null) {
                                     .appendContent(
                                         Util.newElement('input', {
                                             type: 'text',
-                                            style: Util.toStyleString({
+                                            style: Util.objToStyle({
                                                 'text-align': 'center',
                                                 'padding': '3px 8px',
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
@@ -987,7 +987,7 @@ function JsonTable(c = null) {
                                 Util.newElement('td', { class: col['class'] })
                                     .appendContent(
                                         Util.newElement('div', {
-                                            style: Util.toStyleString(headerStyle),
+                                            style: Util.objToStyle(headerStyle),
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
                                             .addEventListenersIf('click', () => {
@@ -1017,7 +1017,7 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let filters = Util.newElement('tr', null);
                         tableSettings['columns'].forEach((col) => {
-                            let filterStyle = Util.toStyleString({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
+                            let filterStyle = Util.objToStyle({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
                             let filterValue = col['filter'] || '';
                             col['filterElement'] = Util.newElement('input', {
                                 ...{ style: 'display:block; ' + filterStyle, value: filterValue, placeholder: (col['filterPlaceholder'] || '') }
@@ -1048,7 +1048,7 @@ function JsonTable(c = null) {
                                 let tableRow = null;
                                 if (!row['###row-removed']) {
                                     try {
-                                        tableRow = Util.newElement('tr', row['###row-inserted'] ? { style: Util.toStyleString(tableSettings.insertedStyle) } : null);
+                                        tableRow = Util.newElement('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
 
                                         tableSettings['columns'].forEach((col) => {
                                             var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
@@ -1059,11 +1059,11 @@ function JsonTable(c = null) {
                                                 }
                                             }
                                             tableRow.appendContent(
-                                                Util.newElement('td', { class: col['class'], style: Util.toStyleString({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                Util.newElement('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                     .appendContent(cellData)
                                                     .appendContentIf(Util.newElement('br'), row['###row-edited'])
                                                     .appendContentIf(
-                                                        Util.newElement('span', { style: Util.toStyleString(tableSettings.editedStyle) })
+                                                        Util.newElement('span', { style: Util.objToStyle(tableSettings.editedStyle) })
                                                             .appendContentIf('(' + row['###ori-' + col['data']] + ')', (row['###ori-' + col['data']] != undefined && row['###ori-' + col['data']] != null)),
                                                         row['###row-edited']
                                                     )
@@ -1085,9 +1085,9 @@ function JsonTable(c = null) {
                                                     }
                                                 }
                                                 tableRow.appendContent(
-                                                    Util.newElement('td', { class: col['class'], style: Util.toStyleString({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                    Util.newElement('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                         .appendContent(
-                                                            Util.newElement('span', { style: Util.toStyleString(tableSettings.removedStyle) })
+                                                            Util.newElement('span', { style: Util.objToStyle(tableSettings.removedStyle) })
                                                                 .appendContent(cellData)
                                                         )
                                                 )
@@ -1110,14 +1110,14 @@ function JsonTable(c = null) {
                 }
 
                 try {
-                    output = Util.newElement('div', { style: Util.toStyleString({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
+                    output = Util.newElement('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
                         .appendContent(
-                            Util.newElement('div', { style: Util.toStyleString({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                            Util.newElement('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(Util.newElement('div', null).appendContent(tableSettings['label']))
                                 .appendContent(Util.newElement('div', { style: 'flex:1' }))
                                 .appendContent(
-                                    Util.newElement('div', { style: Util.toStyleString(tableSettings['actionsGroupStyle']) }).appendContent(
-                                        Util.newElement('div', { style: Util.toStyleString({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
+                                    Util.newElement('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
+                                        Util.newElement('div', { style: Util.objToStyle({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
                                             .appendContentIf(createSelectingGroup(), tableSettings['showSelectingGroup'])
                                             .appendContent(createEditedGroup())
                                             .appendContent(createResetFiltersButton())
@@ -1128,7 +1128,7 @@ function JsonTable(c = null) {
                                         style: 'width:100%;overflow:auto;' + (tableSettings['maxHeight'] ? " max-height:" + tableSettings['maxHeight'] + ";" : "")
                                     }).appendContent(
                                         Util.newElement('table', {
-                                            style: Util.toStyleString({
+                                            style: Util.objToStyle({
                                                 'width': '100%',
                                                 'height': 'min-content',
                                                 'border-collapse': 'collapse'
@@ -1282,115 +1282,147 @@ Util.debounce = function(func, delay) {
 	};
 }
 
-Util.newElement = function (type, attributes) {
-    let e = document.createElement(type);
-    if (attributes !== null && typeof attributes === 'object') {
-        for (let key in attributes) {
-            if (attributes.hasOwnProperty(key)) {
-                e.setAttribute(key, attributes[key]);
-            }
-        }
-    }
-    return e;
+Util.newElement = function (type, attributes = null) {
+	let e = document.createElement(type);
+	if (attributes !== null && typeof attributes === 'object') {
+		for (let key in attributes) {
+			if (attributes.hasOwnProperty(key)) {
+				e.setAttribute(key, attributes[key]);
+			}
+		}
+	}
+	return e;
 };
 
-Util.toStyleString = function (obj) {
-    var output = null;
-    try {
-        output = '';
-        for (let key in (obj || {})) {
-            output += (output ? ' ' : '') + key + ':' + obj[key] + ';';
-        }
-    } catch (error) {
-        throw new Error("error caught @ toStyleString(" + obj + "): " + error);
-    }
-    return output;
+Util.objToStyle = function (obj) {
+	var output = null;
+	try {
+		output = '';
+		for (let key in (obj || {})) {
+			output += (output ? ' ' : '') + key + ':' + obj[key] + ';';
+		}
+	} catch (error) {
+		throw new Error("error caught @ objToStyle(" + obj + "): " + error);
+	}
+	return output;
+};
+
+Util.styleToObj = function (style) {
+	var output = null;
+	try {
+		output = {};
+        var styles = style.split(';');
+        styles.forEach(function(style) {
+            if (style.trim()) {
+                var parts = style.split(':');
+                var key = parts[0].trim();
+                var value = parts[1].trim();
+                output[key] = value;
+            }
+        });
+	} catch (error) {
+		throw new Error("error caught @ styleToObj(" + style + "): " + error);
+	}
+	return output;
 };
 
 Util.downloadAsCsv = function (jsonData = null, fileName = 'data.csv', delimiter = ',') {
-    if (jsonData) {
+	try {
+		if (jsonData) {
 
-        var jsonToCsv = function (jsonData) {
-            let csv = '';
-            let headers = Object.keys(jsonData[0]).sort((a, b) => { return a.localeCompare(b); });
-            // Add the data
-            jsonData.forEach(function (row) {
-                let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
-                csv += (csv == '' ? '' : '\n') + data;
-            });
-            // Get the headers
-            csv = headers.join(delimiter) + '\n' + csv;
-            return csv;
-        }
+			var jsonToCsv = function (jsonData) {
+				let csv = '';
+				let headers = Object.keys(jsonData[0]).sort((a, b) => { return a.localeCompare(b); });
+				// Add the data
+				jsonData.forEach(function (row) {
+					let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
+					csv += (csv == '' ? '' : '\n') + data;
+				});
+				// Get the headers
+				csv = headers.join(delimiter) + '\n' + csv;
+				return csv;
+			}
 
-        // Convert JSON data to CSV
-        let csvData = jsonToCsv(jsonData);
-        // Create a CSV file and allow the user to download it
-        let blob = new Blob([csvData], { type: 'text/csv' });
-        let url = window.URL.createObjectURL(blob);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        // Clean up
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+			// Convert JSON data to CSV
+			let csvData = jsonToCsv(jsonData);
+			// Create a CSV file and allow the user to download it
+			let blob = new Blob([csvData], { type: 'text/csv' });
+			let url = window.URL.createObjectURL(blob);
+			let a = document.createElement('a');
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+			a.click();
+			// Clean up
+			document.body.removeChild(a);
+			window.URL.revokeObjectURL(url);
 
-    }
+		}
+	} catch (error) {
+		throw new Error("error caught @ downloadAsCsv: " + error);
+	}
 }
 
 Util.clone = function (input) {
-    if (Array.isArray(input)) {
-        return input.map(Util.clone);
-    } else if (typeof input === 'object' && input !== null) {
-        if (input instanceof Node) {
-            return input;
-        }
-        let output = {};
-        for (let key in input) {
-            if (input.hasOwnProperty(key)) {
-                output[key] = Util.clone(input[key]);
-            }
-        }
-        return output;
-    } else {
-        return input;
-    }
+	if (Array.isArray(input)) {
+		return input.map(Util.clone);
+	} else if (typeof input === 'object' && input !== null) {
+		if (input instanceof Node) {
+			return input;
+		}
+		let output = {};
+		for (let key in input) {
+			if (input.hasOwnProperty(key)) {
+				output[key] = Util.clone(input[key]);
+			}
+		}
+		return output;
+	} else {
+		return input;
+	}
 }
 
 Util.openBlob = function (blob) {
-    let url = null;
-    try {
-        url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-    } catch (error) {
-        console.error('Error opening blob:', error);
-    } finally {
-        if (url) {
-            URL.revokeObjectURL(url);
-        }
-    }
+	let url = null;
+	try {
+		url = URL.createObjectURL(blob);
+		window.open(url, '_blank');
+	} catch (error) {
+		console.error('Error opening blob:', error);
+	} finally {
+		if (url) {
+			URL.revokeObjectURL(url);
+		}
+	}
 }
 
 Util.downloadBlob = function (blob, filename = 'filename') {
-    let url = null;
-    try {
-        url = URL.createObjectURL(blob);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-    } catch (error) {
-        console.error('Error downloading blob:', error);
-    } finally {
-        if (url) {
-            URL.revokeObjectURL(url);
-        }
-    }
+	let url = null;
+	try {
+		url = URL.createObjectURL(blob);
+		let a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+	} catch (error) {
+		console.error('Error downloading blob:', error);
+	} finally {
+		if (url) {
+			URL.revokeObjectURL(url);
+		}
+	}
 }
+
+Util.get = function (selector) {
+	if (selector != null && selector.trim().startsWith("#")) {
+		return document.querySelector(selector);
+	} else {
+		return document.querySelectorAll(selector);
+	}
+};
+
 
 HTMLElement.prototype.hide = function () {
     if (this) {
@@ -1470,13 +1502,13 @@ HTMLElement.prototype.appendContentIf = function (content, condition = true) {
     return this;
 };
 
-HTMLElement.prototype.appendContentFor = function (list, funcValue = function (item) { return item; }, funcCondition = function (item) { return true; }) {
+HTMLElement.prototype.appendContentOf = function (list, funcValue = function (item) { return item; }, funcCondition = function (item) { return true; }) {
     try {
         for (let item of list) {
             this.appendContentIf(funcValue(item), funcCondition(item));
         }
     } catch (error) {
-        throw ("@ appendContentFor(" + list + ", " + func + "): " + error);
+        throw ("@ appendContentOf(" + list + ", " + func + "): " + error);
     }
 }
 
@@ -1486,7 +1518,7 @@ HTMLElement.prototype.appendFileElement = function (name, attributes) {
             .appendContent(
                 Util.newElement('div', {
                     ...{
-                        'style': Util.toStyleString({
+                        'style': Util.objToStyle({
                             'width': 'calc(100% - 4px)',
                             'padding': '1px',
                             'border': 'hsl(0 0 90) solid 1px',
@@ -1505,7 +1537,7 @@ HTMLElement.prototype.appendFileElement = function (name, attributes) {
                             ...{
                                 'type': 'file',
                                 'name': name,
-                                'style': Util.toStyleString(
+                                'style': Util.objToStyle(
                                     { 'width': 'calc(100% - 30px)' },
                                 )
                             },
@@ -1516,7 +1548,7 @@ HTMLElement.prototype.appendFileElement = function (name, attributes) {
                         Util.newElement('button', {
                             ...{
                                 'type': 'button',
-                                'style': Util.toStyleString({
+                                'style': Util.objToStyle({
                                     'width': '30px',
                                     'height': '20px',
                                     'display': 'flex',
@@ -1547,7 +1579,7 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
     };
 
     let files = Util.newElement('div', {
-        ...{ style: Util.toStyleString(columnElementStyle) },
+        ...{ style: Util.objToStyle(columnElementStyle) },
         ...(attributes['files'] || {})
     });
 
@@ -1560,7 +1592,7 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
             if (max == null || files.children.length < max) {
                 files.appendFileElement(name, {
                     ...{
-                        container: { style: Util.toStyleString({ 'width': '100%', 'padding-bottom': '3px' }) }
+                        container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
                     },
                     ...(attributes['file'] || {})
                 });
@@ -1578,7 +1610,7 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
     for (let i = 0; i < initial; i++) {
         files.appendFileElement(name, {
             ...{
-                container: { style: Util.toStyleString({ 'width': '100%', 'padding-bottom': '3px' }) }
+                container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
             },
             ...(attributes['file'] || {})
         })
@@ -1586,7 +1618,7 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
 
     this.appendContent(
         Util.newElement('div', (attributes['container'] || {})).appendContent(
-            Util.newElement('div', { ...{ style: Util.toStyleString(columnElementStyle) }, ...(attributes['subContainer'] || {}) })
+            Util.newElement('div', { ...{ style: Util.objToStyle(columnElementStyle) }, ...(attributes['subContainer'] || {}) })
                 .appendContent(files)
                 .appendContent(addButton)
         )
@@ -1598,4 +1630,36 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
 HTMLElement.prototype.preventDefault = function (eventType) {
     this.addEventListener(eventType, function (event) { event.preventDefault(); });
     return this;
+}
+
+HTMLElement.prototype.attr = function (name, assignment = null) {
+    if (assignment == null) {
+        return this.getAttribute(name);
+    } else {
+        if (assignment == 'unset') {
+            this.removeAttribute(name);
+        } else {
+            this.setAttribute(name, assignment);
+        }
+        return this;
+    }
+}
+
+HTMLElement.prototype.css = function (name = null, assignment = null) {
+    if (name == null) {
+        return this.attr('style');
+    } else {
+        let obj = Util.styleToObj(this.attr('style'))
+        if (assignment == null) {
+            return obj == null ? null : obj[name];
+        } else {
+            if (assignment == 'unset') {
+                delete obj[name];
+            } else {
+                obj[name] = assignment;
+            }
+            this.attr('style', Util.objToStyle(obj));
+            return this;
+        }
+    }
 }

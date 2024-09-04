@@ -71,10 +71,10 @@
 		var myTable = null;
 		try {
 
-			myTable = new JsonTable(document.getElementById('container'))
+			myTable = new JsonTable(Util.get('#container'))
 
 			// demo changing container, here unnecessary
-			myTable.setContainer(document.getElementById('container'));
+			myTable.setContainer(Util.get('#container'));
 
 			// set the data for the table
 			var dataSource = JSON.parse('[{"name": "Bob", "age": 30, "title": "Manager", "location": "New York", "datetimeOfBirth": "1993-05-11 14:56:07"}, {"name": "Charlie", "age": 20, "title": "Designer", "location": "Los Angeles", "datetimeOfBirth": "2003-02-18 23:22:42"}, {"name": "Alice", "age": 25, "title": "Engineer", "location": "San Francisco", "datetimeOfBirth": "1998-11-27 04:34:23"}, {"name": "David", "age": 28, "title": "Developer", "location": "Chicago", "datetimeOfBirth": "1995-09-21 08:43:17"}, {"name": "Emily", "age": 35, "title": "Director", "location": "Seattle", "datetimeOfBirth": "1988-08-30 03:12:34"}, {"name": "Frank", "age": 22, "title": "Intern", "location": "Boston", "datetimeOfBirth": "2001-07-09 19:27:56"}, {"name": "Grace", "age": 27, "title": "Analyst", "location": "Austin", "datetimeOfBirth": "1996-01-04 10:15:51"}, {"name": "Henry", "age": 33, "title": "Consultant", "location": "Washington, D.C.", "datetimeOfBirth": "1989-12-25 22:48:09"}, {"name": "Isabella", "age": 24, "title": "Programmer", "location": "San Diego", "datetimeOfBirth": "1999-06-15 16:39:14"}, {"name": "Jacob", "age": 29, "title": "Salesperson", "location": "Houston", "datetimeOfBirth": "1994-03-28 07:59:32"}, {"name": "Katie", "age": 26, "title": "Marketing Manager", "location": "Denver", "datetimeOfBirth": "1997-10-08 12:27:45"}, {"name": "Liam", "age": 32, "title": "Product Manager", "location": "Atlanta", "datetimeOfBirth": "1991-02-02 02:18:23"}, {"name": "Mia", "age": 23, "title": "Researcher", "location": "Miami", "datetimeOfBirth": "2000-04-23 21:11:37"}, {"name": "Noah", "age": 31, "title": "Data Scientist", "location": "Philadelphia", "datetimeOfBirth": "1992-07-06 15:55:12"}, {"name": "Olivia", "age": 21, "title": "Writer", "location": "Portland", "datetimeOfBirth": "2002-12-17 06:38:54"}]');
@@ -159,15 +159,15 @@
 
 			// fill the table with data
 			myTable.fillTable();
-			document.getElementById('selected').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected()), 'selected.csv', ','); });
-			document.getElementById('filtered').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered()), 'filtered.csv', ','); });
-			document.getElementById('edited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getEdited()), 'edited.csv', ','); });
-			document.getElementById('selectedfiltered').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getFiltered())), 'selectedFiltered.csv', ','); });
-			document.getElementById('selectededited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getEdited())), 'selectedEdited.csv', ','); });
-			document.getElementById('filterededited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered(myTable.getEdited())), 'filteredEdited.csv', ','); });
-			document.getElementById('inserted').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getInserted()), 'inserted.csv', ','); });
-			document.getElementById('removed').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getRemoved()), 'removed.csv', ','); });
-			document.getElementById('insert').addEventListeners('click', () => { myTable.insertData({ "name": "", "age": 0, "title": "", "location": "", "datetimeOfBirth": "" }).sortAsOriginal() });
+			Util.get('#selected').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected()), 'selected.csv', ','); });
+			Util.get('#filtered').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered()), 'filtered.csv', ','); });
+			Util.get('#edited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getEdited()), 'edited.csv', ','); });
+			Util.get('#selectedfiltered').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getFiltered())), 'selectedFiltered.csv', ','); });
+			Util.get('#selectededited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getEdited())), 'selectedEdited.csv', ','); });
+			Util.get('#filterededited').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered(myTable.getEdited())), 'filteredEdited.csv', ','); });
+			Util.get('#inserted').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getInserted()), 'inserted.csv', ','); });
+			Util.get('#removed').addEventListeners('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getRemoved()), 'removed.csv', ','); });
+			Util.get('#insert').addEventListeners('click', () => { myTable.insertData({ "name": "", "age": 0, "title": "", "location": "", "datetimeOfBirth": "" }).sortAsOriginal() });
 
 		} catch (e) { console.log(e); }
 	</script>

@@ -44,8 +44,8 @@
 	<script type="module">
 		import { Util } from "../../../modules/Util/index.js";
 
-		var unwrapped = document.getElementById("unwrapped");
-		var wrapped = document.getElementById("wrapped");
+		var unwrapped = Util.get("#unwrapped");
+		var wrapped = Util.get("#wrapped");
 
 		function update(source, target, wrap) {
 			let text = source.value;

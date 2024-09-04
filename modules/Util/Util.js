@@ -4,20 +4,20 @@ function Util() {
 };
 
 Util.isObjectOrArray = function (arg) {
-	return arg !== null && ( typeof arg === 'object' || Array.isArray(arg) );
+	return arg !== null && (typeof arg === 'object' || Array.isArray(arg));
 }
 
-Util.debounce = function(func, delay) {
+Util.debounce = function (func, delay) {
 	let timeout;
 	return async function (...args) {
 		clearTimeout(timeout);
-		timeout = setTimeout(function(){
+		timeout = setTimeout(function () {
 			func.apply(this, args);
 		}, delay);
 	};
 }
 
-Util.newElement = function (type, attributes) {
+Util.newElement = function (type, attributes = null) {
 	let e = document.createElement(type);
 	if (attributes !== null && typeof attributes === 'object') {
 		for (let key in attributes) {
@@ -29,7 +29,7 @@ Util.newElement = function (type, attributes) {
 	return e;
 };
 
-Util.toStyleString = function (obj) {
+Util.objToStyle = function (obj) {
 	var output = null;
 	try {
 		output = '';
@@ -37,7 +37,26 @@ Util.toStyleString = function (obj) {
 			output += (output ? ' ' : '') + key + ':' + obj[key] + ';';
 		}
 	} catch (error) {
-		throw new Error("error caught @ toStyleString(" + obj + "): " + error);
+		throw new Error("error caught @ objToStyle(" + obj + "): " + error);
+	}
+	return output;
+};
+
+Util.styleToObj = function (style) {
+	var output = null;
+	try {
+		output = {};
+		var styles = style.split(';');
+		styles.forEach(function (style) {
+			if (style.trim()) {
+				var parts = style.split(':');
+				var key = parts[0].trim();
+				var value = parts[1].trim();
+				output[key] = value;
+			}
+		});
+	} catch (error) {
+		throw new Error("error caught @ styleToObj(" + style + "): " + error);
 	}
 	return output;
 };
@@ -130,5 +149,13 @@ Util.downloadBlob = function (blob, filename = 'filename') {
 		}
 	}
 }
+
+Util.get = function (selector) {
+	if (selector != null && selector.trim().startsWith("#")) {
+		return document.querySelector(selector);
+	} else {
+		return document.querySelectorAll(selector);
+	}
+};
 
 export { Util };

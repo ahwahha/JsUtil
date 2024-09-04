@@ -78,13 +78,13 @@ HTMLElement.prototype.appendContentIf = function (content, condition = true) {
     return this;
 };
 
-HTMLElement.prototype.appendContentFor = function (list, funcValue = function (item) { return item; }, funcCondition = function (item) { return true; }) {
+HTMLElement.prototype.appendContentOf = function (list, funcValue = function (item) { return item; }, funcCondition = function (item) { return true; }) {
     try {
         for (let item of list) {
             this.appendContentIf(funcValue(item), funcCondition(item));
         }
     } catch (error) {
-        throw ("@ appendContentFor(" + list + ", " + func + "): " + error);
+        throw ("@ appendContentOf(" + list + ", " + func + "): " + error);
     }
 }
 
@@ -94,7 +94,7 @@ HTMLElement.prototype.appendFileElement = function (name, attributes) {
             .appendContent(
                 Util.newElement('div', {
                     ...{
-                        'style': Util.toStyleString({
+                        'style': Util.objToStyle({
                             'width': 'calc(100% - 4px)',
                             'padding': '1px',
                             'border': 'hsl(0 0 90) solid 1px',
@@ -113,7 +113,7 @@ HTMLElement.prototype.appendFileElement = function (name, attributes) {
                             ...{
                                 'type': 'file',
                                 'name': name,
-                                'style': Util.toStyleString(
+                                'style': Util.objToStyle(
                                     { 'width': 'calc(100% - 30px)' },
                                 )
                             },
@@ -124,7 +124,7 @@ HTMLElement.prototype.appendFileElement = function (name, attributes) {
                         Util.newElement('button', {
                             ...{
                                 'type': 'button',
-                                'style': Util.toStyleString({
+                                'style': Util.objToStyle({
                                     'width': '30px',
                                     'height': '20px',
                                     'display': 'flex',
@@ -155,7 +155,7 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
     };
 
     let files = Util.newElement('div', {
-        ...{ style: Util.toStyleString(columnElementStyle) },
+        ...{ style: Util.objToStyle(columnElementStyle) },
         ...(attributes['files'] || {})
     });
 
@@ -168,7 +168,7 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
             if (max == null || files.children.length < max) {
                 files.appendFileElement(name, {
                     ...{
-                        container: { style: Util.toStyleString({ 'width': '100%', 'padding-bottom': '3px' }) }
+                        container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
                     },
                     ...(attributes['file'] || {})
                 });
@@ -186,7 +186,7 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
     for (let i = 0; i < initial; i++) {
         files.appendFileElement(name, {
             ...{
-                container: { style: Util.toStyleString({ 'width': '100%', 'padding-bottom': '3px' }) }
+                container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
             },
             ...(attributes['file'] || {})
         })
@@ -194,7 +194,7 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
 
     this.appendContent(
         Util.newElement('div', (attributes['container'] || {})).appendContent(
-            Util.newElement('div', { ...{ style: Util.toStyleString(columnElementStyle) }, ...(attributes['subContainer'] || {}) })
+            Util.newElement('div', { ...{ style: Util.objToStyle(columnElementStyle) }, ...(attributes['subContainer'] || {}) })
                 .appendContent(files)
                 .appendContent(addButton)
         )
@@ -206,4 +206,36 @@ HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max
 HTMLElement.prototype.preventDefault = function (eventType) {
     this.addEventListener(eventType, function (event) { event.preventDefault(); });
     return this;
+}
+
+HTMLElement.prototype.attr = function (name, assignment = null) {
+    if (assignment == null) {
+        return this.getAttribute(name);
+    } else {
+        if (assignment == 'unset') {
+            this.removeAttribute(name);
+        } else {
+            this.setAttribute(name, assignment);
+        }
+        return this;
+    }
+}
+
+HTMLElement.prototype.css = function (name = null, assignment = null) {
+    if (name == null) {
+        return this.attr('style');
+    } else {
+        let obj = Util.styleToObj(this.attr('style'))
+        if (assignment == null) {
+            return obj == null ? null : obj[name];
+        } else {
+            if (assignment == 'unset') {
+                delete obj[name];
+            } else {
+                obj[name] = assignment;
+            }
+            this.attr('style', Util.objToStyle(obj));
+            return this;
+        }
+    }
 }

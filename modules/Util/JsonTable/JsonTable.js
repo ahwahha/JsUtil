@@ -656,13 +656,13 @@ function JsonTable(c = null) {
                 let selectedRows = tableData.filter(row => row['###row-selected']);
                 let noOfSelected = selectedRows.length;
                 if (tableSettings['multiSelect'] == true && haveSelection) {
-                    output = Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                    output = Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                         .appendContent(
                             Util.newElement('div', (noOfSelected > 0 ? {} : { style: 'display:none' }))
                                 .appendContent(tableSettings.noOfSelected + noOfSelected.toString())
                         )
                         .appendContent(
-                            Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                            Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(
                                     Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                         .addEventListeners('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
@@ -708,13 +708,13 @@ function JsonTable(c = null) {
             try {
                 let editedRows = tableData.filter(row => row['###row-edited']);
                 let noOfEdited = editedRows.length;
-                output = Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                output = Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                     .appendContentIf(
                         tableSettings.noOfEdited + noOfEdited
                         , edited
                     )
                     .appendContentIf(
-                        Util.newElement('div', { style: Util.toStyleString({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
                                 Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                     .addEventListeners('click', (event) => { resetData(); refreshTable(); })
@@ -738,9 +738,9 @@ function JsonTable(c = null) {
         let output = null;
         if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
             try {
-                output = Util.newElement('div', { style: Util.toStyleString(tableSettings['paginationGroupStyle']) })
+                output = Util.newElement('div', { style: Util.objToStyle(tableSettings['paginationGroupStyle']) })
                     .appendContent(
-                        Util.newElement('div', { style: Util.toStyleString({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.newElement('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
                                 Util.newElement('div', null)
                                     //toBeginingButton
@@ -762,7 +762,7 @@ function JsonTable(c = null) {
                                     .appendContent(
                                         Util.newElement('input', {
                                             type: 'text',
-                                            style: Util.toStyleString({
+                                            style: Util.objToStyle({
                                                 'text-align': 'center',
                                                 'padding': '3px 8px',
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
@@ -778,7 +778,7 @@ function JsonTable(c = null) {
                                     .appendContent(
                                         Util.newElement('input', {
                                             type: 'text',
-                                            style: Util.toStyleString({
+                                            style: Util.objToStyle({
                                                 'text-align': 'center',
                                                 'padding': '3px 8px',
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
@@ -989,7 +989,7 @@ function JsonTable(c = null) {
                                 Util.newElement('td', { class: col['class'] })
                                     .appendContent(
                                         Util.newElement('div', {
-                                            style: Util.toStyleString(headerStyle),
+                                            style: Util.objToStyle(headerStyle),
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
                                             .addEventListenersIf('click', () => {
@@ -1019,7 +1019,7 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let filters = Util.newElement('tr', null);
                         tableSettings['columns'].forEach((col) => {
-                            let filterStyle = Util.toStyleString({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
+                            let filterStyle = Util.objToStyle({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
                             let filterValue = col['filter'] || '';
                             col['filterElement'] = Util.newElement('input', {
                                 ...{ style: 'display:block; ' + filterStyle, value: filterValue, placeholder: (col['filterPlaceholder'] || '') }
@@ -1050,7 +1050,7 @@ function JsonTable(c = null) {
                                 let tableRow = null;
                                 if (!row['###row-removed']) {
                                     try {
-                                        tableRow = Util.newElement('tr', row['###row-inserted'] ? { style: Util.toStyleString(tableSettings.insertedStyle) } : null);
+                                        tableRow = Util.newElement('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
 
                                         tableSettings['columns'].forEach((col) => {
                                             var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
@@ -1061,11 +1061,11 @@ function JsonTable(c = null) {
                                                 }
                                             }
                                             tableRow.appendContent(
-                                                Util.newElement('td', { class: col['class'], style: Util.toStyleString({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                Util.newElement('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                     .appendContent(cellData)
                                                     .appendContentIf(Util.newElement('br'), row['###row-edited'])
                                                     .appendContentIf(
-                                                        Util.newElement('span', { style: Util.toStyleString(tableSettings.editedStyle) })
+                                                        Util.newElement('span', { style: Util.objToStyle(tableSettings.editedStyle) })
                                                             .appendContentIf('(' + row['###ori-' + col['data']] + ')', (row['###ori-' + col['data']] != undefined && row['###ori-' + col['data']] != null)),
                                                         row['###row-edited']
                                                     )
@@ -1087,9 +1087,9 @@ function JsonTable(c = null) {
                                                     }
                                                 }
                                                 tableRow.appendContent(
-                                                    Util.newElement('td', { class: col['class'], style: Util.toStyleString({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                    Util.newElement('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                         .appendContent(
-                                                            Util.newElement('span', { style: Util.toStyleString(tableSettings.removedStyle) })
+                                                            Util.newElement('span', { style: Util.objToStyle(tableSettings.removedStyle) })
                                                                 .appendContent(cellData)
                                                         )
                                                 )
@@ -1112,14 +1112,14 @@ function JsonTable(c = null) {
                 }
 
                 try {
-                    output = Util.newElement('div', { style: Util.toStyleString({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
+                    output = Util.newElement('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
                         .appendContent(
-                            Util.newElement('div', { style: Util.toStyleString({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                            Util.newElement('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(Util.newElement('div', null).appendContent(tableSettings['label']))
                                 .appendContent(Util.newElement('div', { style: 'flex:1' }))
                                 .appendContent(
-                                    Util.newElement('div', { style: Util.toStyleString(tableSettings['actionsGroupStyle']) }).appendContent(
-                                        Util.newElement('div', { style: Util.toStyleString({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
+                                    Util.newElement('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
+                                        Util.newElement('div', { style: Util.objToStyle({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
                                             .appendContentIf(createSelectingGroup(), tableSettings['showSelectingGroup'])
                                             .appendContent(createEditedGroup())
                                             .appendContent(createResetFiltersButton())
@@ -1130,7 +1130,7 @@ function JsonTable(c = null) {
                                         style: 'width:100%;overflow:auto;' + (tableSettings['maxHeight'] ? " max-height:" + tableSettings['maxHeight'] + ";" : "")
                                     }).appendContent(
                                         Util.newElement('table', {
-                                            style: Util.toStyleString({
+                                            style: Util.objToStyle({
                                                 'width': '100%',
                                                 'height': 'min-content',
                                                 'border-collapse': 'collapse'

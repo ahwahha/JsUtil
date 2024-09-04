@@ -8,7 +8,7 @@
     <div style="color: hsl(0 0 80);">container width 100% (within padding and border):</div>
     <div id="container" style="width:calc(100% - 12px); padding: 5px; border: hsl(0 0 80) dashed 1px;">
         <script id='here' type="module">
-            let here = document.getElementById('here');
+            let here = Util.get('#here');
             import { Util } from "../../../modules/Util/index.js";
             here.parentElement
                 .appendContent(
