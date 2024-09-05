@@ -225,7 +225,8 @@ HTMLElement.prototype.css = function (name = null, assignment = null) {
     if (name == null) {
         return this.attr('style');
     } else {
-        let obj = Util.styleToObj(this.attr('style'))
+        this.attr('style', this.attr('style') == null ? '' : this.attr('style'));
+        let obj = Util.styleToObj(this.attr('style'));
         if (assignment == null) {
             return obj == null ? null : obj[name];
         } else {
