@@ -1,6 +1,6 @@
 function JsonTable(c = null) {
 
-    var container = c;
+    var container = c instanceof Util ? c : new Util(c);
     var tableData = null;
     var originalTableData = null;
     var haveSelection = false;
@@ -48,8 +48,8 @@ function JsonTable(c = null) {
         selectAllEdited: 'Select all edited',
         editFilter: 'Edit filter value:',
         toBegining: '<<',
-        previousPage: Util.newElement('span', { style: 'padding:0px 8px;' }).appendContent('<'),
-        nextPage: Util.newElement('span', { style: 'padding:0px 8px;' }).appendContent('>'),
+        previousPage: Util.create('span', { style: 'padding:0px 8px;' }).appendContent('<'),
+        nextPage: Util.create('span', { style: 'padding:0px 8px;' }).appendContent('>'),
         toEnding: '>>',
         headersStyle: {
             "border-radius": "5px",
@@ -101,7 +101,7 @@ function JsonTable(c = null) {
         if (container) {
             container.clear();
         }
-        container = c;
+        container = c instanceof Util ? c : new Util(c);
         return this;
     }
 
@@ -423,8 +423,8 @@ function JsonTable(c = null) {
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
                 let sortedData = tableData.sort((a, b) => {
-                    let aValue = a[data] === undefined || a[data] === null ? '' : Util.isObjectOrArray(a[data]) ? JSON.stringify(a[data]) : a[data].toString();
-                    let bValue = b[data] === undefined || b[data] === null ? '' : Util.isObjectOrArray(b[data]) ? JSON.stringify(b[data]) : b[data].toString();
+                    let aValue = a[data] === undefined || a[data] === null ? '' : a[data].toString();
+                    let bValue = b[data] === undefined || b[data] === null ? '' : b[data].toString();
                     if (typeof aValue === 'boolean' || typeof bValue === 'boolean') {
                         if (aValue === bValue) {
                             return 0;
@@ -617,8 +617,8 @@ function JsonTable(c = null) {
             if (!haveSelection) {
                 haveSelection = true;
             }
-            let output = Util.newElement('input', { ...{ type: 'checkbox' }, ...(row['###row-selected'] ? { checked: '' } : {}) })
-                .addEventListeners('click', (event) => {
+            let output = Util.create('input', { ...{ type: 'checkbox' }, ...(row['###row-selected'] ? { checked: '' } : {}) })
+                .addEventHandler('click', (event) => {
                     if (typeof tableSettings['multiSelect'] === "boolean" && !tableSettings['multiSelect']) {
                         setAllSelected(false);
                     }
@@ -636,8 +636,8 @@ function JsonTable(c = null) {
             if (!haveRemoval) {
                 haveRemoval = true;
             }
-            let output = Util.newElement('input', { ...{ type: 'checkbox' }, ...(row['###row-removed'] ? { checked: '' } : {}) })
-                .addEventListeners('click', (event) => {
+            let output = Util.create('input', { ...{ type: 'checkbox' }, ...(row['###row-removed'] ? { checked: '' } : {}) })
+                .addEventHandler('click', (event) => {
                     setRemoved(row['###row-index'], event.target.checked);
                     refreshTable();
                 });
@@ -654,26 +654,26 @@ function JsonTable(c = null) {
                 let selectedRows = tableData.filter(row => row['###row-selected']);
                 let noOfSelected = selectedRows.length;
                 if (tableSettings['multiSelect'] == true && haveSelection) {
-                    output = Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                    output = Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                         .appendContent(
-                            Util.newElement('div', (noOfSelected > 0 ? {} : { style: 'display:none' }))
+                            Util.create('div', (noOfSelected > 0 ? {} : { style: 'display:none' }))
                                 .appendContent(tableSettings.noOfSelected + noOfSelected.toString())
                         )
                         .appendContent(
-                            Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                            Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(
-                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventListeners('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
+                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        .addEventHandler('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllFiltered)
                                 )
                                 .appendContent(
-                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventListeners('click', (event) => { setAllFilteredSelected(false); refreshTable(); })
+                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        .addEventHandler('click', (event) => { setAllFilteredSelected(false); refreshTable(); })
                                         .appendContent(tableSettings.unselectAllFiltered)
                                 )
                                 .appendContentIf(
-                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventListeners('click', (event) => { setAllEditedSelected(true); refreshTable(); })
+                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        .addEventHandler('click', (event) => { setAllEditedSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllEdited)
                                     , edited
                                 )
@@ -690,8 +690,8 @@ function JsonTable(c = null) {
         let output = null;
         if (tableSettings != null) {
             try {
-                output = Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                    .addEventListeners('click', (event) => { resetFilters(); filterRows(); resetPageNumbers(); refreshTable(); })
+                output = Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                    .addEventHandler('click', (event) => { resetFilters(); filterRows(); resetPageNumbers(); refreshTable(); })
                     .appendContent(tableSettings.resetFilters);
             } catch (err) {
                 throw new Error("error caught @ createResetFiltersButton() - " + err);
@@ -706,21 +706,21 @@ function JsonTable(c = null) {
             try {
                 let editedRows = tableData.filter(row => row['###row-edited']);
                 let noOfEdited = editedRows.length;
-                output = Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                output = Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                     .appendContentIf(
                         tableSettings.noOfEdited + noOfEdited
                         , edited
                     )
                     .appendContentIf(
-                        Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
-                                Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                    .addEventListeners('click', (event) => { resetData(); refreshTable(); })
+                                Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                    .addEventHandler('click', (event) => { resetData(); refreshTable(); })
                                     .appendContent(tableSettings.resetData)
                             )
                             .appendContent(
-                                Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                    .addEventListeners('click', (event) => { resetSelectedData(); refreshTable(); })
+                                Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                    .addEventHandler('click', (event) => { resetSelectedData(); refreshTable(); })
                                     .appendContent(tableSettings.resetSelectedData)
                             )
                         , edited
@@ -736,29 +736,29 @@ function JsonTable(c = null) {
         let output = null;
         if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
             try {
-                output = Util.newElement('div', { style: Util.objToStyle(tableSettings['paginationGroupStyle']) })
+                output = Util.create('div', { style: Util.objToStyle(tableSettings['paginationGroupStyle']) })
                     .appendContent(
-                        Util.newElement('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
-                                Util.newElement('div', null)
+                                Util.create('div', null)
                                     //toBeginingButton
                                     .appendContent(
-                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventListeners('click', (event) => { toBegining(); refreshTable(); })
+                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                            .addEventHandler('click', (event) => { toBegining(); refreshTable(); })
                                             .appendContent(tableSettings['toBegining'])
                                     )
                                     //previousButton
                                     .appendContent(
-                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
-                                            .addEventListeners('click', (event) => { priviousPage(); refreshTable(); })
+                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                            .addEventHandler('click', (event) => { priviousPage(); refreshTable(); })
                                             .appendContent(tableSettings['previousPage'])
                                     )
                             )
                             .appendContent(
-                                Util.newElement('div', null)
+                                Util.create('div', null)
                                     //startInput
                                     .appendContent(
-                                        Util.newElement('input', {
+                                        Util.create('input', {
                                             type: 'text',
                                             style: Util.objToStyle({
                                                 'text-align': 'center',
@@ -766,15 +766,15 @@ function JsonTable(c = null) {
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['start']
-                                        }).addEventListeners('change', (event) => { setStart(event.target.value); refreshTable(); })
+                                        }).addEventHandler('change', (event) => { setStart(event.target.value); refreshTable(); })
                                     )
                                     .appendContent(
-                                        Util.newElement('span', { style: 'margin: 0px 5px;' })
+                                        Util.create('span', { style: 'margin: 0px 5px;' })
                                             .appendContent('-')
                                     )
                                     //endInput
                                     .appendContent(
-                                        Util.newElement('input', {
+                                        Util.create('input', {
                                             type: 'text',
                                             style: Util.objToStyle({
                                                 'text-align': 'center',
@@ -782,27 +782,27 @@ function JsonTable(c = null) {
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['end']
-                                        }).addEventListeners('change', (event) => { setEnd(event.target.value); refreshTable(); })
+                                        }).addEventHandler('change', (event) => { setEnd(event.target.value); refreshTable(); })
                                     )
                                     .appendContent(
-                                        Util.newElement('span', { style: 'margin: 0px 5px;' })
+                                        Util.create('span', { style: 'margin: 0px 5px;' })
                                             .appendContent('/')
                                     )
                                     .appendContent(getFiltered().length)
                             )
                             .appendContent(
-                                Util.newElement('div', null)
+                                Util.create('div', null)
                                     //toBeginingButton
                                     .appendContent(
-                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventListeners('click', (event) => { nextPage(); refreshTable(); })
+                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                            .addEventHandler('click', (event) => { nextPage(); refreshTable(); })
                                             .appendContent(tableSettings['nextPage'])
                                     )
                                     //previousButton
                                     .appendContent(
-                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
                                             .preventDefault('click')
-                                            .addEventListeners('click', (event) => { toEnding(); refreshTable(); })
+                                            .addEventHandler('click', (event) => { toEnding(); refreshTable(); })
                                             .appendContent(tableSettings['toEnding'])
                                     )
                             )
@@ -975,33 +975,33 @@ function JsonTable(c = null) {
                 sortRows();
                 filterRows();
 
-                let tbody = Util.newElement('tbody', null);
+                let tbody = Util.create('tbody', null);
 
                 /* headers */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        let headers = Util.newElement('tr', null);
+                        let headers = Util.create('tr', null);
                         tableSettings['columns'].forEach((col) => {
                             let headerStyle = { ...(tableSettings['headersStyle'] || {}), ...(col['headerStyle'] || {}) };
                             headers.appendContent(
-                                Util.newElement('td', { class: col['class'] })
+                                Util.create('td', { class: col['class'] })
                                     .appendContent(
-                                        Util.newElement('div', {
+                                        Util.create('div', {
                                             style: Util.objToStyle(headerStyle),
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
-                                            .addEventListenersIf('click', () => {
+                                            .addEventHandlerIf('click', () => {
                                                 setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
                                                 refreshTable();
                                             }, col['sortable'])
                                             .appendContent(
-                                                Util.newElement('div', { style: 'flex:1;' })
+                                                Util.create('div', { style: 'flex:1;' })
                                             )
                                             .appendContent(
                                                 col.header + (tableSettings['sortedBy'] === col['data'] ? (tableSettings['ascending'] ? '▲' : '▼') : '')
                                             )
                                             .appendContent(
-                                                Util.newElement('div', { style: 'flex:1;' })
+                                                Util.create('div', { style: 'flex:1;' })
                                             )
                                     )
                             )
@@ -1015,15 +1015,15 @@ function JsonTable(c = null) {
                 /* filters */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        let filters = Util.newElement('tr', null);
+                        let filters = Util.create('tr', null);
                         tableSettings['columns'].forEach((col) => {
                             let filterStyle = Util.objToStyle({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
                             let filterValue = col['filter'] || '';
-                            col['filterElement'] = Util.newElement('input', {
+                            col['filterElement'] = Util.create('input', {
                                 ...{ style: 'display:block; ' + filterStyle, value: filterValue, placeholder: (col['filterPlaceholder'] || '') }
                                 , ...(col['filterEditable'] ? {} : { 'disabled': 'true' })
                             });
-                            filters.appendContent(Util.newElement('td', { class: col['class'] }).appendContent(col['filterElement']));
+                            filters.appendContent(Util.create('td', { class: col['class'] }).appendContent(col['filterElement']));
                         });
                         tbody.appendContent(filters);
                     }
@@ -1048,7 +1048,7 @@ function JsonTable(c = null) {
                                 let tableRow = null;
                                 if (!row['###row-removed']) {
                                     try {
-                                        tableRow = Util.newElement('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
+                                        tableRow = Util.create('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
 
                                         tableSettings['columns'].forEach((col) => {
                                             var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
@@ -1059,11 +1059,11 @@ function JsonTable(c = null) {
                                                 }
                                             }
                                             tableRow.appendContent(
-                                                Util.newElement('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                Util.create('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                     .appendContent(cellData)
-                                                    .appendContentIf(Util.newElement('br'), row['###row-edited'])
+                                                    .appendContentIf(Util.create('br'), row['###row-edited'])
                                                     .appendContentIf(
-                                                        Util.newElement('span', { style: Util.objToStyle(tableSettings.editedStyle) })
+                                                        Util.create('span', { style: Util.objToStyle(tableSettings.editedStyle) })
                                                             .appendContentIf('(' + row['###ori-' + col['data']] + ')', (row['###ori-' + col['data']] != undefined && row['###ori-' + col['data']] != null)),
                                                         row['###row-edited']
                                                     )
@@ -1074,7 +1074,7 @@ function JsonTable(c = null) {
                                     }
                                 } else {
                                     try {
-                                        tableRow = Util.newElement('tr', null);
+                                        tableRow = Util.create('tr', null);
                                         tableSettings['columns'].forEach((col) => {
                                             try {
                                                 var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
@@ -1085,9 +1085,9 @@ function JsonTable(c = null) {
                                                     }
                                                 }
                                                 tableRow.appendContent(
-                                                    Util.newElement('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                    Util.create('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                         .appendContent(
-                                                            Util.newElement('span', { style: Util.objToStyle(tableSettings.removedStyle) })
+                                                            Util.create('span', { style: Util.objToStyle(tableSettings.removedStyle) })
                                                                 .appendContent(cellData)
                                                         )
                                                 )
@@ -1110,24 +1110,24 @@ function JsonTable(c = null) {
                 }
 
                 try {
-                    output = Util.newElement('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
+                    output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
                         .appendContent(
-                            Util.newElement('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
-                                .appendContent(Util.newElement('div', null).appendContent(tableSettings['label']))
-                                .appendContent(Util.newElement('div', { style: 'flex:1' }))
+                            Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                                .appendContent(Util.create('div', null).appendContent(tableSettings['label']))
+                                .appendContent(Util.create('div', { style: 'flex:1' }))
                                 .appendContent(
-                                    Util.newElement('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
-                                        Util.newElement('div', { style: Util.objToStyle({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
+                                    Util.create('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
+                                        Util.create('div', { style: Util.objToStyle({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
                                             .appendContentIf(createSelectingGroup(), tableSettings['showSelectingGroup'])
                                             .appendContent(createEditedGroup())
                                             .appendContent(createResetFiltersButton())
                                     )
                                 )
                                 .appendContent(
-                                    Util.newElement('div', {
+                                    Util.create('div', {
                                         style: 'width:100%;overflow:auto;' + (tableSettings['maxHeight'] ? " max-height:" + tableSettings['maxHeight'] + ";" : "")
                                     }).appendContent(
-                                        Util.newElement('table', {
+                                        Util.create('table', {
                                             style: Util.objToStyle({
                                                 'width': '100%',
                                                 'height': 'min-content',
@@ -1149,7 +1149,7 @@ function JsonTable(c = null) {
 
     var fillTable = () => {
         try {
-            if (container) {
+            if (container != null) {
                 resetPageNumbers();
                 refreshTable();
             }
@@ -1172,22 +1172,27 @@ function JsonTable(c = null) {
     }
 
     var loadFilterHandlers = function () {
-        var events = ['change', 'keyup', 'dragend'];
+        var events = ['keyup', 'dragend'];
         if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
             for (let col of tableSettings['columns']) {
                 let element = col['filterElement'];
                 if (element) {
-                    element.addEventListeners(events, Util.debounce(() => {
-                        let selectionStart = element.selectionStart;
-                        let selectionEnd = element.selectionEnd;
-                        setFilter(tableSettings['columns'].indexOf(col), element.value);
-                        filterRows();
-                        resetPageNumbers();
-                        refreshTable();
-                        element = tableSettings['columns'][tableSettings['columns'].indexOf(col)]['filterElement'];
-                        element.setSelectionRange(selectionStart, selectionEnd);
-                        element.focus();
-                    }, tableSettings.filterDebounceDelay));
+                    element.addEventHandler(events,
+                        Util.debounce(
+                            (event) => {
+                                let selectionStart = element.entity().selectionStart;
+                                let selectionEnd = element.entity().selectionEnd;
+                                setFilter(tableSettings['columns'].indexOf(col), element.entity().value);
+                                filterRows();
+                                resetPageNumbers();
+                                refreshTable();
+                                let e = tableSettings['columns'][tableSettings['columns'].indexOf(col)]['filterElement'].entity();
+                                element.entity(e);
+                                e.setSelectionRange(selectionStart, selectionEnd);
+                                e.focus();
+                            }
+                            , tableSettings.filterDebounceDelay)
+                    );
                 }
             }
         }
@@ -1265,402 +1270,432 @@ JsonTable.removeKeys = function (arr, keys) {
     }
 }
 
-function Util() {
-};
+function Util(entity) {
+	this._entity = null;
+	if (entity !== null) {
+		if (typeof entity == 'string') {
+			if (entity.trim().startsWith("#")) {
+				this._entity = document.querySelector(entity);
+			} else {
+				this._entity = document.querySelectorAll(entity);
+			}
+			return this;
+		} else if (entity instanceof HTMLElement) {
+			this._entity = entity;
+			return this;
+		} else if (entity instanceof Util) {
+			return entity;
+		}
+	}
+}
 
 Util.isObjectOrArray = function (arg) {
-    return arg !== null && (typeof arg === 'object' || Array.isArray(arg));
+	return arg !== null && (typeof arg === 'object' || Array.isArray(arg));
 }
 
 Util.debounce = function (func, delay) {
-    let timeout;
-    return async function (...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(function () {
-            func.apply(this, args);
-        }, delay);
-    };
+	let timeout;
+	return async function (...args) {
+		clearTimeout(timeout);
+		timeout = setTimeout(function () {
+			func.apply(this, args);
+		}, delay);
+	};
 }
 
-Util.newElement = function (type, attributes = null) {
-    let e = document.createElement(type);
-    if (attributes !== null && typeof attributes === 'object') {
-        for (let key in attributes) {
-            if (attributes.hasOwnProperty(key)) {
-                e.setAttribute(key, attributes[key]);
-            }
-        }
-    }
-    return e;
+Util.create = function (type, attributes = null) {
+	let e = document.createElement(type);
+	if (attributes !== null && typeof attributes === 'object') {
+		for (let key in attributes) {
+			if (attributes.hasOwnProperty(key)) {
+				e.setAttribute(key, attributes[key]);
+			}
+		}
+	}
+	return new Util(e);
 };
 
 Util.objToStyle = function (obj) {
-    var output = null;
-    try {
-        output = '';
-        for (let key in (obj || {})) {
-            output += (output ? ' ' : '') + key + ':' + obj[key] + ';';
-        }
-    } catch (error) {
-        throw new Error("error caught @ objToStyle(" + obj + "): " + error);
-    }
-    return output;
+	var output = null;
+	try {
+		output = '';
+		for (let key in (obj || {})) {
+			output += (output ? ' ' : '') + key + ':' + obj[key] + ';';
+		}
+	} catch (error) {
+		throw new Error("error caught @ objToStyle(" + obj + "): " + error);
+	}
+	return output;
 };
 
 Util.styleToObj = function (style) {
-    var output = null;
-    try {
-        output = {};
-        var styles = style.split(';');
-        styles.forEach(function (style) {
-            if (style.trim()) {
-                var parts = style.split(':');
-                var key = parts[0].trim();
-                var value = parts[1].trim();
-                output[key] = value;
-            }
-        });
-    } catch (error) {
-        throw new Error("error caught @ styleToObj(" + style + "): " + error);
-    }
-    return output;
+	var output = null;
+	try {
+		output = {};
+		var styles = style.split(';');
+		styles.forEach(function (style) {
+			if (style.trim()) {
+				var parts = style.split(':');
+				var key = parts[0].trim();
+				var value = parts[1].trim();
+				output[key] = value;
+			}
+		});
+	} catch (error) {
+		throw new Error("error caught @ styleToObj(" + style + "): " + error);
+	}
+	return output;
 };
 
 Util.downloadAsCsv = function (jsonData = null, fileName = 'data.csv', delimiter = ',') {
-    try {
-        if (jsonData) {
+	try {
+		if (jsonData && jsonData.length > 0) {
 
-            var jsonToCsv = function (jsonData) {
-                let csv = '';
-                let headers = Object.keys(jsonData[0]).sort((a, b) => { return a.localeCompare(b); });
-                // Add the data
-                jsonData.forEach(function (row) {
-                    let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
-                    csv += (csv == '' ? '' : '\n') + data;
-                });
-                // Get the headers
-                csv = headers.join(delimiter) + '\n' + csv;
-                return csv;
-            }
+			var jsonToCsv = function (jsonData) {
+				let csv = '';
+				let headers = Object.keys(jsonData[0]).sort((a, b) => { return a.localeCompare(b); });
+				// Add the data
+				jsonData.forEach(function (row) {
+					let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
+					csv += (csv == '' ? '' : '\n') + data;
+				});
+				// Get the headers
+				csv = headers.join(delimiter) + '\n' + csv;
+				return csv;
+			}
 
-            // Convert JSON data to CSV
-            let csvData = jsonToCsv(jsonData);
-            // Create a CSV file and allow the user to download it
-            let blob = new Blob([csvData], { type: 'text/csv' });
-            let url = window.URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            // Clean up
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
+			// Convert JSON data to CSV
+			let csvData = jsonToCsv(jsonData);
+			// Create a CSV file and allow the user to download it
+			let blob = new Blob([csvData], { type: 'text/csv' });
+			let url = window.URL.createObjectURL(blob);
+			let a = document.createElement('a');
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+			a.click();
+			// Clean up
+			document.body.removeChild(a);
+			window.URL.revokeObjectURL(url);
 
-        }
-    } catch (error) {
-        throw new Error("error caught @ downloadAsCsv: " + error);
-    }
+		}
+	} catch (error) {
+		throw new Error("error caught @ downloadAsCsv: " + error);
+	}
 }
 
 Util.clone = function (input) {
-    if (Array.isArray(input)) {
-        return input.map(Util.clone);
-    } else if (typeof input === 'object' && input !== null) {
-        if (input instanceof Node) {
-            return input;
-        }
-        let output = {};
-        for (let key in input) {
-            if (input.hasOwnProperty(key)) {
-                output[key] = Util.clone(input[key]);
-            }
-        }
-        return output;
-    } else {
-        return input;
-    }
+	if (Array.isArray(input)) {
+		return input.map(Util.clone);
+	} else if (typeof input === 'object' && input !== null) {
+		if (input instanceof Node) {
+			return input;
+		}
+		let output = {};
+		for (let key in input) {
+			if (input.hasOwnProperty(key)) {
+				output[key] = Util.clone(input[key]);
+			}
+		}
+		return output;
+	} else {
+		return input;
+	}
 }
 
 Util.openBlob = function (blob) {
-    let url = null;
-    try {
-        url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-    } catch (error) {
-        console.error('Error opening blob:', error);
-    } finally {
-        if (url) {
-            URL.revokeObjectURL(url);
-        }
-    }
+	let url = null;
+	try {
+		url = URL.createObjectURL(blob);
+		window.open(url, '_blank');
+	} catch (error) {
+		console.error('Error opening blob:', error);
+	} finally {
+		if (url) {
+			URL.revokeObjectURL(url);
+		}
+	}
 }
 
 Util.downloadBlob = function (blob, filename = 'filename') {
-    let url = null;
-    try {
-        url = URL.createObjectURL(blob);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-    } catch (error) {
-        console.error('Error downloading blob:', error);
-    } finally {
-        if (url) {
-            URL.revokeObjectURL(url);
-        }
-    }
+	let url = null;
+	try {
+		url = URL.createObjectURL(blob);
+		let a = document.createElement('a');
+		a.href = url;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+	} catch (error) {
+		console.error('Error downloading blob:', error);
+	} finally {
+		if (url) {
+			URL.revokeObjectURL(url);
+		}
+	}
 }
 
-Util.get = function (selector) {
-    if (selector != null && selector.trim().startsWith("#")) {
-        return document.querySelector(selector);
-    } else {
-        return document.querySelectorAll(selector);
-    }
-};
-
-
-HTMLElement.prototype.hide = function () {
-    if (this) {
-        this.style.display = 'none';
-    }
-    return this;
-};
-
-HTMLElement.prototype.show = function () {
-    if (this) {
-        this.style.display = 'revert';
-    }
-    return this;
-};
-
-HTMLElement.prototype.clear = function () {
-    this.innerHTML = '';
-    return this;
-};
-
-HTMLElement.prototype.fireEvent = function (event) {
-    this.dispatchEvent(new Event(event));
-    return this;
-};
-
-HTMLElement.prototype.addEventListeners = function (events, func) {
-    if (typeof events === 'string') {
-        this.addEventListener(events, func);
-    } else if (Array.isArray(events)) {
-        events.forEach((event) => {
-            if (typeof event === 'string') {
-                this.addEventListener(event, func);
-            } else {
-                throw 'invalid events in input list:' + e;
-            }
-        });
-    } else {
-        throw 'invalid event input list:' + e;
-    }
-    return this;
-};
-
-HTMLElement.prototype.addEventListenersIf = function (events, func, bool) {
-    if (bool) {
-        this.addEventListeners(events, func);
-    }
-    return this;
-};
-
-HTMLElement.prototype.appendContent = function (content) {
-    try {
-        if (content !== null && content !== undefined) {
-            if (typeof content === 'string') {
-                this.append(content);
-            } else if (typeof content === 'number') {
-                this.append(content);
-            } else if (content instanceof HTMLElement) {
-                this.appendChild(content);
-            } else {
-                throw 'content must be a string or number or HTMLElement.';
-            }
-        }
-    } catch (error) {
-        throw ("@ appendContent(" + content + "): " + error);
-    }
-    return this;
-};
-
-HTMLElement.prototype.appendContentIf = function (content, condition = true) {
-    try {
-        if (condition) {
-            this.appendContent(content);
-        }
-    } catch (error) {
-        throw ("@ appendContentIf(" + content + "): " + error);
-    }
-    return this;
-};
-
-HTMLElement.prototype.appendContentOf = function (list, funcValue = function (item) { return item; }, funcCondition = function (item) { return true; }) {
-    try {
-        for (let item of list) {
-            this.appendContentIf(funcValue(item), funcCondition(item));
-        }
-    } catch (error) {
-        throw ("@ appendContentOf(" + list + ", " + func + "): " + error);
-    }
+Util.prototype.parent = function () {
+	return new Util(this._entity.parentElement);
 }
 
-HTMLElement.prototype.appendFileElement = function (name, attributes) {
-    return this.appendContent(
-        Util.newElement('div', (attributes['container'] || {}))
-            .appendContent(
-                Util.newElement('div', {
-                    ...{
-                        'style': Util.objToStyle({
-                            'width': 'calc(100% - 4px)',
-                            'padding': '1px',
-                            'border': 'hsl(0 0 90) solid 1px',
-                            'border-radius': '4px',
-                            'display': 'flex',
-                            'flex-flow': 'row nowrap',
-                            'justify-content': 'flex-start',
-                            'align-items': 'center',
-                            'gap': '3px'
-                        })
-                    },
-                    ...(attributes['subContainer'] || {})
-                })
-                    .appendContent(
-                        Util.newElement('input', {
-                            ...{
-                                'type': 'file',
-                                'name': name,
-                                'style': Util.objToStyle(
-                                    { 'width': 'calc(100% - 30px)' },
-                                )
-                            },
-                            ...(attributes['input'])
-                        })
-                    )
-                    .appendContent(
-                        Util.newElement('button', {
-                            ...{
-                                'type': 'button',
-                                'style': Util.objToStyle({
-                                    'width': '30px',
-                                    'height': '20px',
-                                    'display': 'flex',
-                                    'flex-flow': 'row nowrap',
-                                    'justify-content': 'center',
-                                    'align-items': 'center',
-                                    'font-size': '15px',
-                                    'font-weight': 'bold'
-                                })
-                            },
-                            ...(attributes['removeButton'] || {})
-                        })
-                            .appendContent("✕")
-                            .addEventListeners('click', (event) => { event.target.parentElement.parentElement.remove(); })
-                    )
-            )
-    );
-};
-
-HTMLElement.prototype.appendFileGroup = function (name, attributes, initial, max) {
-
-    let columnElementStyle = {
-        'width': '100%',
-        'display': 'flex',
-        'flex-flow': 'column nowrap',
-        'justify-content': 'flex-start',
-        'align-items': 'flex-start'
-    };
-
-    let files = Util.newElement('div', {
-        ...{ style: Util.objToStyle(columnElementStyle) },
-        ...(attributes['files'] || {})
-    });
-
-    let addButton = Util.newElement('button', {
-        ...{ type: 'button' },
-        ...(attributes['addButton'] || {})
-    })
-        .appendContent("Add")
-        .addEventListeners('click', (event) => {
-            if (max == null || files.children.length < max) {
-                files.appendFileElement(name, {
-                    ...{
-                        container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
-                    },
-                    ...(attributes['file'] || {})
-                });
-            }
-        });
-
-    new MutationObserver(() => {
-        if (files.children.length < max && addButton.style.display === 'none') {
-            addButton.show();
-        } else if (files.children.length == max && addButton.style.display !== 'none') {
-            addButton.hide();
-        }
-    }).observe(files, { attributes: !true, childList: true, subtree: true })
-
-    for (let i = 0; i < initial; i++) {
-        files.appendFileElement(name, {
-            ...{
-                container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
-            },
-            ...(attributes['file'] || {})
-        })
-    }
-
-    this.appendContent(
-        Util.newElement('div', (attributes['container'] || {})).appendContent(
-            Util.newElement('div', { ...{ style: Util.objToStyle(columnElementStyle) }, ...(attributes['subContainer'] || {}) })
-                .appendContent(files)
-                .appendContent(addButton)
-        )
-    );
-
-    return this;
-};
-
-HTMLElement.prototype.preventDefault = function (eventType) {
-    this.addEventListener(eventType, function (event) { event.preventDefault(); });
-    return this;
+Util.prototype.entity = function (entity = null) {
+	if (entity == null) {
+		return this._entity;
+	} else {
+		this._entity = entity;
+		return this;
+	}
 }
 
-HTMLElement.prototype.attr = function (name, assignment = null) {
-    if (assignment == null) {
-        return this.getAttribute(name);
-    } else {
-        if (assignment == 'unset') {
-            this.removeAttribute(name);
-        } else {
-            this.setAttribute(name, assignment);
-        }
-        return this;
-    }
+Util.prototype.hide = function () {
+	if (this._entity) {
+		this._entity.style.display = 'none';
+	}
+	return this;
+};
+
+Util.prototype.show = function () {
+	if (this._entity) {
+		this._entity.style.display = 'revert';
+	}
+	return this;
+};
+
+Util.prototype.clear = function () {
+	if (this._entity) {
+		this._entity.innerHTML = '';
+	}
+	return this;
+};
+
+Util.prototype.fireEvent = function (event) {
+	if (this._entity) {
+		this._entity.dispatchEvent(new Event(event));
+	}
+	return this;
+};
+
+Util.prototype.addEventHandler = function (events, func) {
+	try {
+		if (typeof events === 'string') {
+			this._entity.addEventListener(events, func);
+		} else if (Array.isArray(events)) {
+			events.forEach((event) => {
+				if (typeof event === 'string') {
+					this._entity.addEventListener(event, func);
+				} else {
+					throw 'invalid events in input list:' + e;
+				}
+			});
+		} else {
+			throw 'invalid event input list:' + e;
+		}
+		return this;
+	} catch (e) {
+		throw '@ addEventHandler: ' + e;
+	}
+};
+
+Util.prototype.addEventHandlerIf = function (events, func, bool) {
+	if (bool) {
+		this.addEventHandler(events, func);
+	}
+	return this;
+};
+
+Util.prototype.appendContent = function (content) {
+	try {
+		if (content !== null && content !== undefined) {
+			if (typeof content === 'string') {
+				this._entity.append(content);
+			} else if (typeof content === 'number') {
+				this._entity.append(content);
+			} else if (content instanceof Util) {
+				this._entity.appendChild(content.entity());
+			} else if (content instanceof HTMLElement) {
+				this._entity.appendChild(content);
+			} else {
+				throw 'content must be a string or number or Util or HTMLElement';
+			}
+		}
+	} catch (error) {
+		throw ("@ appendContent(" + content + "): " + error);
+	}
+	return this;
+};
+
+Util.prototype.appendContentIf = function (content, condition = true) {
+	try {
+		if (condition) {
+			this.appendContent(content);
+		}
+	} catch (error) {
+		throw ("@ appendContentIf(" + content + "): " + error);
+	}
+	return this;
+};
+
+Util.prototype.appendContentOf = function (list, funcValue = function (item) { return item; }, funcCondition = function (item) { return true; }) {
+	try {
+		for (let item of list) {
+			this.appendContentIf(funcValue(item), funcCondition(item));
+		}
+	} catch (error) {
+		throw ("@ appendContentOf(" + list + ", " + func + "): " + error);
+	}
 }
 
-HTMLElement.prototype.css = function (name = null, assignment = null) {
-    if (name == null) {
-        return this.attr('style');
-    } else {
-        this.attr('style', this.attr('style') == null ? '' : this.attr('style'));
-        let obj = Util.styleToObj(this.attr('style'));
-        if (assignment == null) {
-            return obj == null ? null : obj[name];
-        } else {
-            if (assignment == 'unset') {
-                delete obj[name];
-            } else {
-                obj[name] = assignment;
-            }
-            this.attr('style', Util.objToStyle(obj));
-            return this;
-        }
-    }
+Util.prototype.appendFileElement = function (name, attributes) {
+	return this.appendContent(
+		Util.create('div', (attributes['container'] || {}))
+			.appendContent(
+				Util.create('div', {
+					...{
+						'style': Util.objToStyle({
+							'width': 'calc(100% - 4px)',
+							'padding': '1px',
+							'border': 'hsl(0 0 90) solid 1px',
+							'border-radius': '4px',
+							'display': 'flex',
+							'flex-flow': 'row nowrap',
+							'justify-content': 'flex-start',
+							'align-items': 'center',
+							'gap': '3px'
+						})
+					},
+					...(attributes['subContainer'] || {})
+				})
+					.appendContent(
+						Util.create('input', {
+							...{
+								'type': 'file',
+								'name': name,
+								'style': Util.objToStyle(
+									{ 'width': 'calc(100% - 30px)' },
+								)
+							},
+							...(attributes['input'])
+						})
+					)
+					.appendContent(
+						Util.create('button', {
+							...{
+								'type': 'button',
+								'style': Util.objToStyle({
+									'width': '30px',
+									'height': '20px',
+									'display': 'flex',
+									'flex-flow': 'row nowrap',
+									'justify-content': 'center',
+									'align-items': 'center',
+									'font-size': '15px',
+									'font-weight': 'bold'
+								})
+							},
+							...(attributes['removeButton'] || {})
+						})
+							.appendContent("✕")
+							.addEventHandler('click', (event) => { event.target.parentElement.parentElement.remove(); })
+					)
+			)
+	);
+};
+
+Util.prototype.appendFileGroup = function (name, attributes, initial, max) {
+
+	let columnElementStyle = {
+		'width': '100%',
+		'display': 'flex',
+		'flex-flow': 'column nowrap',
+		'justify-content': 'flex-start',
+		'align-items': 'flex-start'
+	};
+
+	let files = Util.create('div', {
+		...{ style: Util.objToStyle(columnElementStyle) },
+		...(attributes['files'] || {})
+	});
+
+	let addButton = Util.create('button', {
+		...{ type: 'button' },
+		...(attributes['addButton'] || {})
+	})
+		.appendContent("Add")
+		.addEventHandler('click', (event) => {
+			if (max == null || files.entity().children.length < max) {
+				files.appendFileElement(name, {
+					...{
+						container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
+					},
+					...(attributes['file'] || {})
+				});
+			}
+		});
+
+	new MutationObserver(() => {
+		if (files.entity().children.length < max && addButton.style.display === 'none') {
+			addButton.show();
+		} else if (files.entity().children.length == max && addButton.style.display !== 'none') {
+			addButton.hide();
+		}
+	}).observe(files.entity(), { attributes: !true, childList: true, subtree: true })
+
+	for (let i = 0; i < initial; i++) {
+		files.appendFileElement(name, {
+			...{
+				container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
+			},
+			...(attributes['file'] || {})
+		})
+	}
+
+	this.appendContent(
+		Util.create('div', (attributes['container'] || {})).appendContent(
+			Util.create('div', { ...{ style: Util.objToStyle(columnElementStyle) }, ...(attributes['subContainer'] || {}) })
+				.appendContent(files)
+				.appendContent(addButton)
+		)
+	);
+
+	return this;
+};
+
+Util.prototype.preventDefault = function (eventType) {
+	this.addEventHandler(eventType, function (event) { event.preventDefault(); });
+	return this;
+}
+
+Util.prototype.attr = function (name, assignment = null) {
+	if (assignment == null) {
+		return this._entity.getAttribute(name);
+	} else {
+		if (assignment == 'unset') {
+			this._entity.removeAttribute(name);
+		} else {
+			this._entity.setAttribute(name, assignment);
+		}
+		return this;
+	}
+}
+
+Util.prototype.css = function (name = null, assignment = null) {
+	if (name == null) {
+		return this.attr('style');
+	} else {
+		this.attr('style', this.attr('style') == null ? '' : this.attr('style'));
+		let obj = Util.styleToObj(this.attr('style'));
+		if (assignment == null) {
+			return obj == null ? null : obj[name];
+		} else {
+			if (assignment == 'unset') {
+				delete obj[name];
+			} else {
+				obj[name] = assignment;
+			}
+			this.attr('style', Util.objToStyle(obj));
+			return this;
+		}
+	}
 }

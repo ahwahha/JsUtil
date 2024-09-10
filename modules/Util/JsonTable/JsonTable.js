@@ -2,7 +2,7 @@ import { Util } from '../Util.js';
 
 function JsonTable(c = null) {
 
-    var container = c;
+    var container = c instanceof Util ? c : new Util(c);
     var tableData = null;
     var originalTableData = null;
     var haveSelection = false;
@@ -50,8 +50,8 @@ function JsonTable(c = null) {
         selectAllEdited: 'Select all edited',
         editFilter: 'Edit filter value:',
         toBegining: '<<',
-        previousPage: Util.newElement('span', { style: 'padding:0px 8px;' }).appendContent('<'),
-        nextPage: Util.newElement('span', { style: 'padding:0px 8px;' }).appendContent('>'),
+        previousPage: Util.create('span', { style: 'padding:0px 8px;' }).appendContent('<'),
+        nextPage: Util.create('span', { style: 'padding:0px 8px;' }).appendContent('>'),
         toEnding: '>>',
         headersStyle: {
             "border-radius": "5px",
@@ -94,7 +94,7 @@ function JsonTable(c = null) {
             "text-decoration": "line-through",
             "text-decoration-color": "hsl(0, 100%, 30%)"
         },
-		filterDebounceDelay: 500,
+        filterDebounceDelay: 500,
         negationChar: "`"
     };
     var tableSettings = tableDefaultSettings;
@@ -103,7 +103,7 @@ function JsonTable(c = null) {
         if (container) {
             container.clear();
         }
-        container = c;
+        container = c instanceof Util ? c : new Util(c);
         return this;
     }
 
@@ -619,8 +619,8 @@ function JsonTable(c = null) {
             if (!haveSelection) {
                 haveSelection = true;
             }
-            let output = Util.newElement('input', { ...{ type: 'checkbox' }, ...(row['###row-selected'] ? { checked: '' } : {}) })
-                .addEventListeners('click', (event) => {
+            let output = Util.create('input', { ...{ type: 'checkbox' }, ...(row['###row-selected'] ? { checked: '' } : {}) })
+                .addEventHandler('click', (event) => {
                     if (typeof tableSettings['multiSelect'] === "boolean" && !tableSettings['multiSelect']) {
                         setAllSelected(false);
                     }
@@ -638,8 +638,8 @@ function JsonTable(c = null) {
             if (!haveRemoval) {
                 haveRemoval = true;
             }
-            let output = Util.newElement('input', { ...{ type: 'checkbox' }, ...(row['###row-removed'] ? { checked: '' } : {}) })
-                .addEventListeners('click', (event) => {
+            let output = Util.create('input', { ...{ type: 'checkbox' }, ...(row['###row-removed'] ? { checked: '' } : {}) })
+                .addEventHandler('click', (event) => {
                     setRemoved(row['###row-index'], event.target.checked);
                     refreshTable();
                 });
@@ -656,26 +656,26 @@ function JsonTable(c = null) {
                 let selectedRows = tableData.filter(row => row['###row-selected']);
                 let noOfSelected = selectedRows.length;
                 if (tableSettings['multiSelect'] == true && haveSelection) {
-                    output = Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                    output = Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                         .appendContent(
-                            Util.newElement('div', (noOfSelected > 0 ? {} : { style: 'display:none' }))
+                            Util.create('div', (noOfSelected > 0 ? {} : { style: 'display:none' }))
                                 .appendContent(tableSettings.noOfSelected + noOfSelected.toString())
                         )
                         .appendContent(
-                            Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                            Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(
-                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventListeners('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
+                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        .addEventHandler('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllFiltered)
                                 )
                                 .appendContent(
-                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventListeners('click', (event) => { setAllFilteredSelected(false); refreshTable(); })
+                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        .addEventHandler('click', (event) => { setAllFilteredSelected(false); refreshTable(); })
                                         .appendContent(tableSettings.unselectAllFiltered)
                                 )
                                 .appendContentIf(
-                                    Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventListeners('click', (event) => { setAllEditedSelected(true); refreshTable(); })
+                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        .addEventHandler('click', (event) => { setAllEditedSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllEdited)
                                     , edited
                                 )
@@ -692,8 +692,8 @@ function JsonTable(c = null) {
         let output = null;
         if (tableSettings != null) {
             try {
-                output = Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                    .addEventListeners('click', (event) => { resetFilters(); filterRows(); resetPageNumbers(); refreshTable(); })
+                output = Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                    .addEventHandler('click', (event) => { resetFilters(); filterRows(); resetPageNumbers(); refreshTable(); })
                     .appendContent(tableSettings.resetFilters);
             } catch (err) {
                 throw new Error("error caught @ createResetFiltersButton() - " + err);
@@ -708,21 +708,21 @@ function JsonTable(c = null) {
             try {
                 let editedRows = tableData.filter(row => row['###row-edited']);
                 let noOfEdited = editedRows.length;
-                output = Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                output = Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                     .appendContentIf(
                         tableSettings.noOfEdited + noOfEdited
                         , edited
                     )
                     .appendContentIf(
-                        Util.newElement('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
-                                Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                    .addEventListeners('click', (event) => { resetData(); refreshTable(); })
+                                Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                    .addEventHandler('click', (event) => { resetData(); refreshTable(); })
                                     .appendContent(tableSettings.resetData)
                             )
                             .appendContent(
-                                Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                    .addEventListeners('click', (event) => { resetSelectedData(); refreshTable(); })
+                                Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                    .addEventHandler('click', (event) => { resetSelectedData(); refreshTable(); })
                                     .appendContent(tableSettings.resetSelectedData)
                             )
                         , edited
@@ -738,29 +738,29 @@ function JsonTable(c = null) {
         let output = null;
         if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
             try {
-                output = Util.newElement('div', { style: Util.objToStyle(tableSettings['paginationGroupStyle']) })
+                output = Util.create('div', { style: Util.objToStyle(tableSettings['paginationGroupStyle']) })
                     .appendContent(
-                        Util.newElement('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
-                                Util.newElement('div', null)
+                                Util.create('div', null)
                                     //toBeginingButton
                                     .appendContent(
-                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventListeners('click', (event) => { toBegining(); refreshTable(); })
+                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                            .addEventHandler('click', (event) => { toBegining(); refreshTable(); })
                                             .appendContent(tableSettings['toBegining'])
                                     )
                                     //previousButton
                                     .appendContent(
-                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
-                                            .addEventListeners('click', (event) => { priviousPage(); refreshTable(); })
+                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                            .addEventHandler('click', (event) => { priviousPage(); refreshTable(); })
                                             .appendContent(tableSettings['previousPage'])
                                     )
                             )
                             .appendContent(
-                                Util.newElement('div', null)
+                                Util.create('div', null)
                                     //startInput
                                     .appendContent(
-                                        Util.newElement('input', {
+                                        Util.create('input', {
                                             type: 'text',
                                             style: Util.objToStyle({
                                                 'text-align': 'center',
@@ -768,15 +768,15 @@ function JsonTable(c = null) {
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['start']
-                                        }).addEventListeners('change', (event) => { setStart(event.target.value); refreshTable(); })
+                                        }).addEventHandler('change', (event) => { setStart(event.target.value); refreshTable(); })
                                     )
                                     .appendContent(
-                                        Util.newElement('span', { style: 'margin: 0px 5px;' })
+                                        Util.create('span', { style: 'margin: 0px 5px;' })
                                             .appendContent('-')
                                     )
                                     //endInput
                                     .appendContent(
-                                        Util.newElement('input', {
+                                        Util.create('input', {
                                             type: 'text',
                                             style: Util.objToStyle({
                                                 'text-align': 'center',
@@ -784,27 +784,27 @@ function JsonTable(c = null) {
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['end']
-                                        }).addEventListeners('change', (event) => { setEnd(event.target.value); refreshTable(); })
+                                        }).addEventHandler('change', (event) => { setEnd(event.target.value); refreshTable(); })
                                     )
                                     .appendContent(
-                                        Util.newElement('span', { style: 'margin: 0px 5px;' })
+                                        Util.create('span', { style: 'margin: 0px 5px;' })
                                             .appendContent('/')
                                     )
                                     .appendContent(getFiltered().length)
                             )
                             .appendContent(
-                                Util.newElement('div', null)
+                                Util.create('div', null)
                                     //toBeginingButton
                                     .appendContent(
-                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventListeners('click', (event) => { nextPage(); refreshTable(); })
+                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                            .addEventHandler('click', (event) => { nextPage(); refreshTable(); })
                                             .appendContent(tableSettings['nextPage'])
                                     )
                                     //previousButton
                                     .appendContent(
-                                        Util.newElement('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
                                             .preventDefault('click')
-                                            .addEventListeners('click', (event) => { toEnding(); refreshTable(); })
+                                            .addEventHandler('click', (event) => { toEnding(); refreshTable(); })
                                             .appendContent(tableSettings['toEnding'])
                                     )
                             )
@@ -977,33 +977,33 @@ function JsonTable(c = null) {
                 sortRows();
                 filterRows();
 
-                let tbody = Util.newElement('tbody', null);
+                let tbody = Util.create('tbody', null);
 
                 /* headers */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        let headers = Util.newElement('tr', null);
+                        let headers = Util.create('tr', null);
                         tableSettings['columns'].forEach((col) => {
                             let headerStyle = { ...(tableSettings['headersStyle'] || {}), ...(col['headerStyle'] || {}) };
                             headers.appendContent(
-                                Util.newElement('td', { class: col['class'] })
+                                Util.create('td', { class: col['class'] })
                                     .appendContent(
-                                        Util.newElement('div', {
+                                        Util.create('div', {
                                             style: Util.objToStyle(headerStyle),
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
-                                            .addEventListenersIf('click', () => {
+                                            .addEventHandlerIf('click', () => {
                                                 setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
                                                 refreshTable();
                                             }, col['sortable'])
                                             .appendContent(
-                                                Util.newElement('div', { style: 'flex:1;' })
+                                                Util.create('div', { style: 'flex:1;' })
                                             )
                                             .appendContent(
                                                 col.header + (tableSettings['sortedBy'] === col['data'] ? (tableSettings['ascending'] ? '▲' : '▼') : '')
                                             )
                                             .appendContent(
-                                                Util.newElement('div', { style: 'flex:1;' })
+                                                Util.create('div', { style: 'flex:1;' })
                                             )
                                     )
                             )
@@ -1017,15 +1017,15 @@ function JsonTable(c = null) {
                 /* filters */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        let filters = Util.newElement('tr', null);
+                        let filters = Util.create('tr', null);
                         tableSettings['columns'].forEach((col) => {
                             let filterStyle = Util.objToStyle({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
                             let filterValue = col['filter'] || '';
-                            col['filterElement'] = Util.newElement('input', {
+                            col['filterElement'] = Util.create('input', {
                                 ...{ style: 'display:block; ' + filterStyle, value: filterValue, placeholder: (col['filterPlaceholder'] || '') }
                                 , ...(col['filterEditable'] ? {} : { 'disabled': 'true' })
                             });
-                            filters.appendContent(Util.newElement('td', { class: col['class'] }).appendContent(col['filterElement']));
+                            filters.appendContent(Util.create('td', { class: col['class'] }).appendContent(col['filterElement']));
                         });
                         tbody.appendContent(filters);
                     }
@@ -1050,7 +1050,7 @@ function JsonTable(c = null) {
                                 let tableRow = null;
                                 if (!row['###row-removed']) {
                                     try {
-                                        tableRow = Util.newElement('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
+                                        tableRow = Util.create('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
 
                                         tableSettings['columns'].forEach((col) => {
                                             var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
@@ -1061,11 +1061,11 @@ function JsonTable(c = null) {
                                                 }
                                             }
                                             tableRow.appendContent(
-                                                Util.newElement('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                Util.create('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                     .appendContent(cellData)
-                                                    .appendContentIf(Util.newElement('br'), row['###row-edited'])
+                                                    .appendContentIf(Util.create('br'), row['###row-edited'])
                                                     .appendContentIf(
-                                                        Util.newElement('span', { style: Util.objToStyle(tableSettings.editedStyle) })
+                                                        Util.create('span', { style: Util.objToStyle(tableSettings.editedStyle) })
                                                             .appendContentIf('(' + row['###ori-' + col['data']] + ')', (row['###ori-' + col['data']] != undefined && row['###ori-' + col['data']] != null)),
                                                         row['###row-edited']
                                                     )
@@ -1076,7 +1076,7 @@ function JsonTable(c = null) {
                                     }
                                 } else {
                                     try {
-                                        tableRow = Util.newElement('tr', null);
+                                        tableRow = Util.create('tr', null);
                                         tableSettings['columns'].forEach((col) => {
                                             try {
                                                 var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
@@ -1087,9 +1087,9 @@ function JsonTable(c = null) {
                                                     }
                                                 }
                                                 tableRow.appendContent(
-                                                    Util.newElement('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                    Util.create('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                         .appendContent(
-                                                            Util.newElement('span', { style: Util.objToStyle(tableSettings.removedStyle) })
+                                                            Util.create('span', { style: Util.objToStyle(tableSettings.removedStyle) })
                                                                 .appendContent(cellData)
                                                         )
                                                 )
@@ -1112,24 +1112,24 @@ function JsonTable(c = null) {
                 }
 
                 try {
-                    output = Util.newElement('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
+                    output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
                         .appendContent(
-                            Util.newElement('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
-                                .appendContent(Util.newElement('div', null).appendContent(tableSettings['label']))
-                                .appendContent(Util.newElement('div', { style: 'flex:1' }))
+                            Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                                .appendContent(Util.create('div', null).appendContent(tableSettings['label']))
+                                .appendContent(Util.create('div', { style: 'flex:1' }))
                                 .appendContent(
-                                    Util.newElement('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
-                                        Util.newElement('div', { style: Util.objToStyle({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
+                                    Util.create('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
+                                        Util.create('div', { style: Util.objToStyle({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
                                             .appendContentIf(createSelectingGroup(), tableSettings['showSelectingGroup'])
                                             .appendContent(createEditedGroup())
                                             .appendContent(createResetFiltersButton())
                                     )
                                 )
                                 .appendContent(
-                                    Util.newElement('div', {
+                                    Util.create('div', {
                                         style: 'width:100%;overflow:auto;' + (tableSettings['maxHeight'] ? " max-height:" + tableSettings['maxHeight'] + ";" : "")
                                     }).appendContent(
-                                        Util.newElement('table', {
+                                        Util.create('table', {
                                             style: Util.objToStyle({
                                                 'width': '100%',
                                                 'height': 'min-content',
@@ -1151,7 +1151,7 @@ function JsonTable(c = null) {
 
     var fillTable = () => {
         try {
-            if (container) {
+            if (container != null) {
                 resetPageNumbers();
                 refreshTable();
             }
@@ -1174,22 +1174,27 @@ function JsonTable(c = null) {
     }
 
     var loadFilterHandlers = function () {
-        var events = ['change', 'keyup', 'dragend'];
+        var events = ['keyup', 'dragend'];
         if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
             for (let col of tableSettings['columns']) {
                 let element = col['filterElement'];
                 if (element) {
-                    element.addEventListeners(events, Util.debounce(() => {
-                        let selectionStart = element.selectionStart;
-                        let selectionEnd = element.selectionEnd;
-                        setFilter(tableSettings['columns'].indexOf(col), element.value);
-                        filterRows();
-                        resetPageNumbers();
-                        refreshTable();
-                        element = tableSettings['columns'][tableSettings['columns'].indexOf(col)]['filterElement'];
-                        element.setSelectionRange(selectionStart, selectionEnd);
-                        element.focus();
-                    }, tableSettings.filterDebounceDelay));
+                    element.addEventHandler(events,
+                        Util.debounce(
+                            (event) => {
+                                let selectionStart = element.entity().selectionStart;
+                                let selectionEnd = element.entity().selectionEnd;
+                                setFilter(tableSettings['columns'].indexOf(col), element.entity().value);
+                                filterRows();
+                                resetPageNumbers();
+                                refreshTable();
+                                let e = tableSettings['columns'][tableSettings['columns'].indexOf(col)]['filterElement'].entity();
+                                element.entity(e);
+                                e.setSelectionRange(selectionStart, selectionEnd);
+                                e.focus();
+                            }
+                            , tableSettings.filterDebounceDelay)
+                    );
                 }
             }
         }
