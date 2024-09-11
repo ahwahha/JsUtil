@@ -1493,15 +1493,15 @@ Util.prototype.addEventHandler = function (events, func) {
 				if (typeof event === 'string') {
 					this._entity.addEventListener(event, func);
 				} else {
-					throw 'invalid events in input list:' + e;
+					throw 'invalid events in input list:' + events;
 				}
 			});
 		} else {
-			throw 'invalid event input list:' + e;
+			throw 'invalid event input list:' + events;
 		}
 		return this;
-	} catch (e) {
-		throw '@ addEventHandler: ' + e;
+	} catch (error) {
+		throw '@ addEventHandler: ' + error;
 	}
 };
 
@@ -1668,6 +1668,29 @@ Util.prototype.appendFileGroup = function (name, attributes, initial, max) {
 
 	return this;
 };
+
+Util.prototype.appendSelect = function (items) {
+	let select = Util.create('select');
+	if (items && Array.isArray(items) && items.length > 0) {
+		for (let i = 0; i < items.length; i++) {
+			let option = Util.create('option');
+			if (typeof items[i] === "object" && items[i] !== null) {
+				for (let attr in items[i]) {
+					if (attr === 'content') {
+						option.appendContent(items[i][attr]);
+					} else if (attr === 'eventHandler') {
+						option.addEventHandler(attr['events'], attr['func']);
+					} else {
+						option.attr(attr, items[i][attr]);
+					}
+				}
+			}
+			select.appendContent(option);
+		}
+        this.appendContent(select);
+	}
+	return this;
+}
 
 Util.prototype.preventDefault = function (eventType) {
 	this.addEventHandler(eventType, function (event) { event.preventDefault(); });
