@@ -2,7 +2,7 @@ import './Util.js'
 
 function Util(entity) {
     this._entity = null;
-    if (entity !== null) {
+    if (entity != null) {
         if (typeof entity == 'string') {
             return Util.get(entity);
         } else if (entity instanceof HTMLElement) {
@@ -27,7 +27,7 @@ Util.get = function (selector) {
 }
 
 Util.isObjectOrArray = function (arg) {
-    return arg !== null && (typeof arg === 'object' || Array.isArray(arg));
+    return arg != null && (typeof arg === 'object' || Array.isArray(arg));
 }
 
 Util.debounce = function (func, delay) {
@@ -254,7 +254,7 @@ Util.prototype.content = function (content) {
 
 Util.prototype.appendContent = function (content) {
     try {
-        if (content !== null && content !== undefined) {
+        if (content != null) {
             if (typeof content === 'string') {
                 this._entity.append(content);
             } else if (typeof content === 'number') {
@@ -444,7 +444,7 @@ Util.prototype.preventDefault = function (eventType) {
 }
 
 Util.prototype.attr = function (name, assignment) {
-    if (assignment == null) {
+    if (assignment === undefined) {
         return this._entity.getAttribute(name);
     } else {
         if (assignment == 'unset') {
@@ -462,7 +462,7 @@ Util.prototype.css = function (name, assignment) {
     } else {
         this.attr('style', this.attr('style') == null ? '' : this.attr('style'));
         let obj = Util.styleToObj(this.attr('style'));
-        if (assignment == null) {
+        if (assignment === undefined) {
             return obj == null ? null : obj[name];
         } else {
             if (assignment == 'unset') {
