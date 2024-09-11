@@ -393,8 +393,8 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let a = row[col['data']] === undefined || row[col['data']] === null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']].toString();
-                            let b = col['filter'] === undefined || col['filter'] === null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'].toString();
+                            let a = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']].toString();
+                            let b = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'].toString();
                             let matching = match(a, b, false);
                             if (!matching) {
                                 isFiltered = false;
@@ -423,8 +423,8 @@ function JsonTable(c = null) {
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
                 let sortedData = tableData.sort((a, b) => {
-                    let aValue = a[data] === undefined || a[data] === null ? '' : a[data].toString();
-                    let bValue = b[data] === undefined || b[data] === null ? '' : b[data].toString();
+                    let aValue = a[data] == null ? '' : a[data].toString();
+                    let bValue = b[data] == null ? '' : b[data].toString();
                     if (typeof aValue === 'boolean' || typeof bValue === 'boolean') {
                         if (aValue === bValue) {
                             return 0;
@@ -855,7 +855,7 @@ function JsonTable(c = null) {
         let match = false;
 
         try {
-            if (text === null && matchingText !== '') {
+            if (text == null && matchingText !== '') {
                 return false;
             } else if (matchingText.trim() === "") {
                 match = true;
@@ -1051,7 +1051,7 @@ function JsonTable(c = null) {
                                         tableRow = Util.create('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
 
                                         tableSettings['columns'].forEach((col) => {
-                                            var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
+                                            var cellData = row[col['data']] != null ? String(row[col['data']]) : '';
                                             if (col.modifier) {
                                                 if (typeof col.modifier === 'function') {
                                                     var clone = Object.assign({}, row);
@@ -1077,7 +1077,7 @@ function JsonTable(c = null) {
                                         tableRow = Util.create('tr', null);
                                         tableSettings['columns'].forEach((col) => {
                                             try {
-                                                var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
+                                                var cellData = row[col['data']] != null ? String(row[col['data']]) : '';
                                                 if (col['data'] == '###row-removed') {
                                                     if (typeof col.modifier === 'function') {
                                                         var clone = Object.assign({}, row);
@@ -1272,7 +1272,7 @@ JsonTable.removeKeys = function (arr, keys) {
 
 function Util(entity) {
     this._entity = null;
-    if (entity !== null) {
+    if (entity != null) {
         if (typeof entity == 'string') {
             return Util.get(entity);
         } else if (entity instanceof HTMLElement) {
@@ -1297,7 +1297,7 @@ Util.get = function (selector) {
 }
 
 Util.isObjectOrArray = function (arg) {
-    return arg !== null && (typeof arg === 'object' || Array.isArray(arg));
+    return arg != null && (typeof arg === 'object' || Array.isArray(arg));
 }
 
 Util.debounce = function (func, delay) {
@@ -1524,7 +1524,7 @@ Util.prototype.content = function (content) {
 
 Util.prototype.appendContent = function (content) {
     try {
-        if (content !== null && content !== undefined) {
+        if (content != null) {
             if (typeof content === 'string') {
                 this._entity.append(content);
             } else if (typeof content === 'number') {
@@ -1714,7 +1714,7 @@ Util.prototype.preventDefault = function (eventType) {
 }
 
 Util.prototype.attr = function (name, assignment) {
-    if (assignment == null) {
+    if (assignment === undefined) {
         return this._entity.getAttribute(name);
     } else {
         if (assignment == 'unset') {
@@ -1732,7 +1732,7 @@ Util.prototype.css = function (name, assignment) {
     } else {
         this.attr('style', this.attr('style') == null ? '' : this.attr('style'));
         let obj = Util.styleToObj(this.attr('style'));
-        if (assignment == null) {
+        if (assignment === undefined) {
             return obj == null ? null : obj[name];
         } else {
             if (assignment == 'unset') {
