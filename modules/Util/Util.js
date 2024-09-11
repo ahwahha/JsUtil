@@ -1,5 +1,19 @@
 import './Util.js'
 
+function Util(entity) {
+    this._entity = null;
+    if (entity !== null) {
+        if (typeof entity == 'string') {
+            return Util.get(entity);
+        } else if (entity instanceof HTMLElement) {
+            this._entity = entity;
+            return this;
+        } else if (entity instanceof Util) {
+            return entity;
+        }
+    }
+}
+
 Util.get = function (selector) {
     if (typeof selector == 'string') {
         if (selector.trim().startsWith("#")) {
@@ -26,9 +40,9 @@ Util.debounce = function (func, delay) {
     };
 }
 
-Util.create = function (type, attributes = null) {
+Util.create = function (type, attributes) {
     let e = document.createElement(type);
-    if (attributes !== null && typeof attributes === 'object') {
+    if (attributes != null && typeof attributes === 'object') {
         for (let key in attributes) {
             if (attributes.hasOwnProperty(key)) {
                 e.setAttribute(key, attributes[key]);
@@ -70,7 +84,7 @@ Util.styleToObj = function (style) {
     return output;
 };
 
-Util.downloadAsCsv = function (jsonData = null, fileName = 'data.csv', delimiter = ',') {
+Util.downloadAsCsv = function (jsonData, fileName = 'data.csv', delimiter = ',') {
     try {
         if (jsonData && jsonData.length > 0) {
 
@@ -110,7 +124,7 @@ Util.downloadAsCsv = function (jsonData = null, fileName = 'data.csv', delimiter
 Util.clone = function (input) {
     if (Array.isArray(input)) {
         return input.map(Util.clone);
-    } else if (typeof input === 'object' && input !== null) {
+    } else if (typeof input === 'object' && input != null) {
         if (input instanceof Node) {
             return input;
         }
@@ -163,8 +177,8 @@ Util.prototype.parent = function () {
     return new Util(this._entity.parentElement);
 }
 
-Util.prototype.entity = function (entity = null) {
-    if (entity == null) {
+Util.prototype.entity = function (entity) {
+    if (entity == undefined) {
         return this._entity;
     } else {
         this._entity = entity;
@@ -228,6 +242,16 @@ Util.prototype.addEventHandlerIf = function (events, func, bool) {
     return this;
 };
 
+Util.prototype.content = function (content) {
+    if (content === undefined) {
+        return this._entity.innerHTML;
+    } else {
+        if (content) {
+            this._entity.innerHTML = content;
+        }
+    }
+}
+
 Util.prototype.appendContent = function (content) {
     try {
         if (content !== null && content !== undefined) {
@@ -244,7 +268,7 @@ Util.prototype.appendContent = function (content) {
             }
         }
     } catch (error) {
-        throw ("@ appendContent(" + content + "): " + error);
+        throw ("@ appendContent(" + JSON.stringify(content) + "): " + error);
     }
     return this;
 };
@@ -333,7 +357,7 @@ Util.prototype.appendFileGroup = function (name, attributes, initial, max) {
     return this;
 };
 
-Util.createFileGroup = function (name, attributes, initial, max) {
+Util.createFileGroup = function (name = '', attributes, initial, max) {
 
     let columnElementStyle = {
         'width': '100%',
@@ -397,7 +421,7 @@ Util.createSelect = function (items) {
     if (items && Array.isArray(items) && items.length > 0) {
         for (let i = 0; i < items.length; i++) {
             let option = Util.create('option');
-            if (typeof items[i] === "object" && items[i] !== null) {
+            if (typeof items[i] === "object" && items[i] != null) {
                 for (let attr in items[i]) {
                     if (attr === 'content') {
                         option.appendContent(items[i][attr]);
@@ -419,7 +443,7 @@ Util.prototype.preventDefault = function (eventType) {
     return this;
 }
 
-Util.prototype.attr = function (name, assignment = null) {
+Util.prototype.attr = function (name, assignment) {
     if (assignment == null) {
         return this._entity.getAttribute(name);
     } else {
@@ -432,7 +456,7 @@ Util.prototype.attr = function (name, assignment = null) {
     }
 }
 
-Util.prototype.css = function (name = null, assignment = null) {
+Util.prototype.css = function (name, assignment) {
     if (name == null) {
         return this.attr('style');
     } else {

@@ -742,7 +742,7 @@ function JsonTable(c = null) {
                     .appendContent(
                         Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
-                                Util.create('div', null)
+                                Util.create('div')
                                     //toBeginingButton
                                     .appendContent(
                                         Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
@@ -757,7 +757,7 @@ function JsonTable(c = null) {
                                     )
                             )
                             .appendContent(
-                                Util.create('div', null)
+                                Util.create('div')
                                     //startInput
                                     .appendContent(
                                         Util.create('input', {
@@ -793,7 +793,7 @@ function JsonTable(c = null) {
                                     .appendContent(getFiltered().length)
                             )
                             .appendContent(
-                                Util.create('div', null)
+                                Util.create('div')
                                     //toBeginingButton
                                     .appendContent(
                                         Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
@@ -982,7 +982,7 @@ function JsonTable(c = null) {
                 /* headers */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        let headers = Util.create('tr', null);
+                        let headers = Util.create('tr');
                         tableSettings['columns'].forEach((col) => {
                             let headerStyle = { ...(tableSettings['headersStyle'] || {}), ...(col['headerStyle'] || {}) };
                             headers.appendContent(
@@ -1017,7 +1017,7 @@ function JsonTable(c = null) {
                 /* filters */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        let filters = Util.create('tr', null);
+                        let filters = Util.create('tr');
                         tableSettings['columns'].forEach((col) => {
                             let filterStyle = Util.objToStyle({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
                             let filterValue = col['filter'] || '';
@@ -1076,7 +1076,7 @@ function JsonTable(c = null) {
                                     }
                                 } else {
                                     try {
-                                        tableRow = Util.create('tr', null);
+                                        tableRow = Util.create('tr');
                                         tableSettings['columns'].forEach((col) => {
                                             try {
                                                 var cellData = row[col['data']] !== null ? String(row[col['data']]) : '';
@@ -1115,7 +1115,7 @@ function JsonTable(c = null) {
                     output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
                         .appendContent(
                             Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
-                                .appendContent(Util.create('div', null).appendContent(tableSettings['label']))
+                                .appendContent(Util.create('div').appendContent(tableSettings['label']))
                                 .appendContent(Util.create('div', { style: 'flex:1' }))
                                 .appendContent(
                                     Util.create('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
