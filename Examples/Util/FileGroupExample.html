@@ -9,7 +9,7 @@
     <div id="container" style="width:calc(100% - 12px); padding: 5px; border: hsl(0 0 80) dashed 1px;">
         <script id='here' type="module">
             import { Util } from "../../../modules/Util/index.js";
-            let here = new Util('#here');
+            let here = Util.get('#here');
             here.parent()
                 .appendContent(
                     Util.create('div', { style: 'color: hsl(0 100 90)' })

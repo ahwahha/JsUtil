@@ -71,7 +71,7 @@
 		var myTable = null;
 		try {
 
-			myTable = new JsonTable(new Util('#container'));
+			myTable = new JsonTable(Util.get('#container'));
 
 			// demo changing container, here unnecessary
 			myTable.setContainer(document.getElementById("container"));
@@ -159,15 +159,15 @@
 
 			// fill the table with data
 			myTable.fillTable();
-			new Util('#selected').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected()), 'selected.csv', ','); });
-			new Util('#filtered').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered()), 'filtered.csv', ','); });
-			new Util('#edited').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getEdited()), 'edited.csv', ','); });
-			new Util('#selectedfiltered').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getFiltered())), 'selectedFiltered.csv', ','); });
-			new Util('#selectededited').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getEdited())), 'selectedEdited.csv', ','); });
-			new Util('#filterededited').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered(myTable.getEdited())), 'filteredEdited.csv', ','); });
-			new Util('#inserted').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getInserted()), 'inserted.csv', ','); });
-			new Util('#removed').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getRemoved()), 'removed.csv', ','); });
-			new Util('#insert').addEventHandler('click', () => { myTable.insertData({ "name": "", "age": 0, "title": "", "location": "", "datetimeOfBirth": "" }).sortAsOriginal() });
+			Util.get('#selected').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected()), 'selected.csv', ','); });
+			Util.get('#filtered').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered()), 'filtered.csv', ','); });
+			Util.get('#edited').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getEdited()), 'edited.csv', ','); });
+			Util.get('#selectedfiltered').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getFiltered())), 'selectedFiltered.csv', ','); });
+			Util.get('#selectededited').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getSelected(myTable.getEdited())), 'selectedEdited.csv', ','); });
+			Util.get('#filterededited').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered(myTable.getEdited())), 'filteredEdited.csv', ','); });
+			Util.get('#inserted').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getInserted()), 'inserted.csv', ','); });
+			Util.get('#removed').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getRemoved()), 'removed.csv', ','); });
+			Util.get('#insert').addEventHandler('click', () => { myTable.insertData({ "name": "", "age": 0, "title": "", "location": "", "datetimeOfBirth": "" }).sortAsOriginal() });
 
 		} catch (e) { console.log(e); }
 	</script>

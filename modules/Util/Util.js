@@ -4,18 +4,25 @@ function Util(entity) {
 	this._entity = null;
 	if (entity !== null) {
 		if (typeof entity == 'string') {
-			if (entity.trim().startsWith("#")) {
-				this._entity = document.querySelector(entity);
-			} else {
-				this._entity = document.querySelectorAll(entity);
-			}
-			return this;
+			return Util.get(entity);
 		} else if (entity instanceof HTMLElement) {
 			this._entity = entity;
 			return this;
 		} else if (entity instanceof Util) {
 			return entity;
 		}
+	}
+}
+
+Util.get = function (selector) {
+	if (typeof selector == 'string') {
+		if (selector.trim().startsWith("#")) {
+			return new Util(document.querySelector(selector));
+		} else {
+			return new Util(document.querySelectorAll(selector));
+		}
+	} else {
+		return null;
 	}
 }
 
