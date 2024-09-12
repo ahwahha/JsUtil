@@ -19,7 +19,11 @@ Util.get = function (selector) {
         if (selector.trim().startsWith("#")) {
             return new Util(document.querySelector(selector));
         } else {
-            return new Util(document.querySelectorAll(selector));
+            let array = [];
+            document.querySelectorAll(selector).forEach((item) => {
+                array.push(new Util(item));
+            })
+            return array;
         }
     } else {
         return null;
@@ -247,8 +251,9 @@ Util.prototype.content = function (content) {
         return this._entity.innerHTML;
     } else {
         if (content) {
-            this._entity.innerHTML = content;
+            this.appendContent(content);
         }
+        return this;
     }
 }
 
@@ -389,9 +394,9 @@ Util.createFileGroup = function (name = '', attributes, initial, max) {
         });
 
     new MutationObserver(() => {
-        if (files.entity().children.length < max && addButton.style.display === 'none') {
+        if (files.entity().children.length < max && addButton.entity().style.display === 'none') {
             addButton.show();
-        } else if (files.entity().children.length == max && addButton.style.display !== 'none') {
+        } else if (files.entity().children.length == max && addButton.entity().style.display !== 'none') {
             addButton.hide();
         }
     }).observe(files.entity(), { attributes: !true, childList: true, subtree: true })
@@ -474,6 +479,12 @@ Util.prototype.css = function (name, assignment) {
             return this;
         }
     }
+}
+
+Util.prototype.remove = function () {
+    this._entity.remove();
+    this._entity = undefined;
+    return this;
 }
 
 export { Util };
