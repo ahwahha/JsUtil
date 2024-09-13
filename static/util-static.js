@@ -1717,6 +1717,15 @@ Util.prototype.preventDefault = function (eventType) {
     this.addEventHandler(eventType, function (event) { event.preventDefault(); });
     return this;
 }
+    
+Util.prototype.val = function (value) {
+    if (value === undefined) {
+        return this._entity['value'];
+    } else {
+        this._entity['value'] = value;
+        return this;
+    }
+}
 
 Util.prototype.attr = function (name, assignment) {
     if (assignment === undefined) {
