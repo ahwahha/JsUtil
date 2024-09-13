@@ -251,7 +251,7 @@ Util.prototype.content = function (content) {
         return this._entity.innerHTML;
     } else {
         if (content) {
-            this.appendContent(content);
+            this.clear().appendContent(content);
         }
         return this;
     }
