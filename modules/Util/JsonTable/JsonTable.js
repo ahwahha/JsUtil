@@ -171,6 +171,7 @@ function JsonTable(c = null) {
                     });
                 }
                 edited = true;
+                setEdited();
             }
             return this;
         } catch (error) {
@@ -303,7 +304,7 @@ function JsonTable(c = null) {
                     let isEdited = false;
                     for (let key in row) {
                         if (!key.startsWith('###row-') && !key.startsWith('###ori-')) {
-                            if (row[key] !== oriRow[key] || row[key].length !== oriRow[key].length) {
+                            if (!row[key] || row[key] !== oriRow[key] || row[key].length !== oriRow[key].length) {
                                 isEdited = true;
                                 break;
                             }
