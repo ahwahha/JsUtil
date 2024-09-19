@@ -144,17 +144,32 @@ function JsonTable(c = null) {
 
     var insertData = function (data) {
         try {
-            if (data != null && Array.isArray(data) && tableData != null && Array.isArray(tableData)) {
-                tableData.push({
-                    ...data, ...{
-                        '###row-index': -1 * ++insertCount,
-                        '###row-filtered': false,
-                        '###row-selected': false,
-                        '###row-edited': false,
-                        '###row-inserted': true,
-                        '###row-removed': false
-                    }
-                });
+            if (tableData != null && Array.isArray(tableData)) {
+                if (Array.isArray(data)) {
+                    data.forEach((item) => {
+                        tableData.push({
+                            ...item, ...{
+                                '###row-index': -1 * ++insertCount,
+                                '###row-filtered': false,
+                                '###row-selected': false,
+                                '###row-edited': false,
+                                '###row-inserted': true,
+                                '###row-removed': false
+                            }
+                        });
+                    })
+                } else {
+                    tableData.push({
+                        ...data, ...{
+                            '###row-index': -1 * ++insertCount,
+                            '###row-filtered': false,
+                            '###row-selected': false,
+                            '###row-edited': false,
+                            '###row-inserted': true,
+                            '###row-removed': false
+                        }
+                    });
+                }
                 edited = true;
             }
             return this;
@@ -995,7 +1010,7 @@ function JsonTable(c = null) {
                                             .addEventHandlerIf('click', () => {
                                                 setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
                                                 refreshTable();
-                                            }, col['sortable'])
+                                            }, undefined, col['sortable'])
                                             .appendContent(
                                                 Util.create('div', { style: 'flex:1;' })
                                             )

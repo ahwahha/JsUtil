@@ -167,7 +167,7 @@
 			Util.get('#filterededited').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getFiltered(myTable.getEdited())), 'filteredEdited.csv', ','); });
 			Util.get('#inserted').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getInserted()), 'inserted.csv', ','); });
 			Util.get('#removed').addEventHandler('click', () => { Util.downloadAsCsv(JsonTable.cleanKeys(myTable.getRemoved()), 'removed.csv', ','); });
-			Util.get('#insert').addEventHandler('click', () => { myTable.insertData({ "name": "", "age": 0, "title": "", "location": "", "datetimeOfBirth": "" }).sortAsOriginal() });
+			Util.get('#insert').addEventHandler('click', () => { myTable.insertData({ "name": "", "age": 0, "title": "", "location": "", "datetimeOfBirth": "" }).refreshTable(); });
 
 		} catch (e) { console.log(e); }
 	</script>

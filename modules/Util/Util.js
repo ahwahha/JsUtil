@@ -1,12 +1,12 @@
 import './Util.js'
 
 function Util(entity) {
-    this._entity = null;
+    this['_entity'] = null;
     if (entity != null) {
         if (typeof entity == 'string') {
             return Util.get(entity);
         } else if (entity instanceof HTMLElement) {
-            this._entity = entity;
+            this['_entity'] = entity;
             return this;
         } else if (entity instanceof Util) {
             return entity;
@@ -178,54 +178,57 @@ Util.downloadBlob = function (blob, filename = 'filename') {
 }
 
 Util.prototype.parent = function () {
-    return new Util(this._entity.parentElement);
+    return new Util(this['_entity'].parentElement);
 }
 
 Util.prototype.entity = function (entity) {
     if (entity == undefined) {
-        return this._entity;
+        return this['_entity'];
     } else {
-        this._entity = entity;
+        this['_entity'] = entity;
         return this;
     }
 }
 
 Util.prototype.hide = function () {
-    if (this._entity) {
-        this._entity.style.display = 'none';
+    if (this['_entity']) {
+        this['_entity'].style.display = 'none';
     }
     return this;
 };
 
 Util.prototype.show = function () {
-    if (this._entity) {
-        this._entity.style.display = 'revert';
+    if (this['_entity']) {
+        this['_entity'].style.display = 'revert';
     }
     return this;
 };
 
 Util.prototype.clear = function () {
-    if (this._entity) {
-        this._entity.innerHTML = '';
+    if (this['_entity']) {
+        this['_entity'].innerHTML = '';
     }
     return this;
 };
 
 Util.prototype.fireEvent = function (event) {
-    if (this._entity) {
-        this._entity.dispatchEvent(new Event(event));
+    if (this['_entity']) {
+        this['_entity'].dispatchEvent(new Event(event));
     }
     return this;
 };
 
-Util.prototype.addEventHandler = function (events, func) {
+Util.prototype.addEventHandler = function (events, func, options) {
     try {
+        this['_eventListenerList'] = this['_eventListenerList'] ? this['_eventListenerList'] : [];
         if (typeof events === 'string') {
-            this._entity.addEventListener(events, func);
+            this['_entity'].addEventListener(events, func, options);
+            this['_eventListenerList'].push({ type: events, listener: func, options: options });
         } else if (Array.isArray(events)) {
             events.forEach((event) => {
                 if (typeof event === 'string') {
-                    this._entity.addEventListener(event, func);
+                    this['_entity'].addEventListener(event, func, options);
+                    this['_eventListenerList'].push({ type: event, listener: func, options: options });
                 } else {
                     throw 'invalid events in input list:' + events;
                 }
@@ -239,16 +242,26 @@ Util.prototype.addEventHandler = function (events, func) {
     }
 };
 
-Util.prototype.addEventHandlerIf = function (events, func, bool) {
+Util.prototype.addEventHandlerIf = function (events, func, options, bool) {
     if (bool) {
         this.addEventHandler(events, func);
     }
     return this;
 };
 
+Util.prototype.removeAllEventHandlers = function () {
+    if (this['_eventListenerList'] && this['_eventListenerList'].length > 0) {
+        this['_eventListenerList'].forEach((item) => {
+            this['_entity'].removeEventListener(item['type'], item['listener'], item['options']);
+        })
+    }
+    this['_eventListenerList'] = undefined;
+    return this;
+}
+
 Util.prototype.content = function (content) {
     if (content === undefined) {
-        return this._entity.innerHTML;
+        return this['_entity'].innerHTML;
     } else {
         if (content) {
             this.clear().appendContent(content);
@@ -261,11 +274,11 @@ Util.prototype.appendContent = function (content) {
     try {
         if (content != null) {
             if (typeof content === 'string') {
-                this._entity.append(content);
+                this['_entity'].append(content);
             } else if (typeof content === 'number') {
-                this._entity.append(content);
+                this['_entity'].append(content);
             } else if (content instanceof HTMLElement) {
-                this._entity.appendChild(content);
+                this['_entity'].appendChild(content);
             } else if (content instanceof Util) {
                 this.appendContent(content.entity());
             } else {
@@ -450,21 +463,21 @@ Util.prototype.preventDefault = function (eventType) {
 
 Util.prototype.val = function (value) {
     if (value === undefined) {
-        return this._entity['value'];
+        return this['_entity']['value'];
     } else {
-        this._entity['value'] = value;
+        this['_entity']['value'] = value;
         return this;
     }
 }
 
 Util.prototype.attr = function (name, assignment) {
     if (assignment === undefined) {
-        return this._entity.getAttribute(name);
+        return this['_entity'].getAttribute(name);
     } else {
         if (assignment == 'unset') {
-            this._entity.removeAttribute(name);
+            this['_entity'].removeAttribute(name);
         } else {
-            this._entity.setAttribute(name, assignment);
+            this['_entity'].setAttribute(name, assignment);
         }
         return this;
     }
@@ -491,8 +504,8 @@ Util.prototype.css = function (name, assignment) {
 }
 
 Util.prototype.remove = function () {
-    this._entity.remove();
-    this._entity = undefined;
+    this['_entity'].remove();
+    this['_entity'] = undefined;
     return this;
 }
 
