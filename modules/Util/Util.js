@@ -264,12 +264,12 @@ Util.prototype.appendContent = function (content) {
                 this._entity.append(content);
             } else if (typeof content === 'number') {
                 this._entity.append(content);
-            } else if (content instanceof Util) {
-                this._entity.appendChild(content.entity());
             } else if (content instanceof HTMLElement) {
                 this._entity.appendChild(content);
+            } else if (content instanceof Util) {
+                this.appendContent(content.entity());
             } else {
-                throw 'content must be a string or number or Util or HTMLElement';
+                throw 'content must be a string or number or HTMLElement or Util';
             }
         }
     } catch (error) {
