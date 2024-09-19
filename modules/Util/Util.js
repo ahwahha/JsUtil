@@ -447,7 +447,7 @@ Util.prototype.preventDefault = function (eventType) {
     this.addEventHandler(eventType, function (event) { event.preventDefault(); });
     return this;
 }
-    
+
 Util.prototype.val = function (value) {
     if (value === undefined) {
         return this._entity['value'];
@@ -496,112 +496,113 @@ Util.prototype.remove = function () {
     return this;
 }
 
-Util.prototype.appendMovableDiv = function(content) {
-	this.css('position','relative')
-	.appendContent(Util.createMovableDiv(content));
-	return this;
+Util.prototype.appendMovableDiv = function (content) {
+    this.css('position', 'relative')
+        .appendContent(Util.createMovableDiv(content));
+    return this;
 }
 
-Util.createMovableDiv = function(content) {
-	let html = Util.get('html')[0].css('position','relative');
-	let div = Util.create('div')
-		.css('position','absolute')
-		.css('height', '100px')
-		.css('width', '200px')
-		.css('margin','0px')
-		.css('padding','0px')
-		.css('border', 'solid #ddd 1px')
-		.css('z-index', '50')
-		.css('box-sizing','border-box')
-		.css('background-color','#fff')
-		.appendContent(
-			Util.create('div')
-				.css('height', '20px')
-				.css('width', '20px')
-				.css('margin','0px')
-				.css('padding','0px')
-				.css('position','absolute')
-				.css('right','-21px')
-				.css('top','-1px')
-				.css('border-top', 'solid #ddd 1px')
-				.css('border-bottom', 'solid #ddd 1px')
-				.css('border-right', 'solid #ddd 1px')
-				.css('display','flex')
-				.css('justify-content','center')
-				.css('align-items','center')
-				.css('font-size','20px')
-				.css('box-sizing','border-box')
-				.css('color','inherit')
-				.css('background-color','inherit')
-				.appendContent('✖')
-		)
-		.appendContent(
-			Util.create('div')
-				.css('height', '20px')
-				.css('width', '20px')
-				.css('margin','0px')
-				.css('padding','0px')
-				.css('position','absolute')
-				.css('right','-21px')
-				.css('top','-1px')
-				.css('font-size','20px')
-				.css('box-sizing','border-box')
-				.css('z-index', '51')
-				.addEventHandler('click',(e)=>{
-					div.remove();
-				})
-		)
-		.appendContent(
-			Util.create('div')
-				.css('height', '20px')
-				.css('width', '20px')
-				.css('margin','0px')
-				.css('padding','0px')
-				.css('position','absolute')
-				.css('right','-21px')
-				.css('top','19px')
-				.css('border-right', 'solid #ddd 1px')
-				.css('border-bottom', 'solid #ddd 1px')
-				.css('display','flex')
-				.css('justify-content','center')
-				.css('align-items','center')
-				.css('font-size','20px')
-				.css('box-sizing','border-box')
-				.css('color','inherit')
-				.css('background-color','inherit')
-				.appendContent('✠')
-		)
-		.appendContent(
-			Util.create('div')
-				.css('height', '20px')
-				.css('width', '20px')
-				.css('margin','0px')
-				.css('padding','0px')
-				.css('position','absolute')
-				.css('right','-21px')
-				.css('top','19px')
-				.css('font-size','20px')
-				.css('box-sizing','border-box')
-				.css('z-index', '51')
-				.addEventHandler('mousedown',(e)=>{
-					div['hold'] = {};
-					div['hold']['x'] = e.clientX;
-					div['hold']['y'] = e.clientY;
-				})
-				.addEventHandler('mouseup',(e)=>{
-					div['hold'] = undefined;
-				})
-		)
-		.appendContentIf(content, content);
-	html.addEventHandler('mousemove',(e)=>{
-		if(div['hold']){
-			div.css('left', div.entity().offsetLeft + e.clientX - div['hold']['x'] + 'px');
-			div.css('top', div.entity().offsetTop + e.clientY - div['hold']['y'] + 'px');
-			div['hold']['x'] = e.clientX;
-			div['hold']['y'] = e.clientY;
-		}
-	});
-	return div;
+Util.createMovableDiv = function (content) {
+    let div = Util.create('div');
+    div.css('position', 'absolute')
+        .css('height', '100px')
+        .css('width', '200px')
+        .css('margin', '0px')
+        .css('padding', '0px')
+        .css('border', 'solid #ddd 1px')
+        .css('z-index', '50')
+        .css('box-sizing', 'border-box')
+        .css('background-color', '#fff')
+        .appendContent(
+            Util.create('div')
+                .css('height', '20px')
+                .css('width', '20px')
+                .css('margin', '0px')
+                .css('padding', '0px')
+                .css('position', 'absolute')
+                .css('right', '-21px')
+                .css('top', '-1px')
+                .css('border-top', 'solid #ddd 1px')
+                .css('border-bottom', 'solid #ddd 1px')
+                .css('border-right', 'solid #ddd 1px')
+                .css('display', 'flex')
+                .css('justify-content', 'center')
+                .css('align-items', 'center')
+                .css('font-size', '15px')
+                .css('box-sizing', 'border-box')
+                .css('color', 'inherit')
+                .css('background-color', 'inherit')
+                .appendContent('✖')
+        )
+        .appendContent(
+            Util.create('div')
+                .css('height', '20px')
+                .css('width', '20px')
+                .css('margin', '0px')
+                .css('padding', '0px')
+                .css('position', 'absolute')
+                .css('right', '-21px')
+                .css('top', '-1px')
+                .css('box-sizing', 'border-box')
+                .css('z-index', '51')
+                .addEventHandler('click', (e) => {
+                    div.remove();
+                })
+        )
+        .appendContent(
+            Util.create('div')
+                .css('height', '20px')
+                .css('width', '20px')
+                .css('margin', '0px')
+                .css('padding', '0px')
+                .css('position', 'absolute')
+                .css('right', '-21px')
+                .css('top', '19px')
+                .css('border-right', 'solid #ddd 1px')
+                .css('border-bottom', 'solid #ddd 1px')
+                .css('display', 'flex')
+                .css('justify-content', 'center')
+                .css('align-items', 'center')
+                .css('font-size', '15px')
+                .css('box-sizing', 'border-box')
+                .css('color', 'inherit')
+                .css('background-color', 'inherit')
+                .appendContent('✠')
+        )
+        .appendContent(
+            Util.create('div')
+                .css('height', '20px')
+                .css('width', '20px')
+                .css('margin', '0px')
+                .css('padding', '0px')
+                .css('position', 'absolute')
+                .css('right', '-21px')
+                .css('top', '19px')
+                .css('box-sizing', 'border-box')
+                .css('z-index', '51')
+                .drag(div)
+        )
+        .appendContentIf(content, content);
+    return div;
+}
+
+Util.prototype.drag = function (target) {
+    this.addEventHandler('mousedown', (e) => {
+        target['hold'] = {};
+        target['hold']['x'] = e.clientX;
+        target['hold']['y'] = e.clientY;
+    }).addEventHandler('mouseup', (e) => {
+        target['hold'] = undefined;
+    });
+    Util.get('html')[0].css('position', 'relative').addEventHandler('mousemove', (e) => {
+        if (target['hold']) {
+            target.css('left', target.entity().offsetLeft + e.clientX - target['hold']['x'] + 'px');
+            target.css('top', target.entity().offsetTop + e.clientY - target['hold']['y'] + 'px');
+            target['hold']['x'] = e.clientX;
+            target['hold']['y'] = e.clientY;
+        }
+    });
+    return this;
 }
 
 export { Util };
