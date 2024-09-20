@@ -145,7 +145,7 @@ function JsonTable(c = null) {
             if (tableData != null && Array.isArray(tableData)) {
                 if (Array.isArray(data)) {
                     data.forEach((item) => {
-                        tableData.push({
+                        let row = {
                             ...item, ...{
                                 '###row-index': -1 * ++insertCount,
                                 '###row-filtered': false,
@@ -154,10 +154,12 @@ function JsonTable(c = null) {
                                 '###row-inserted': true,
                                 '###row-removed': false
                             }
-                        });
+                        };
+                        tableData.push(row);
+                        originalTableData.push(Util.clone(row));
                     })
                 } else {
-                    tableData.push({
+                    let row = {
                         ...data, ...{
                             '###row-index': -1 * ++insertCount,
                             '###row-filtered': false,
@@ -166,7 +168,9 @@ function JsonTable(c = null) {
                             '###row-inserted': true,
                             '###row-removed': false
                         }
-                    });
+                    };
+                    tableData.push(row);
+                    originalTableData.push(Util.clone(row));
                 }
                 edited = true;
                 setEdited();
@@ -180,8 +184,7 @@ function JsonTable(c = null) {
     var resetSelectedData = function () {
         try {
             var rows = getEdited(getSelected());
-            for (let i = 0; i < rows.length; i++) {
-                let row = rows[i];
+            for (let row of rows) {
                 let oriRow = originalTableData.find(origDataRow => origDataRow['###row-index'] === row['###row-index']);
                 if (tableData != null && Array.isArray(tableData)) {
                     let dataRow = tableData.find(dataRow => dataRow['###row-index'] === row['###row-index']);
@@ -302,7 +305,7 @@ function JsonTable(c = null) {
                     let isEdited = false;
                     for (let key in row) {
                         if (!key.startsWith('###row-') && !key.startsWith('###ori-')) {
-                            if (!row[key] || row[key] !== oriRow[key] || row[key].length !== oriRow[key].length) {
+                            if (row[key] !== oriRow[key]) {
                                 isEdited = true;
                                 break;
                             }
@@ -756,7 +759,7 @@ function JsonTable(c = null) {
                     .appendContent(
                         Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
-                                Util.create('div', null)
+                                Util.create('div')
                                     //toBeginingButton
                                     .appendContent(
                                         Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
@@ -771,7 +774,7 @@ function JsonTable(c = null) {
                                     )
                             )
                             .appendContent(
-                                Util.create('div', null)
+                                Util.create('div')
                                     //startInput
                                     .appendContent(
                                         Util.create('input', {
@@ -807,7 +810,7 @@ function JsonTable(c = null) {
                                     .appendContent(getFiltered().length)
                             )
                             .appendContent(
-                                Util.create('div', null)
+                                Util.create('div')
                                     //toBeginingButton
                                     .appendContent(
                                         Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
@@ -1080,7 +1083,7 @@ function JsonTable(c = null) {
                                                     .appendContentIf(Util.create('br'), row['###row-edited'])
                                                     .appendContentIf(
                                                         Util.create('span', { style: Util.objToStyle(tableSettings.editedStyle) })
-                                                            .appendContentIf('(' + row['###ori-' + col['data']] + ')', (row['###ori-' + col['data']] != undefined && row['###ori-' + col['data']] != null)),
+                                                            .appendContentIf('(' + row['###ori-' + col['data']] + ')', row['###ori-' + col['data']] !== undefined),
                                                         row['###row-edited']
                                                     )
                                             )
@@ -1093,12 +1096,14 @@ function JsonTable(c = null) {
                                         tableRow = Util.create('tr', null);
                                         tableSettings['columns'].forEach((col) => {
                                             try {
-                                                var cellData = row[col['data']] != null ? String(row[col['data']]) : '';
-                                                if (col['data'] == '###row-removed') {
+                                                var cellData = row[col['data']] !== undefined ? String(row[col['data']]) : '';
+                                                if (col['data'] === '###row-removed') {
                                                     if (typeof col.modifier === 'function') {
                                                         var clone = Object.assign({}, row);
                                                         cellData = col.modifier(clone);
                                                     }
+                                                } else if (col['data'] === '###row-selected') {
+                                                    cellData = "";
                                                 }
                                                 tableRow.appendContent(
                                                     Util.create('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
@@ -1129,7 +1134,7 @@ function JsonTable(c = null) {
                     output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
                         .appendContent(
                             Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px', 'background-color': '#fff' }) })
-                                .appendContent(Util.create('div', null).appendContent(tableSettings['label']))
+                                .appendContent(Util.create('div').appendContent(tableSettings['label']))
                                 .appendContent(Util.create('div', { style: 'flex:1' }))
                                 .appendContent(
                                     Util.create('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
