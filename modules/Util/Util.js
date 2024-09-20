@@ -557,7 +557,6 @@ Util.createMovableDiv = function (content) {
                 .css('right', '-21px')
                 .css('top', '-1px')
                 .css('box-sizing', 'border-box')
-                .css('z-index', '51')
                 .addEventHandler('click', (e) => {
                     div.remove();
                 })
@@ -592,7 +591,6 @@ Util.createMovableDiv = function (content) {
                 .css('right', '-21px')
                 .css('top', '19px')
                 .css('box-sizing', 'border-box')
-                .css('z-index', '51')
                 .drag(div)
         )
         .appendContentIf(content, content);
