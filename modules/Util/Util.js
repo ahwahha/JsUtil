@@ -126,7 +126,16 @@ Util.downloadAsCsv = function (jsonData, fileName = 'data.csv', delimiter = ',')
 }
 
 Util.clone = function (input) {
-    if (Array.isArray(input)) {
+    if (input instanceof Util) {
+        let u = new Util(input.entity());
+        if (input['_eventListenerList']) {
+            u['_eventListenerList'] = [];
+            for (let l of input['_eventListenerList']) {
+                u.addEventHandler(l['type'], l['listener'], l['options']);
+            }
+        }
+        return u;
+    } else if (Array.isArray(input)) {
         return input.map(Util.clone);
     } else if (typeof input === 'object' && input != null) {
         if (input instanceof Node) {
