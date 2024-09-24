@@ -1544,7 +1544,7 @@ Util.prototype.addEventHandler = function (events, func, options) {
 
 Util.prototype.addEventHandlerIf = function (events, func, options, bool) {
     if (bool) {
-        this.addEventHandler(events, func);
+        this.addEventHandler(events, func, options);
     }
     return this;
 };
