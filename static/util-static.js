@@ -1131,9 +1131,9 @@ function JsonTable(c = null) {
                 }
 
                 try {
-                    output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px' }) })
+                    output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px', 'background-color': '#fff' }) })
                         .appendContent(
-                            Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px', 'background-color': '#fff' }) })
+                            Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(Util.create('div').appendContent(tableSettings['label']))
                                 .appendContent(Util.create('div', { style: 'flex:1' }))
                                 .appendContent(
@@ -1378,43 +1378,6 @@ Util.styleToObj = function (style) {
     }
     return output;
 };
-
-Util.downloadAsCsv = function (jsonData, fileName = 'data.csv', delimiter = ',') {
-    try {
-        if (jsonData && jsonData.length > 0) {
-
-            var jsonToCsv = function (jsonData) {
-                let csv = '';
-                let headers = Object.keys(jsonData[0]).sort((a, b) => { return a.localeCompare(b); });
-                // Add the data
-                jsonData.forEach(function (row) {
-                    let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
-                    csv += (csv == '' ? '' : '\n') + data;
-                });
-                // Get the headers
-                csv = headers.join(delimiter) + '\n' + csv;
-                return csv;
-            }
-
-            // Convert JSON data to CSV
-            let csvData = jsonToCsv(jsonData);
-            // Create a CSV file and allow the user to download it
-            let blob = new Blob([csvData], { type: 'text/csv' });
-            let url = window.URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            // Clean up
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-
-        }
-    } catch (error) {
-        throw new Error("error caught @ downloadAsCsv: " + error);
-    }
-}
 
 Util.clone = function (input) {
     if (input instanceof Util) {
@@ -1914,4 +1877,115 @@ Util.prototype.drag = function (target) {
         }
     });
     return this;
+}
+
+Util.downloadBlob = function (blob, fileName = 'data') {
+    try {
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        throw new Error("error caught @ downloadBlob: " + error);
+    }
+}
+
+Util.parseCsv = function (csv, delimiter = ',') {
+    function splitCSVLines(input) {
+        const lines = [];
+        let currentLine = '';
+        let insideQuotes = false;
+
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+            const nextChar = input[i + 1];
+
+            if (char === '"') {
+                if (insideQuotes && nextChar === '"') {
+                    // Handle escaped quote by adding a single quote to the current line
+                    currentLine += '"';
+                    i++; // Skip the next character
+                } else {
+                    insideQuotes = !insideQuotes;
+                }
+            } else if (!insideQuotes && (char === '\n' || (char === '\r' && nextChar !== '\n'))) {
+                lines.push(currentLine);
+                currentLine = '';
+            } else if (!insideQuotes && char === '\r' && nextChar === '\n') {
+                lines.push(currentLine);
+                currentLine = '';
+                i++; // Skip the next character as it's part of \r\n
+            } else {
+                currentLine += char;
+            }
+        }
+
+        // Add the last line if there's any remaining content
+        if (currentLine) {
+            lines.push(currentLine);
+        }
+
+        return lines;
+    }
+
+    function splitCSVLine(line, delimiter) {
+        const regex = new RegExp(`(?:^|${delimiter})(\"(?:[^\"]+|\"\")*\"|[^${delimiter}]*)`, 'g');
+        const matches = [];
+        let match;
+        while (match = regex.exec(line)) {
+            matches.push(match[1].replace(/^\"|\"$/g, '').replace(/\"\"/g, '\"'));
+        }
+        return matches;
+    }
+
+    function csvLineToObject(headers, lineArray) {
+        const obj = {};
+        for (let i = 0; i < headers.length; i++) {
+            obj[headers[i]] = lineArray[i];
+        }
+        return obj;
+    }
+
+    const lines = splitCSVLines(csv);
+    const headers = splitCSVLine(lines[0], delimiter);
+    const result = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        const currentLine = splitCSVLine(lines[i], delimiter);
+        const obj = csvLineToObject(headers, currentLine);
+        result.push(obj);
+    }
+
+    return result;
+}
+
+Util.objectArrayToCsv = function (data, delimiter = ',', linebreak = '\n') {
+    let csv = '';
+    let headers = Object.keys(data[0]).sort((a, b) => { return a.localeCompare(b); });
+    // Add the data
+    data.forEach(function (row) {
+        let data = headers.map(header => JSON.stringify(row[header])).join(delimiter);
+        csv += (csv == '' ? '' : linebreak) + data;
+    });
+    // Get the headers
+    csv = headers.join(delimiter) + linebreak + csv;
+    return csv;
+}
+
+Util.downloadAsCsv = function (data, fileName = 'data.csv', delimiter = ',') {
+    try {
+        if (data && data.length > 0) {
+            // Convert JSON data to CSV
+            let csvData = Util.objectArrayToCsv(data, delimiter);
+
+            // Create a CSV file and allow the user to download it
+            Util.downloadBlob(new Blob([csvData], { type: 'text/csv' }), fileName);
+        }
+    } catch (error) {
+        throw new Error("error caught @ downloadAsCsv: " + error);
+    }
 }
