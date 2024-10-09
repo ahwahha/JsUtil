@@ -716,4 +716,8 @@ Util.downloadAsCsv = function (data, fileName = 'data.csv', delimiter = ',') {
     }
 }
 
+Util.prototype.noFocus = function (){
+    this.addEventHandler('focus', (event) => { this.entity().blur(); })
+}
+
 export { Util };
