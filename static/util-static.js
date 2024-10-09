@@ -2008,3 +2008,7 @@ Util.downloadAsCsv = function (data, fileName = 'data.csv', delimiter = ',') {
         throw new Error("error caught @ downloadAsCsv: " + error);
     }
 }
+
+Util.prototype.noFocus = function (){
+    this.addEventHandler('focus', (event) => { this.entity().blur(); })
+}
