@@ -1,5 +1,3 @@
-import './Util.js'
-
 function Util(entity) {
     this['_entity'] = null;
     if (entity != null) {
@@ -164,14 +162,14 @@ Util.prototype.entity = function (entity) {
 
 Util.prototype.hide = function () {
     if (this['_entity']) {
-        this['_entity'].style.display = 'none';
+        this.css('display','none');
     }
     return this;
 };
 
 Util.prototype.show = function () {
     if (this['_entity']) {
-        this['_entity'].style.display = 'revert';
+        this.css('display','unset');
     }
     return this;
 };
@@ -455,6 +453,19 @@ Util.prototype.attr = function (name, assignment) {
     }
 }
 
+Util.prototype.prop = function (name, assignment) {
+    if (assignment === undefined) {
+        return this[name];
+    } else {
+        if (assignment == 'unset') {
+            this[name] = undefined;
+        } else {
+            this[name] = assignment;
+        }
+        return this;
+    }
+}
+
 Util.prototype.css = function (name, assignment) {
     if (name == null) {
         return this.attr('style');
@@ -529,6 +540,9 @@ Util.createMovableDiv = function (content) {
                 .css('right', '-21px')
                 .css('top', '-1px')
                 .css('box-sizing', 'border-box')
+                .addEventHandler('mouseover', function(event){event.target.style.cursor = 'pointer';})
+                .addEventHandler('mouseout', function(event){event.target.style.cursor = 'default';})
+                .addEventHandler('focus', function(event){event.target.blur()})
                 .addEventHandler('click', (e) => {
                     div.remove();
                 })
@@ -563,6 +577,9 @@ Util.createMovableDiv = function (content) {
                 .css('right', '-21px')
                 .css('top', '19px')
                 .css('box-sizing', 'border-box')
+                .addEventHandler('mouseover', function(event){event.target.style.cursor = 'move';})
+                .addEventHandler('mouseout', function(event){event.target.style.cursor = 'default';})
+                .addEventHandler('focus', function(event){event.target.blur()})
                 .drag(div)
         )
         .appendContentIf(content, content);
