@@ -114,7 +114,7 @@ function JsonTable(c = null) {
     var setData = function (data) {
         try {
             edited = false;
-            if (data != null && data.length > 0) {
+            if (data != null) {
                 data.forEach((row, index) => {
                     row['###row-index'] = index + 1;
                     row['###row-filtered'] = true;
