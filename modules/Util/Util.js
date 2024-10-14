@@ -1,3 +1,4 @@
+
 function Util(entity) {
     this['_entity'] = null;
     if (entity != null) {
@@ -162,14 +163,14 @@ Util.prototype.entity = function (entity) {
 
 Util.prototype.hide = function () {
     if (this['_entity']) {
-        this.css('display','none');
+        this.css('display', 'none');
     }
     return this;
 };
 
 Util.prototype.show = function () {
     if (this['_entity']) {
-        this.css('display','unset');
+        this.css('display', 'unset');
     }
     return this;
 };
@@ -282,124 +283,6 @@ Util.prototype.appendContentOf = function (list, funcValue = function (item) { r
     }
 }
 
-Util.prototype.appendFileElement = function (name, attributes) {
-    return this.appendContent(Util.createFileElement(name, attributes));
-};
-
-Util.createFileElement = function (name, attributes) {
-    return Util.create('div', (attributes['container'] || {}))
-        .appendContent(
-            Util.create('div', {
-                ...{
-                    'style': Util.objToStyle({
-                        'width': 'calc(100% - 4px)',
-                        'padding': '1px',
-                        'border': 'hsl(0 0 90) solid 1px',
-                        'border-radius': '4px',
-                        'display': 'flex',
-                        'flex-flow': 'row nowrap',
-                        'justify-content': 'flex-start',
-                        'align-items': 'center',
-                        'gap': '3px'
-                    })
-                },
-                ...(attributes['subContainer'] || {})
-            })
-                .appendContent(
-                    Util.create('input', {
-                        ...{
-                            'type': 'file',
-                            'name': name,
-                            'style': Util.objToStyle(
-                                { 'width': 'calc(100% - 30px)' },
-                            )
-                        },
-                        ...(attributes['input'])
-                    })
-                )
-                .appendContent(
-                    Util.create('button', {
-                        ...{
-                            'type': 'button',
-                            'style': Util.objToStyle({
-                                'width': '30px',
-                                'height': '20px',
-                                'display': 'flex',
-                                'flex-flow': 'row nowrap',
-                                'justify-content': 'center',
-                                'align-items': 'center',
-                                'font-size': '15px',
-                                'font-weight': 'bold'
-                            })
-                        },
-                        ...(attributes['removeButton'] || {})
-                    })
-                        .appendContent("✕")
-                        .addEventHandler('click', (event) => { event.target.parentElement.parentElement.remove(); })
-                )
-        );
-};
-
-Util.prototype.appendFileGroup = function (name, attributes, initial, max) {
-    this.appendContent(Util.createFileGroup(name, attributes, initial, max));
-    return this;
-};
-
-Util.createFileGroup = function (name = '', attributes, initial, max) {
-
-    let columnElementStyle = {
-        'width': '100%',
-        'display': 'flex',
-        'flex-flow': 'column nowrap',
-        'justify-content': 'flex-start',
-        'align-items': 'flex-start'
-    };
-
-    let files = Util.create('div', {
-        ...{ style: Util.objToStyle(columnElementStyle) },
-        ...(attributes['files'] || {})
-    });
-
-    let addButton = Util.create('button', {
-        ...{ type: 'button' },
-        ...(attributes['addButton'] || {})
-    })
-        .appendContent("Add")
-        .addEventHandler('click', (event) => {
-            if (max == null || files.entity().children.length < max) {
-                files.appendFileElement(name, {
-                    ...{
-                        container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
-                    },
-                    ...(attributes['file'] || {})
-                });
-            }
-        });
-
-    new MutationObserver(() => {
-        if (files.entity().children.length < max && addButton.entity().style.display === 'none') {
-            addButton.show();
-        } else if (files.entity().children.length == max && addButton.entity().style.display !== 'none') {
-            addButton.hide();
-        }
-    }).observe(files.entity(), { attributes: !true, childList: true, subtree: true })
-
-    for (let i = 0; i < initial; i++) {
-        files.appendFileElement(name, {
-            ...{
-                container: { style: Util.objToStyle({ 'width': '100%', 'padding-bottom': '3px' }) }
-            },
-            ...(attributes['file'] || {})
-        })
-    }
-
-    return Util.create('div', (attributes['container'] || {})).appendContent(
-        Util.create('div', { ...{ style: Util.objToStyle(columnElementStyle) }, ...(attributes['subContainer'] || {}) })
-            .appendContent(files)
-            .appendContent(addButton)
-    );
-};
-
 Util.prototype.appendSelect = function (items) {
     return this.appendContent(Util.createSelect(items));
 }
@@ -489,119 +372,6 @@ Util.prototype.css = function (name, assignment) {
 Util.prototype.remove = function () {
     this['_entity'].remove();
     this['_entity'] = undefined;
-    return this;
-}
-
-Util.prototype.appendMovableDiv = function (content) {
-    this.css('position', 'relative')
-        .appendContent(Util.createMovableDiv(content));
-    return this;
-}
-
-Util.createMovableDiv = function (content) {
-    let div = Util.create('div');
-    div.css('position', 'absolute')
-        .css('height', '100px')
-        .css('width', '200px')
-        .css('margin', '0px')
-        .css('padding', '0px')
-        .css('border', 'solid #ddd 1px')
-        .css('z-index', '50')
-        .css('box-sizing', 'border-box')
-        .css('background-color', '#fff')
-        .appendContent(
-            Util.create('div')
-                .css('height', '20px')
-                .css('width', '20px')
-                .css('margin', '0px')
-                .css('padding', '0px')
-                .css('position', 'absolute')
-                .css('right', '-21px')
-                .css('top', '-1px')
-                .css('border-top', 'solid #ddd 1px')
-                .css('border-bottom', 'solid #ddd 1px')
-                .css('border-right', 'solid #ddd 1px')
-                .css('display', 'flex')
-                .css('justify-content', 'center')
-                .css('align-items', 'center')
-                .css('font-size', '15px')
-                .css('box-sizing', 'border-box')
-                .css('color', 'inherit')
-                .css('background-color', 'inherit')
-                .appendContent('✖')
-        )
-        .appendContent(
-            Util.create('div')
-                .css('height', '20px')
-                .css('width', '20px')
-                .css('margin', '0px')
-                .css('padding', '0px')
-                .css('position', 'absolute')
-                .css('right', '-21px')
-                .css('top', '-1px')
-                .css('box-sizing', 'border-box')
-                .addEventHandler('mouseover', function(event){event.target.style.cursor = 'pointer';})
-                .addEventHandler('mouseout', function(event){event.target.style.cursor = 'default';})
-                .addEventHandler('focus', function(event){event.target.blur()})
-                .addEventHandler('click', (e) => {
-                    div.remove();
-                })
-        )
-        .appendContent(
-            Util.create('div')
-                .css('height', '20px')
-                .css('width', '20px')
-                .css('margin', '0px')
-                .css('padding', '0px')
-                .css('position', 'absolute')
-                .css('right', '-21px')
-                .css('top', '19px')
-                .css('border-right', 'solid #ddd 1px')
-                .css('border-bottom', 'solid #ddd 1px')
-                .css('display', 'flex')
-                .css('justify-content', 'center')
-                .css('align-items', 'center')
-                .css('font-size', '15px')
-                .css('box-sizing', 'border-box')
-                .css('color', 'inherit')
-                .css('background-color', 'inherit')
-                .appendContent('✠')
-        )
-        .appendContent(
-            Util.create('div')
-                .css('height', '20px')
-                .css('width', '20px')
-                .css('margin', '0px')
-                .css('padding', '0px')
-                .css('position', 'absolute')
-                .css('right', '-21px')
-                .css('top', '19px')
-                .css('box-sizing', 'border-box')
-                .addEventHandler('mouseover', function(event){event.target.style.cursor = 'move';})
-                .addEventHandler('mouseout', function(event){event.target.style.cursor = 'default';})
-                .addEventHandler('focus', function(event){event.target.blur()})
-                .drag(div)
-        )
-        .appendContentIf(content, content);
-    return div;
-}
-
-Util.prototype.drag = function (target) {
-    this.addEventHandler('mousedown', (e) => {
-        target['hold'] = {};
-        target['hold']['x'] = e.clientX;
-        target['hold']['y'] = e.clientY;
-    }).addEventHandler('mouseup', (e) => {
-        target['hold'] = undefined;
-    });
-    Util.get('html')[0].css('position', 'relative').addEventHandler('mousemove', (e) => {
-        if (target['hold']) {
-            target.css('left', target.entity().offsetLeft + e.clientX - target['hold']['x'] + 'px');
-            target.css('top', target.entity().offsetTop + e.clientY - target['hold']['y'] + 'px');
-            target['hold']['x'] = e.clientX;
-            target['hold']['y'] = e.clientY;
-        }
-    });
     return this;
 }
 
@@ -716,9 +486,345 @@ Util.downloadAsCsv = function (data, fileName = 'data.csv', delimiter = ',') {
     }
 }
 
-Util.prototype.noFocus = function (){
+Util.prototype.noFocus = function () {
     this.addEventHandler('focus', (event) => { this.entity().blur(); })
+}
+
+Util.loaded = function (func) {
+    if (func != null && typeof func === 'function') {
+        document.addEventListener('DOMContentLoaded', func);
+    }
+}
+
+Util.fileElement = function (name = '') {
+    let container, inputField, removeButton
+    let e = Util.create('div')
+        .appendContent(
+            container = Util.create('div', {
+                'style': Util.objToStyle({
+                    'width': 'calc(100% - 4px)',
+                    'padding': '1px',
+                    'border': 'hsl(0 0 90) solid 1px',
+                    'border-radius': '4px',
+                    'display': 'flex',
+                    'flex-flow': 'row nowrap',
+                    'justify-content': 'flex-start',
+                    'align-items': 'center',
+                    'gap': '3px'
+                })
+            })
+                .appendContent(
+                    inputField = Util.create('input', {
+                        'type': 'file',
+                        'name': name,
+                        'style': Util.objToStyle(
+                            { 'width': 'calc(100% - 30px)' },
+                        )
+                    })
+                )
+                .appendContent(
+                    removeButton = Util.create('div', {
+                        'style': Util.objToStyle({
+                            'width': '30px',
+                            'height': '20px',
+                            'display': 'flex',
+                            'flex-flow': 'row nowrap',
+                            'justify-content': 'center',
+                            'align-items': 'center',
+                            'font-size': '15px',
+                            'font-weight': 'bold',
+                            'cursor': 'pointer',
+                            'margin': '0px',
+                            'padding': '0px',
+                            'border': '1px solid #888888',
+                            'border-radius': '3px',
+                            'color': '#000000;',
+                            'background-color': '#f3f3f3',
+                            'outline': 'none'
+                        })
+                    })
+                        .appendContent("✕")
+                        .addEventHandler('click', (event) => { e.remove(); })
+                )
+        );
+    return e.prop('container', container).prop('inputField', inputField).prop('removeButton', removeButton);
+};
+
+Util.fileGroup = function (name = '', initial, max) {
+
+    let e;
+    let columnElementStyle = {
+        'width': '100%',
+        'display': 'flex',
+        'flex-flow': 'column nowrap',
+        'justify-content': 'flex-start',
+        'align-items': 'flex-start'
+    };
+
+    let files = Util.create('div', { style: Util.objToStyle(columnElementStyle) });
+
+    let addButton = Util.create('div', {
+        style: Util.objToStyle({
+            'width': '30px',
+            'height': '20px',
+            'display': 'flex',
+            'flex-flow': 'row nowrap',
+            'justify-content': 'center',
+            'align-items': 'center',
+            'font-size': '100%',
+            'cursor': 'pointer',
+            'margin': '0px',
+            'padding': '0px 3px',
+            'border': '1px solid #888888',
+            'border-radius': '3px',
+            'color': '#000000;',
+            'background-color': '#f3f3f3',
+            'outline': 'none'
+        })
+    })
+        .appendContent("Add")
+        .addEventHandler('click', (event) => {
+            if (max == null || files.entity().children.length < max) {
+                files.appendContent(
+                    Util.fileElement(name).css('width', '100%').css('padding-bottom', '3px')
+                );
+            }
+        });
+
+    new MutationObserver(() => {
+        if (files.entity().children.length < max && addButton.entity().style.display === 'none') {
+            addButton.show();
+        } else if (files.entity().children.length == max && addButton.entity().style.display !== 'none') {
+            addButton.hide();
+        }
+    }).observe(files.entity(), { attributes: !true, childList: true, subtree: true })
+
+    for (let i = 0; i < initial; i++) {
+        files.appendContent(Util.fileElement(name).css('width', '100%').css('padding-bottom', '3px'));
+    }
+
+    e = Util.create('div').appendContent(
+        Util.create('div', { style: Util.objToStyle(columnElementStyle) })
+            .appendContent(files)
+            .appendContent(addButton)
+    );
+
+    return e.prop('container', e).prop('files', files).prop('addButton', addButton);
+};
+
+Util.prototype.appendMovableDiv = function (content) {
+    this.css('position', 'relative')
+        .appendContent(Util.createMovableDiv(content));
     return this;
+}
+
+Util.createMovableDiv = function (content) {
+    let div = Util.create('div', {
+        style: this.objToStyle({
+            'position': 'absolute',
+            'height': 'min-content',
+            'width': 'min-content',
+            'min-height': '50px',
+            'min-width': '50px',
+            'margin': '0px',
+            'padding': '0px',
+            'border': 'solid #ddd 1px',
+            'z-index': '50',
+            'box-sizing': 'border-box',
+            'background-color': '#fff'
+        })
+    });
+    div.appendContent(
+        Util.create('div', {
+            style: this.objToStyle({
+                'height': '20px',
+                'width': '20px',
+                'margin': '0px',
+                'padding': '0px',
+                'position': 'absolute',
+                'right': '-21px',
+                'top': '-1px',
+                'border-top': 'solid #ddd 1px',
+                'border-bottom': 'solid #ddd 1px',
+                'border-right': 'solid #ddd 1px',
+                'display': 'flex',
+                'justify-content': 'center',
+                'align-items': 'center',
+                'font-size': '15px',
+                'box-sizing': 'border-box',
+                'color': 'inherit',
+                'background-color': 'inherit'
+            })
+        })
+            .appendContent('✖')
+    )
+        .appendContent(
+            Util.create('div', {
+                style: this.objToStyle({
+                    'height': '20px',
+                    'width': '20px',
+                    'margin': '0px',
+                    'padding': '0px',
+                    'position': 'absolute',
+                    'right': '-21px',
+                    'top': '-1px',
+                    'box-sizing': 'border-box'
+                })
+            })
+                .addEventHandler('mouseover', function (event) { event.target.style.cursor = 'pointer'; })
+                .addEventHandler('mouseout', function (event) { event.target.style.cursor = 'default'; })
+                .addEventHandler('focus', function (event) { event.target.blur() })
+                .addEventHandler('click', (e) => {
+                    div.remove();
+                })
+        )
+        .appendContent(
+            Util.create('div', {
+                style: this.objToStyle({
+                    'height': '20px',
+                    'width': '20px',
+                    'margin': '0px',
+                    'padding': '0px',
+                    'position': 'absolute',
+                    'right': '-21px',
+                    'top': '19px',
+                    'border-right': 'solid #ddd 1px',
+                    'border-bottom': 'solid #ddd 1px',
+                    'display': 'flex',
+                    'justify-content': 'center',
+                    'align-items': 'center',
+                    'font-size': '15px',
+                    'box-sizing': 'border-box',
+                    'color': 'inherit',
+                    'background-color': 'inherit'
+                })
+            })
+                .appendContent('✠')
+        )
+        .appendContent(
+            Util.create('div', {
+                style: this.objToStyle({
+                    'height': '20px',
+                    'width': '20px',
+                    'margin': '0px',
+                    'padding': '0px',
+                    'position': 'absolute',
+                    'right': '-21px',
+                    'top': '19px',
+                    'box-sizing': 'border-box'
+                })
+            })
+                .addEventHandler('mouseover', function (event) { event.target.style.cursor = 'move'; })
+                .addEventHandler('mouseout', function (event) { event.target.style.cursor = 'default'; })
+                .addEventHandler('focus', function (event) { event.target.blur() })
+                .drag(div)
+        )
+        .appendContentIf(content, content);
+    return div;
+}
+
+Util.prototype.drag = function (target) {
+    this.addEventHandler('mousedown', (e) => {
+        this['hold'] = {};
+        this['hold']['x'] = e.clientX;
+        this['hold']['y'] = e.clientY;
+    }).addEventHandler('mouseup', (e) => {
+        this['hold'] = undefined;
+    });
+    Util.get('html')[0].css('position', 'relative').addEventHandler('mousemove', (e) => {
+        if (this['hold']) {
+            target.css('left', target.entity().offsetLeft + e.clientX - this['hold']['x'] + 'px');
+            target.css('top', target.entity().offsetTop + e.clientY - this['hold']['y'] + 'px');
+            this['hold']['x'] = e.clientX;
+            this['hold']['y'] = e.clientY;
+        }
+    });
+    return this;
+}
+
+Object.defineProperty(Util, 'directions', {
+    value: { up: 0, right: 1, down: 2, left: 3 }
+    , writable: false
+    , configurable: false
+    , enumerable: false
+});
+
+Util.createSplitedDiv = function (direction, firstSpan, adjustable) {
+    direction = direction == null ? 1 : direction;
+    firstSpan = firstSpan == null ? '50%' : firstSpan;
+    adjustable = adjustable == null ? false : adjustable;
+
+    let container = Util.create('div', {
+        style: Util.objToStyle({
+            'padding': '0px',
+            'margin': '0px',
+            'box-sizing': 'border-box',
+            'width': '100%',
+            'height': '100%',
+            'display': 'flex',
+            'align-items': 'center'
+        })
+    })
+        .css('flex-flow', (direction % 2 === 0 ? 'column' : 'row') + ' nowrap')
+        .css('justify-content', (direction % 3 === 0 ? 'flex-end' : 'flex-start'))
+        .css('flex-direction', (direction % 2 === 0 ? 'column' : 'row') + (direction % 3 === 0 ? '-reverse' : ''));
+
+    let a = Util.create('div', {
+        style: Util.objToStyle({
+            'padding': '0px',
+            'margin': '0px',
+            'box-sizing': 'border-box'
+        })
+    })
+        .css((direction % 2 === 0 ? 'width' : 'height'), '100%')
+        .css((direction % 2 === 0 ? 'height' : 'width'), firstSpan);
+
+    let b = Util.create('div', {
+        style: Util.objToStyle({
+            'padding': '0px',
+            'margin': '0px',
+            'box-sizing': 'border-box',
+            'flex': '1'
+        })
+    })
+        .css((direction % 2 === 0 ? 'width' : 'height'), '100%');
+
+    let divider = Util.create('div', {
+        style: Util.objToStyle({
+            'padding': '0px',
+            'margin': '0px',
+            'box-sizing': 'border-box',
+            'cursor': !adjustable ? 'unset' : direction % 2 === 0 ? 'row-resize' : 'col-resize',
+            'box-sizing': 'border-box',
+            'border': '0px',
+            'background-image': 'linear-gradient(to ' + (direction % 2 === 0 ? 'bottom' : 'right') + ',  #eee, #eee, #f8f8f8, #eee, #eee)'
+        })
+    })
+        .css((direction % 2 === 0 ? 'width' : 'height'), '100%')
+        .css((direction % 2 === 0 ? 'height' : 'width'), '3px');
+
+    if (adjustable) {
+        divider.addEventHandler('mousedown', (e) => {
+            divider['hold'] = {};
+            divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
+        }).addEventHandler('mouseup', (e) => {
+            divider['hold'] = undefined;
+        });
+        Util.get('html')[0].addEventHandler('mousemove', (e) => {
+            if (divider['hold']) {
+                a.css((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
+                divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
+            }
+        });
+    }
+
+    return container
+        .prop('a', a)
+        .prop('b', b)
+        .prop('divider', divider)
+        .appendContent(a)
+        .appendContent(divider)
+        .appendContent(b);
 }
 
 export { Util };
