@@ -28,7 +28,7 @@
                     .appendContent('appended file group width 400px (within border):')
             ).appendContent(
                 Util.createMovableDiv(
-                    Util.fileGroup('file', 3, 5).css('border', 'hsl(0 100 90) dashed 1px').css('width', '400px').css('box-sizing','border-box')
+                    Util.createFileGroup('file', 3, 10).css('border', 'hsl(0 100 90) dashed 1px').css('width', '400px').css('box-sizing','border-box')
                 ).css('border','unset')
             );
             here.remove();

@@ -1790,7 +1790,7 @@ Util.loaded = function (func) {
     }
 }
 
-Util.fileElement = function (name = '', fileElementProps = {}) {
+Util.createFileElement = function (name = '', fileElementProps = {}) {
     let container, inputField, removeButton
     let e = Util.create('div')
         .appendContent(
@@ -1850,7 +1850,7 @@ Util.fileElement = function (name = '', fileElementProps = {}) {
     return e.prop('container', container).prop('inputField', inputField).prop('removeButton', removeButton);
 };
 
-Util.fileGroup = function (name = '', initial, max, fileElementProps = {}) {
+Util.createFileGroup = function (name = '', initial, max, fileElementProps = {}) {
 
     let e;
     let columnElementStyle = {
@@ -1884,7 +1884,7 @@ Util.fileGroup = function (name = '', initial, max, fileElementProps = {}) {
         .addEventHandler('click', (event) => {
             if (max == null || files.entity().children.length < max) {
                 files.appendContent(
-                    Util.fileElement(name, fileElementProps).css('width', '100%').css('padding-bottom', '3px')
+                    Util.createFileElement(name, fileElementProps).css('width', '100%').css('padding-bottom', '3px')
                 );
             }
         });
@@ -1898,7 +1898,7 @@ Util.fileGroup = function (name = '', initial, max, fileElementProps = {}) {
     }).observe(files.entity(), { attributes: !true, childList: true, subtree: true })
 
     for (let i = 0; i < initial; i++) {
-        files.appendContent(Util.fileElement(name, fileElementProps).css('width', '100%').css('padding-bottom', '3px'));
+        files.appendContent(Util.createFileElement(name, fileElementProps).css('width', '100%').css('padding-bottom', '3px'));
     }
 
     e = Util.create('div').appendContent(
