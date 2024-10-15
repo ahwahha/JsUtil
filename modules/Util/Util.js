@@ -1,4 +1,3 @@
-
 function Util(entity) {
     this['_entity'] = null;
     if (entity != null) {
@@ -496,52 +495,58 @@ Util.loaded = function (func) {
     }
 }
 
-Util.fileElement = function (name = '') {
+Util.fileElement = function (name = '', fileElementProps = {}) {
     let container, inputField, removeButton
     let e = Util.create('div')
         .appendContent(
             container = Util.create('div', {
-                'style': Util.objToStyle({
-                    'width': 'calc(100% - 4px)',
-                    'padding': '1px',
-                    'border': 'hsl(0 0 90) solid 1px',
-                    'border-radius': '4px',
-                    'display': 'flex',
-                    'flex-flow': 'row nowrap',
-                    'justify-content': 'flex-start',
-                    'align-items': 'center',
-                    'gap': '3px'
-                })
+                ...{
+                    'style': Util.objToStyle({
+                        'width': 'calc(100% - 4px)',
+                        'padding': '1px',
+                        'border': 'hsl(0 0 90) solid 1px',
+                        'border-radius': '4px',
+                        'display': 'flex',
+                        'flex-flow': 'row nowrap',
+                        'justify-content': 'flex-start',
+                        'align-items': 'center',
+                        'gap': '3px'
+                    })
+                }, ...(fileElementProps['container'] || {})
             })
                 .appendContent(
                     inputField = Util.create('input', {
-                        'type': 'file',
-                        'name': name,
-                        'style': Util.objToStyle(
-                            { 'width': 'calc(100% - 30px)' },
-                        )
+                        ...{
+                            'type': 'file',
+                            'name': name,
+                            'style': Util.objToStyle(
+                                { 'width': 'calc(100% - 30px)' },
+                            )
+                        }, ...(fileElementProps['inputField'] || {})
                     })
                 )
                 .appendContent(
                     removeButton = Util.create('div', {
-                        'style': Util.objToStyle({
-                            'width': '30px',
-                            'height': '20px',
-                            'display': 'flex',
-                            'flex-flow': 'row nowrap',
-                            'justify-content': 'center',
-                            'align-items': 'center',
-                            'font-size': '15px',
-                            'font-weight': 'bold',
-                            'cursor': 'pointer',
-                            'margin': '0px',
-                            'padding': '0px',
-                            'border': '1px solid #888888',
-                            'border-radius': '3px',
-                            'color': '#000000;',
-                            'background-color': '#f3f3f3',
-                            'outline': 'none'
-                        })
+                        ...{
+                            'style': Util.objToStyle({
+                                'width': '30px',
+                                'height': '20px',
+                                'display': 'flex',
+                                'flex-flow': 'row nowrap',
+                                'justify-content': 'center',
+                                'align-items': 'center',
+                                'font-size': '15px',
+                                'font-weight': 'bold',
+                                'cursor': 'pointer',
+                                'margin': '0px',
+                                'padding': '0px',
+                                'border': '1px solid #888888',
+                                'border-radius': '3px',
+                                'color': '#000000;',
+                                'background-color': '#f3f3f3',
+                                'outline': 'none'
+                            })
+                        }, ...(fileElementProps['removeButton'] || {})
                     })
                         .appendContent("✕")
                         .addEventHandler('click', (event) => { e.remove(); })
@@ -550,7 +555,7 @@ Util.fileElement = function (name = '') {
     return e.prop('container', container).prop('inputField', inputField).prop('removeButton', removeButton);
 };
 
-Util.fileGroup = function (name = '', initial, max) {
+Util.fileGroup = function (name = '', initial, max, fileElementProps = {}) {
 
     let e;
     let columnElementStyle = {
@@ -565,8 +570,6 @@ Util.fileGroup = function (name = '', initial, max) {
 
     let addButton = Util.create('div', {
         style: Util.objToStyle({
-            'width': '30px',
-            'height': '20px',
             'display': 'flex',
             'flex-flow': 'row nowrap',
             'justify-content': 'center',
@@ -586,7 +589,7 @@ Util.fileGroup = function (name = '', initial, max) {
         .addEventHandler('click', (event) => {
             if (max == null || files.entity().children.length < max) {
                 files.appendContent(
-                    Util.fileElement(name).css('width', '100%').css('padding-bottom', '3px')
+                    Util.fileElement(name, fileElementProps).css('width', '100%').css('padding-bottom', '3px')
                 );
             }
         });
@@ -600,7 +603,7 @@ Util.fileGroup = function (name = '', initial, max) {
     }).observe(files.entity(), { attributes: !true, childList: true, subtree: true })
 
     for (let i = 0; i < initial; i++) {
-        files.appendContent(Util.fileElement(name).css('width', '100%').css('padding-bottom', '3px'));
+        files.appendContent(Util.fileElement(name, fileElementProps).css('width', '100%').css('padding-bottom', '3px'));
     }
 
     e = Util.create('div').appendContent(
