@@ -1,0 +1,25 @@
+<html>
+
+<head></head>
+
+<body>
+    <script src="../Util.js" type="text/javascript"></script>
+    <script>
+        let dv, dh;
+        Util.loaded(() => {
+            Util.get('body')[0].css('margin','0px');
+            Util.get('#main').css('position','relative').css('margin','0px').css('padding','0px').appendContent(
+                dv = Util.createSplitedDiv(Util.directions.down, '50px', true)
+            );
+
+            dv.a.appendContent('top section');
+            dv.b.appendContent(dh = Util.createSplitedDiv(Util.directions.right, '30%', true));
+
+            dh.a.appendContent(Util.create('iframe').css('width','100%').css('height','100%').css('border','none').attr('src','JSON_parser.html'));
+            dh.b.appendContent(Util.create('iframe').css('width','100%').css('height','100%').css('border','none').attr('src','JsonTableExample-static.html'));
+        });
+    </script>
+    <div id='main'></div>
+</body>
+
+</html>
