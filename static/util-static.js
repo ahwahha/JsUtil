@@ -395,6 +395,19 @@ function JsonTable(c = null) {
         }
     }
 
+    var getNotRemoved = function (arr) {
+        try {
+            arr = (arr || tableData);
+            if (arr != null && Array.isArray(arr)) {
+                return deepFilter(arr, row => !row['###row-removed']);
+            } else {
+                return null;
+            }
+        } catch (error) {
+            throw new Error("error caught @ getNotRemoved(): " + error.toString());
+        }
+    }
+
     var sortAsOriginal = function () {
         try {
             setSorting('###row-index', true)
@@ -1223,7 +1236,7 @@ function JsonTable(c = null) {
     return {
         setData, getData, resetData, insertData,
         setTableSettings, getTableSettings, sortAsOriginal,
-        getSelected, getFiltered, getEdited, getInserted, getRemoved,
+        getSelected, getFiltered, getEdited, getInserted, getRemoved, getNotRemoved,
         createSelectBox, createRemoveBox, editData, setContainer, fillTable, refreshTable
     };
 

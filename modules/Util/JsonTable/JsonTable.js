@@ -190,9 +190,7 @@ function JsonTable(c = null) {
                 let oriRow = originalTableData.find(origDataRow => origDataRow['###row-index'] === row['###row-index']);
                 if (tableData != null && Array.isArray(tableData)) {
                     let dataRow = tableData.find(dataRow => dataRow['###row-index'] === row['###row-index']);
-                    let replacement = Util.clone(oriRow);
-                    replacement['###row-selected'] = true;
-                    Object.assign(dataRow, replacement);
+                    Object.assign(dataRow, oriRow);
                 }
             }
             setEdited();
@@ -309,7 +307,7 @@ function JsonTable(c = null) {
                     let isEdited = false;
                     for (let key in row) {
                         if (!key.startsWith('###row-') && !key.startsWith('###ori-')) {
-                            if ((typeof row[key] === 'string' ? row[key] : JSON.stringify(row[key])) !== ((typeof oriRow[key] === 'string' ? oriRow[key] : JSON.stringify(oriRow[key])))) {
+                            if (row[key] !== oriRow[key]) {
                                 isEdited = true;
                                 break;
                             }
@@ -754,11 +752,11 @@ function JsonTable(c = null) {
                                     .addEventHandler('click', (event) => { resetData(); refreshTable(); })
                                     .appendContent(tableSettings.resetData)
                             )
-                            .appendContentIf(
+                            .appendContent(
                                 Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                     .addEventHandler('click', (event) => { resetSelectedData(); refreshTable(); })
                                     .appendContent(tableSettings.resetSelectedData)
-                                , haveSelection)
+                            )
                         , edited
                     );
             } catch (err) {
@@ -1071,14 +1069,14 @@ function JsonTable(c = null) {
                 try {
                     let start = tableSettings['start'];
                     let end = tableSettings['end'];
-                    var filteredData = getFiltered();
+                    let filteredData = getFiltered();
                     if (filteredData != null && Array.isArray(filteredData) && tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         filteredData.slice(start - 1, end).forEach((row, index) => {
                             try {
-                                var rowsStyle = (col) => {
+                                let rowsStyle = (col) => {
                                     return { ...(tableSettings.rowsStyle || ''), ...(col.rowsStyle || '') };
                                 };
-                                var oddEvenRowsStyle = (col) => {
+                                let oddEvenRowsStyle = (col) => {
                                     return (index % 2 === 1 ? tableSettings.evenRowsStyle : tableSettings.oddRowsStyle);
                                 };
                                 let tableRow = null;
