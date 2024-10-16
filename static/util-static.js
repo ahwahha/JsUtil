@@ -1085,10 +1085,11 @@ function JsonTable(c = null) {
                                         tableRow = Util.create('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
 
                                         tableSettings['columns'].forEach((col) => {
-                                            var cellData = row[col['data']] != null ? String(row[col['data']]) : '';
+                                            let cellData = row[col['data']] != null ? String(row[col['data']]) : '';
+                                            let oriData = row['###ori-' + col['data']] || '';
                                             if (col.modifier) {
                                                 if (typeof col.modifier === 'function') {
-                                                    var clone = Object.assign({}, row);
+                                                    let clone = Object.assign({}, row);
                                                     cellData = col.modifier(clone);
                                                 }
                                             }
@@ -1098,7 +1099,7 @@ function JsonTable(c = null) {
                                                     .appendContentIf(Util.create('br'), row['###row-edited'])
                                                     .appendContentIf(
                                                         Util.create('span', { style: Util.objToStyle(tableSettings.editedStyle) })
-                                                            .appendContentIf('(' + row['###ori-' + col['data']] + ')', row['###ori-' + col['data']] !== undefined),
+                                                            .appendContentIf('(' + (typeof oriData === 'string' ? '"' + oriData + '"' : JSON.stringify(oriData)) + ')', row['###ori-' + col['data']] !== undefined),
                                                         row['###row-edited']
                                                     )
                                             )
