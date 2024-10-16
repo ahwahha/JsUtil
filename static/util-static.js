@@ -188,7 +188,9 @@ function JsonTable(c = null) {
                 let oriRow = originalTableData.find(origDataRow => origDataRow['###row-index'] === row['###row-index']);
                 if (tableData != null && Array.isArray(tableData)) {
                     let dataRow = tableData.find(dataRow => dataRow['###row-index'] === row['###row-index']);
-                    Object.assign(dataRow, oriRow);
+                    let replacement = Util.clone(oriRow);
+                    replacement['###row-selected'] = true;
+                    Object.assign(dataRow, replacement);
                 }
             }
             setEdited();
@@ -305,7 +307,7 @@ function JsonTable(c = null) {
                     let isEdited = false;
                     for (let key in row) {
                         if (!key.startsWith('###row-') && !key.startsWith('###ori-')) {
-                            if (row[key] !== oriRow[key]) {
+                            if ((typeof row[key] === 'string' ? row[key] : JSON.stringify(row[key])) !== ((typeof oriRow[key] === 'string' ? oriRow[key] : JSON.stringify(oriRow[key])))) {
                                 isEdited = true;
                                 break;
                             }
@@ -392,6 +394,19 @@ function JsonTable(c = null) {
             }
         } catch (error) {
             throw new Error("error caught @ getRemoved(): " + error.toString());
+        }
+    }
+
+    var getUnRemoved = function (arr) {
+        try {
+            arr = (arr || tableData);
+            if (arr != null && Array.isArray(arr)) {
+                return deepFilter(arr, row => !row['###row-removed']);
+            } else {
+                return null;
+            }
+        } catch (error) {
+            throw new Error("error caught @ getUnRemoved(): " + error.toString());
         }
     }
 
@@ -737,11 +752,11 @@ function JsonTable(c = null) {
                                     .addEventHandler('click', (event) => { resetData(); refreshTable(); })
                                     .appendContent(tableSettings.resetData)
                             )
-                            .appendContent(
+                            .appendContentIf(
                                 Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                     .addEventHandler('click', (event) => { resetSelectedData(); refreshTable(); })
                                     .appendContent(tableSettings.resetSelectedData)
-                            )
+                                , haveSelection)
                         , edited
                     );
             } catch (err) {
@@ -1222,7 +1237,7 @@ function JsonTable(c = null) {
     return {
         setData, getData, resetData, insertData,
         setTableSettings, getTableSettings, sortAsOriginal,
-        getSelected, getFiltered, getEdited, getInserted, getRemoved,
+        getSelected, getFiltered, getEdited, getInserted, getRemoved, getUnRemoved,
         createSelectBox, createRemoveBox, editData, setContainer, fillTable, refreshTable
     };
 
