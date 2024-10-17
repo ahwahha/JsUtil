@@ -305,7 +305,7 @@ function JsonTable(c = null) {
                     let isEdited = false;
                     for (let key in row) {
                         if (!key.startsWith('###row-') && !key.startsWith('###ori-')) {
-                            if (row[key] !== oriRow[key]) {
+                            if ((typeof row[key] === 'object' ? JSON.stringify(row[key]) : row[key]) !== (typeof oriRow[key] === 'object' ? JSON.stringify(oriRow[key]) : oriRow[key])) {
                                 isEdited = true;
                                 break;
                             }
@@ -425,8 +425,8 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let a = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']].toString();
-                            let b = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'].toString();
+                            let a = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : JSON.stringify(row[col['data']]);
+                            let b = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : JSON.stringify(col['filter']);
                             let matching = match(a, b, false);
                             if (!matching) {
                                 isFiltered = false;
@@ -455,8 +455,8 @@ function JsonTable(c = null) {
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
                 let sortedData = tableData.sort((a, b) => {
-                    let aValue = a[data] == null ? '' : a[data].toString();
-                    let bValue = b[data] == null ? '' : b[data].toString();
+                    let aValue = a[data] == null ? '' : JSON.stringify(a[data]);
+                    let bValue = b[data] == null ? '' : JSON.stringify(b[data]);
                     if (typeof aValue === 'boolean' || typeof bValue === 'boolean') {
                         if (aValue === bValue) {
                             return 0;
@@ -970,20 +970,13 @@ function JsonTable(c = null) {
                 let row = tableData.find((row) => {
                     return row['###row-index'] === index;
                 });
-                let tryParseJson = (str) => {
-                    try {
-                        return JSON.parse(Util.clone(str).replaceAll('\n', '').replaceAll('\n', '').replaceAll('\t', ''));
-                    } catch (e) {
-                        return str;
-                    }
-                }
-                if (row[data] !== value) {
+                if ((typeof row[data] === 'object' ? JSON.stringify(row[data]) : row[data]) !== (typeof value === 'object' ? JSON.stringify(value) : value)) {
                     if (row['###ori-' + data] === undefined) {
                         row['###ori-' + data] = row[data];
                     } else if (row['###ori-' + data] === value) {
                         delete row['###ori-' + data];
                     }
-                    row[data] = tryParseJson(value);
+                    row[data] = value;
                     setEdited([row]);
                 }
             }
