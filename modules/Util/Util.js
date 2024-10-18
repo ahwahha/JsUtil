@@ -10,7 +10,7 @@ function Util(entity) {
             return entity;
         }
     }
-}
+};
 
 Util.get = function (selector) {
     if (typeof selector == 'string') {
@@ -26,11 +26,11 @@ Util.get = function (selector) {
     } else {
         return null;
     }
-}
+};
 
 Util.isObjectOrArray = function (arg) {
     return arg != null && (typeof arg === 'object' || Array.isArray(arg));
-}
+};
 
 Util.debounce = function (func, delay) {
     let timeout;
@@ -40,7 +40,7 @@ Util.debounce = function (func, delay) {
             func.apply(this, args);
         }, delay);
     };
-}
+};
 
 Util.create = function (type, attributes) {
     let e = document.createElement(type);
@@ -112,7 +112,7 @@ Util.clone = function (input) {
     } else {
         return input;
     }
-}
+};
 
 Util.openBlob = function (blob) {
     let url = null;
@@ -126,7 +126,7 @@ Util.openBlob = function (blob) {
             URL.revokeObjectURL(url);
         }
     }
-}
+};
 
 Util.downloadBlob = function (blob, filename = 'filename') {
     let url = null;
@@ -145,11 +145,11 @@ Util.downloadBlob = function (blob, filename = 'filename') {
             URL.revokeObjectURL(url);
         }
     }
-}
+};
 
 Util.prototype.parent = function () {
     return new Util(this['_entity'].parentElement);
-}
+};
 
 Util.prototype.entity = function (entity) {
     if (entity == undefined) {
@@ -158,7 +158,7 @@ Util.prototype.entity = function (entity) {
         this['_entity'] = entity;
         return this;
     }
-}
+};
 
 Util.prototype.hide = function () {
     if (this['_entity']) {
@@ -227,7 +227,7 @@ Util.prototype.removeAllEventHandlers = function () {
     }
     this['_eventListenerList'] = undefined;
     return this;
-}
+};
 
 Util.prototype.content = function (content) {
     if (content === undefined) {
@@ -238,7 +238,7 @@ Util.prototype.content = function (content) {
         }
         return this;
     }
-}
+};
 
 Util.prototype.appendContent = function (content) {
     try {
@@ -280,11 +280,11 @@ Util.prototype.appendContentOf = function (list, funcValue = function (item) { r
     } catch (error) {
         throw ("@ appendContentOf(" + list + ", " + func + "): " + error);
     }
-}
+};
 
 Util.prototype.appendSelect = function (items) {
     return this.appendContent(Util.createSelect(items));
-}
+};
 
 Util.createSelect = function (items) {
     let select = Util.create('select');
@@ -306,12 +306,12 @@ Util.createSelect = function (items) {
         }
     }
     return select;
-}
+};
 
 Util.prototype.preventDefault = function (eventType) {
     this.addEventHandler(eventType, function (event) { event.preventDefault(); });
     return this;
-}
+};
 
 Util.prototype.val = function (value) {
     if (value === undefined) {
@@ -320,7 +320,7 @@ Util.prototype.val = function (value) {
         this['_entity']['value'] = value;
         return this;
     }
-}
+};
 
 Util.prototype.attr = function (name, assignment) {
     if (assignment === undefined) {
@@ -333,7 +333,7 @@ Util.prototype.attr = function (name, assignment) {
         }
         return this;
     }
-}
+};
 
 Util.prototype.prop = function (name, assignment) {
     if (assignment === undefined) {
@@ -346,7 +346,7 @@ Util.prototype.prop = function (name, assignment) {
         }
         return this;
     }
-}
+};
 
 Util.prototype.css = function (name, assignment) {
     if (name == null) {
@@ -366,13 +366,13 @@ Util.prototype.css = function (name, assignment) {
             return this;
         }
     }
-}
+};
 
 Util.prototype.remove = function () {
     this['_entity'].remove();
     this['_entity'] = undefined;
     return this;
-}
+};
 
 Util.downloadBlob = function (blob, fileName = 'data') {
     try {
@@ -387,7 +387,7 @@ Util.downloadBlob = function (blob, fileName = 'data') {
     } catch (error) {
         throw new Error("error caught @ downloadBlob: " + error);
     }
-}
+};
 
 Util.parseCsv = function (csv, delimiter = ',') {
     function splitCSVLines(input) {
@@ -456,7 +456,7 @@ Util.parseCsv = function (csv, delimiter = ',') {
     }
 
     return result;
-}
+};
 
 Util.objectArrayToCsv = function (data, delimiter = ',', linebreak = '\n') {
     let csv = '';
@@ -469,7 +469,7 @@ Util.objectArrayToCsv = function (data, delimiter = ',', linebreak = '\n') {
     // Get the headers
     csv = headers.join(delimiter) + linebreak + csv;
     return csv;
-}
+};
 
 Util.downloadAsCsv = function (data, fileName = 'data.csv', delimiter = ',') {
     try {
@@ -483,17 +483,17 @@ Util.downloadAsCsv = function (data, fileName = 'data.csv', delimiter = ',') {
     } catch (error) {
         throw new Error("error caught @ downloadAsCsv: " + error);
     }
-}
+};
 
 Util.prototype.noFocus = function () {
     this.addEventHandler('focus', (event) => { this.entity().blur(); })
-}
+};
 
 Util.loaded = function (func) {
     if (func != null && typeof func === 'function') {
         document.addEventListener('DOMContentLoaded', func);
     }
-}
+};
 
 Util.createFileElement = function (name = '', fileElementProps = {}) {
     let container, inputField, removeButton
@@ -619,7 +619,7 @@ Util.prototype.appendMovableDiv = function (content) {
     this.css('position', 'relative')
         .appendContent(Util.createMovableDiv(content));
     return this;
-}
+};
 
 Util.createMovableDiv = function (content) {
     let div = Util.create('div', {
@@ -724,7 +724,7 @@ Util.createMovableDiv = function (content) {
         )
         .appendContentIf(content, content);
     return div;
-}
+};
 
 Util.prototype.drag = function (target) {
     this.addEventHandler('mousedown', (e) => {
@@ -743,7 +743,7 @@ Util.prototype.drag = function (target) {
         }
     });
     return this;
-}
+};
 
 Object.defineProperty(Util, 'directions', {
     value: { up: 0, right: 1, down: 2, left: 3 }
@@ -828,6 +828,134 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable) {
         .appendContent(a)
         .appendContent(divider)
         .appendContent(b);
+};
+
+Util.getStrParts = (str, delimiter = '`', lv = 1) => {
+    try {
+        let getParts = (str, delimiter, lv) => {
+            let parts = str.split(delimiter.repeat(lv));
+            if (lv > 1) {
+                let a = [];
+                for (let i = 0; i < parts.length; i++) {
+                    let part = getParts(parts[i], delimiter, lv - 1);
+                    a.push(part);
+                }
+                return a;
+            } else {
+                return parts;
+            }
+        }
+        return getParts(str, delimiter, lv);
+    } catch (e) {
+        throw new Error("error caught @ getStrParts: " + e);
+    }
+};
+
+
+Util.match = function (text, matchingText, delimiter, caseSensitive) {
+    let match = false;
+    try {
+        if (text == null && matchingText !== '') {
+            match = false;
+        } else if (matchingText.trim() === "") {
+            match = true;
+        } else {
+            let regex = matchingText.trim().startsWith("regex:");
+
+            if (regex) {
+                let regexPattern = new RegExp(matchingText.trim().substring(6));
+                match = regexPattern.test(text);
+            } else {
+
+                if (!caseSensitive) {
+                    text = text.toUpperCase();
+                    matchingText = matchingText.toUpperCase();
+                }
+
+                let parts = Util.getStrParts(matchingText, delimiter, 2);
+
+                let splitPart = (str) => {
+                    try {
+                        let values = [];
+                        let isQuoteOpen = false;
+                        let currentWord = "";
+
+                        /* push every whole string in quotes */
+                        for (let i = 0; i < str.length; i++) {
+                            let char = str[i];
+                            if (!isQuoteOpen && (char === " " || char === "," || char === "+" || char === "\t")) {
+                                if (currentWord !== "") {
+                                    values.push(currentWord);
+                                    currentWord = "";
+                                }
+                            } else if (char === "\"") {
+                                isQuoteOpen = !isQuoteOpen;
+                                if (!isQuoteOpen && currentWord !== "") {
+                                    values.push(currentWord);
+                                    currentWord = "";
+                                }
+                            } else {
+                                currentWord += char;
+                            }
+                        }
+
+                        /* push the last part */
+                        if (currentWord !== "") {
+                            values.push(currentWord);
+                        }
+
+                        return values;
+                    } catch (e) {
+                        throw '@ splitPart: ' + e;
+                    }
+                }
+
+                let check = (str, array) => {
+                    try {
+                        let includes = array[0] ? splitPart(array[0]) : [];
+                        let excludes = array[1] ? splitPart(array[1]) : [];
+
+                        /*handle excludes*/
+                        let exclusiveMatch = true;
+                        for (let value of excludes) {
+                            exclusiveMatch = exclusiveMatch && str.indexOf(value) === -1;
+                            if (!exclusiveMatch) {
+                                return false;
+                            }
+                        }
+
+                        /*handle includes*/
+                        let inclusiveAndMatch = includes.length !== 0;
+                        for (let value of includes) {
+                            inclusiveAndMatch = inclusiveAndMatch && str.indexOf(value) !== -1;
+                            if (!inclusiveAndMatch) {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    } catch (e) {
+                        throw '@ check: ' + e;
+                    }
+                }
+
+                match = false;
+                for (let i = 0; i < parts.length; i++) {
+                    if (check(text, parts[i])) {
+                        match = true;
+                        break;
+                    }
+                }
+
+            }
+
+        }
+        return match;
+        
+    } catch (e) {
+        throw new Error("error caught @ match: " + e);
+    }
+
 }
 
 export { Util };

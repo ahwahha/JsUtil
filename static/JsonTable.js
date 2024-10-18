@@ -93,7 +93,7 @@ function JsonTable(c = null) {
             "text-decoration-color": "hsl(0, 100%, 30%)"
         },
         filterDebounceDelay: 500,
-        negationChar: "`"
+        delimiter: "`"
     };
     var tableSettings = tableDefaultSettings;
 
@@ -305,7 +305,7 @@ function JsonTable(c = null) {
                     let isEdited = false;
                     for (let key in row) {
                         if (!key.startsWith('###row-') && !key.startsWith('###ori-')) {
-                            if ((typeof row[key] === 'object' ? JSON.stringify(row[key]) : row[key]) !== (typeof oriRow[key] === 'object' ? JSON.stringify(oriRow[key]) : oriRow[key])) {
+                            if ((Util.isObjectOrArray(row[key]) ? JSON.stringify(row[key]) : row[key]) !== (Util.isObjectOrArray(oriRow[key]) ? JSON.stringify(oriRow[key]) : oriRow[key])) {
                                 isEdited = true;
                                 break;
                             }
@@ -425,9 +425,9 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let a = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : JSON.stringify(row[col['data']]);
-                            let b = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : JSON.stringify(col['filter']);
-                            let matching = match(a, b, false);
+                            let a = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']];
+                            let b = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'];
+                            let matching = Util.match(a, b, tableSettings['delimiter'], false);
                             if (!matching) {
                                 isFiltered = false;
                                 break;
@@ -883,94 +883,13 @@ function JsonTable(c = null) {
         }
     }
 
-    var match = function (text, matchingText, caseSensitive) {
-        let match = false;
-
-        try {
-            if (text == null && matchingText !== '') {
-                return false;
-            } else if (matchingText.trim() === "") {
-                match = true;
-            } else {
-                let regex = matchingText.trim().startsWith("regex:");
-
-                if (regex) {
-                    let regexPattern = new RegExp(matchingText.trim().substring(6));
-                    match = regexPattern.test(text);
-                } else {
-                    if (!caseSensitive) {
-                        text = text.toUpperCase();
-                        matchingText = matchingText.toUpperCase();
-                    }
-
-                    let values = [];
-                    let isQuoteOpen = false;
-                    let currentWord = "";
-
-                    for (let i = 0; i < matchingText.length; i++) {
-                        let char = matchingText[i];
-
-                        if (!isQuoteOpen && (char === " " || char === "," || char === "+" || char === "\t")) {
-                            if (currentWord !== "") {
-                                values.push(currentWord);
-                                currentWord = "";
-                            }
-                        } else if (char === "\"") {
-                            isQuoteOpen = !isQuoteOpen;
-
-                            if (!isQuoteOpen && currentWord !== "") {
-                                values.push(currentWord);
-                                currentWord = "";
-                            }
-                        } else {
-                            currentWord += char;
-                        }
-                    }
-
-                    if (currentWord !== "") {
-                        values.push(currentWord);
-                    }
-
-                    let exclusionSet = [];
-                    let inclusionSet = [];
-
-                    for (let value of values) {
-                        if (value.startsWith(tableSettings['negationChar'])) {
-                            exclusionSet.push(value.substring(1));
-                        } else {
-                            inclusionSet.push(value);
-                        }
-                    }
-
-                    /*handle excludes*/
-                    let exclusiveMatch = true;
-                    for (let value of exclusionSet) {
-                        exclusiveMatch = exclusiveMatch && text.indexOf(value) === -1;
-                    }
-
-                    /*handle includes*/
-                    let inclusiveMatch = inclusionSet.length === 0;
-                    for (let value of inclusionSet) {
-                        inclusiveMatch = inclusiveMatch || text.indexOf(value) !== -1;
-                    }
-
-                    match = exclusiveMatch && inclusiveMatch;
-                }
-            }
-        } catch (e) {
-            throw new Error("error caught @ match(" + text + ", " + matchingText + ", " + (caseSensitive ? "true" : "false") + "): " + e);
-        }
-
-        return match;
-    }
-
     var editData = function (index, data, value) {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 let row = tableData.find((row) => {
                     return row['###row-index'] === index;
                 });
-                if ((typeof row[data] === 'object' ? JSON.stringify(row[data]) : row[data]) !== (typeof value === 'object' ? JSON.stringify(value) : value)) {
+                if ((Util.isObjectOrArray(row[data]) ? JSON.stringify(row[data]) : row[data]) !== (Util.isObjectOrArray(value) ? JSON.stringify(value) : value)) {
                     if (row['###ori-' + data] === undefined) {
                         row['###ori-' + data] = row[data];
                     } else if (row['###ori-' + data] === value) {
