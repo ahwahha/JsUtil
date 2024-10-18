@@ -176,6 +176,8 @@ function JsonTable(c = null) {
                 }
                 edited = true;
                 setEdited();
+                filterRows();
+                resetPageNumbers();
             }
             return this;
         } catch (error) {
