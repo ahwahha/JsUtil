@@ -95,7 +95,9 @@ function JsonTable(c = null) {
             "text-decoration-color": "hsl(0, 100%, 30%)"
         },
         filterDebounceDelay: 500,
-        delimiter: "`"
+        filterFunction: function (a, b) {
+            return Util.match(a, b, '`', false);
+        }
     };
     var tableSettings = tableDefaultSettings;
 
@@ -431,7 +433,7 @@ function JsonTable(c = null) {
                         for (let col of tableSettings['columns']) {
                             let a = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']];
                             let b = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'];
-                            let matching = Util.match(a, b, tableSettings['delimiter'], false);
+                            let matching = tableSettings['filterFunction'](a, b);
                             if (!matching) {
                                 isFiltered = false;
                                 break;
