@@ -1167,6 +1167,7 @@ function JsonTable(c = null) {
             if (container != null) {
                 sortRows();
                 filterRows();
+                if (resetPage) { resetPageNumbers(); }
                 container.clear().appendContent(
                     createTable()
                 );
