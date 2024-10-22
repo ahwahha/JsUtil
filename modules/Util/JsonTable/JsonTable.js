@@ -105,10 +105,10 @@ function JsonTable(c = null) {
                     // console.log('boolean');
                     return filter.trim() == '' ? true : (data == (filter == 'true' ? true : filter == 'false' ? false : null));
                 } else if (data != '' && !isNaN(data)) {
-                    filterNumbers(data, filter);
+                    return filterNumbers(data, filter);
                 } else if (isDateString(data)) {
                     // console.log('date');
-                    filterDates(data, filter);
+                    return filterDates(data, filter);
                 } else {
                     // console.log('string');
                     return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false);
@@ -122,20 +122,24 @@ function JsonTable(c = null) {
     let tableSettings = tableDefaultSettings;
 
     let filterNumbers = function (data, filter) {
-        if (filter.trim() == '') {
-            return true;
-        } else if (filter.trim().startsWith('<') && !isNaN(filter.trim().substring(1).trim())) {
-            return parseFloat(data) < parseFloat(filter.replaceAll('<', ''));
-        } else if (filter.trim().startsWith('<=') && !isNaN(filter.trim().substring(2).trim())) {
-            return parseFloat(data) <= parseFloat(filter.replaceAll('<=', ''));
-        } else if (filter.trim().startsWith('=') && !isNaN(filter.trim().substring(1).trim())) {
-            return parseFloat(data) == parseFloat(filter.replaceAll('=', ''));
-        } else if (filter.trim().startsWith('>=') && !isNaN(filter.trim().substring(2).trim())) {
-            return parseFloat(data) >= parseFloat(filter.replaceAll('>=', ''));
-        } else if (filter.trim().startsWith('>') && !isNaN(filter.trim().substring(1).trim())) {
-            return parseFloat(data) > parseFloat(filter.replaceAll('>', ''));
-        } else {
-            return parseFloat(data) == parseFloat(filter);
+        try {
+            if (filter.trim() == '') {
+                return true;
+            } else if (filter.trim().startsWith('<') && !isNaN(filter.trim().substring(1).trim())) {
+                return parseFloat(data) < parseFloat(filter.replaceAll('<', ''));
+            } else if (filter.trim().startsWith('<=') && !isNaN(filter.trim().substring(2).trim())) {
+                return parseFloat(data) <= parseFloat(filter.replaceAll('<=', ''));
+            } else if (filter.trim().startsWith('=') && !isNaN(filter.trim().substring(1).trim())) {
+                return parseFloat(data) == parseFloat(filter.replaceAll('=', ''));
+            } else if (filter.trim().startsWith('>=') && !isNaN(filter.trim().substring(2).trim())) {
+                return parseFloat(data) >= parseFloat(filter.replaceAll('>=', ''));
+            } else if (filter.trim().startsWith('>') && !isNaN(filter.trim().substring(1).trim())) {
+                return parseFloat(data) > parseFloat(filter.replaceAll('>', ''));
+            } else {
+                return parseFloat(data) == parseFloat(filter);
+            }
+        } catch (e) {
+            console.log(e);
         }
     }
 
@@ -1068,9 +1072,13 @@ function JsonTable(c = null) {
                                             let cellData = row[col['data']] != null ? String(row[col['data']]) : '';
                                             let oriData = row['###ori-' + col['data']] || '';
                                             if (col.modifier) {
-                                                if (typeof col.modifier === 'function') {
-                                                    let clone = Object.assign({}, row);
-                                                    cellData = col.modifier(clone);
+                                                try {
+                                                    if (typeof col.modifier === 'function') {
+                                                        let clone = Object.assign({}, row);
+                                                        cellData = col.modifier(clone);
+                                                    }
+                                                } catch (e) {
+                                                    throw "@ col.modifier: " + e;
                                                 }
                                             }
                                             tableRow.appendContent(
@@ -1170,9 +1178,7 @@ function JsonTable(c = null) {
                 sortRows();
                 filterRows();
                 if (resetPage) { resetPageNumbers(); }
-                container.clear().appendContent(
-                    createTable()
-                );
+                container.clear().appendContent(createTable());
                 loadFilterHandlers();
             }
             return this;
