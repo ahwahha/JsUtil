@@ -12,62 +12,57 @@
 			border-collapse: collapse;
 		}
 	</style>
-	<script src="resources/Util.js" type="text/javascript"></script>
-	<script src="resources/JsonTable.js" type="text/javascript"></script>
-	<link rel='stylesheet' href='resources/button.css'>
+	<script src="../Util.js" type="text/javascript"></script>
+	<script src="../JsonTable.js" type="text/javascript"></script>
+	<link rel='stylesheet' href='button.css'>
 	<script>
 
 		Util.loaded(async () => {
 
-			let api = 'http://localhost:2001';
-			let path = 'notes/notes.json';
-
-			function update(col, event) {
-				let v = event.target.value;
-				myTable.editData(row['###row-index'], col, event.target.value).refreshTable();
-			}
+			// let api = 'http://localhost:2001';
+			// let path = 'notes/notes.json';
 
 			async function getData() {
 				try {
-					let response = await fetch(api + '/get', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify({ file: path })
-					});
+					// let response = await fetch(api + '/get', {
+					// 	method: 'POST',
+					// 	headers: {
+					// 		'Content-Type': 'application/json'
+					// 	},
+					// 	body: JSON.stringify({ file: path })
+					// });
 					let data = null;
-					if (response.ok) {
-						data = (await response.json()).data || null;
-					}
+					// if (response.ok) {
+					// 	data = (await response.json()).data || null;
+					// }
 					return JSON.parse(data ? decodeBase64Unicode(data) : '[]'); // Decode base64 to text
 				} catch (error) {
 					console.error('Error fetching data:', error);
 				}
 			}
 
-			async function putData(str) {
-				try {
-					let encodedData = encodeBase64Unicode(str); // Encode text to base64
-					let response = await fetch(api + '/put', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify({ file: path, data: encodedData })
-					});
-					if (!response.ok) {
-						throw new Error('Network response was not ok');
-					}
-					return await response.json();
-				} catch (error) {
-					console.error('Error putting data:', error);
-				}
-			}
+			// async function putData(str) {
+			// 	try {
+			// 		let encodedData = encodeBase64Unicode(str); // Encode text to base64
+			// 		let response = await fetch(api + '/put', {
+			// 			method: 'POST',
+			// 			headers: {
+			// 				'Content-Type': 'application/json'
+			// 			},
+			// 			body: JSON.stringify({ file: path, data: encodedData })
+			// 		});
+			// 		if (!response.ok) {
+			// 			throw new Error('Network response was not ok');
+			// 		}
+			// 		return await response.json();
+			// 	} catch (error) {
+			// 		console.error('Error putting data:', error);
+			// 	}
+			// }
 
 			let createTextarea = function (row, col, value) {
 				let e;
-				let output = typeof value === 'object' ? JSON.stringify(value, null, "  ") : value;
+				let output = typeof value === 'object' ? JSON.stringify(value, null, "  ") : String(value);
 				let height = (output.split("\n").length * 15 + 8) + 'px';
 				return e = Util.create('textarea')
 					.appendContent((() => {
@@ -91,7 +86,6 @@
 								.replaceAll("\n", "")
 								.replaceAll("\t", ""))
 						} catch (err) {
-							console.log('error: ' + err);
 							v = e.val();
 						}
 						myTable.editData(row['###row-index'], col, v).refreshTable();
@@ -165,7 +159,7 @@
 						.addEventHandler('click', async function () {
 							// await putData(JSON.stringify(Util.clone(JsonTable.cleanKeys(myTable.getNotRemoved()))));
 							// location.reload();
-							await navigator.clipboard.writeText(JSON.stringify(Util.clone(JsonTable.cleanKeys(myTable.getNotRemoved()))));
+							await navigator.clipboard.writeText(JSON.stringify(Util.clone(myTable.getNotRemoved()), null, '  '));
 							alert('data copied to clipboard');
 						})
 						// .appendContent('save')
@@ -180,7 +174,7 @@
 			let data = await getData();
 			// console.log(data)
 			myTable.setData(data);
-			myTable.fillTable();
+			myTable.refreshTable(true);
 		})
 	</script>
 </head>

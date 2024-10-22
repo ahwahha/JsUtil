@@ -2,14 +2,14 @@ import { Util } from '../Util.js';
 
 function JsonTable(c = null) {
 
-    var container = c instanceof Util ? c : new Util(c);
-    var tableData = null;
-    var originalTableData = null;
-    var haveSelection = false;
-    var haveRemoval = false;
-    var edited = false;
-    var insertCount = 0;
-    var tableDefaultSettings = {
+    let container = c instanceof Util ? c : new Util(c);
+    let tableData = null;
+    let originalTableData = null;
+    let haveSelection = false;
+    let haveRemoval = false;
+    let edited = false;
+    let insertCount = 0;
+    let tableDefaultSettings = {
         label: "",
         columns: [
             {
@@ -95,13 +95,69 @@ function JsonTable(c = null) {
             "text-decoration-color": "hsl(0, 100%, 30%)"
         },
         filterDebounceDelay: 500,
-        filterFunction: function (a, b) {
-            return Util.match(a, b, '`', false);
+        filterFunction: function (data, filter) {
+            // console.log(data + ',' + filter);
+            try {
+                if (data == null) {
+                    // console.log('null');
+                    return false;
+                } else if (typeof data === 'boolean') {
+                    // console.log('boolean');
+                    return filter.trim() == '' ? true : (data == (filter == 'true' ? true : filter == 'false' ? false : null));
+                } else if (data != '' && !isNaN(data)) {
+                    filterNumbers(data, filter);
+                } else if (isDateString(data)) {
+                    // console.log('date');
+                    filterDates(data, filter);
+                } else {
+                    // console.log('string');
+                    return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false);
+                }
+            } catch (e) {
+                // console.log('error');
+                return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false);
+            }
         }
     };
-    var tableSettings = tableDefaultSettings;
+    let tableSettings = tableDefaultSettings;
 
-    var setContainer = function (c) {
+    let filterNumbers = function (data, filter) {
+        if (filter.trim() == '') {
+            return true;
+        } else if (filter.trim().startsWith('<') && !isNaN(filter.trim().substring(1).trim())) {
+            return parseFloat(data) < parseFloat(filter.replaceAll('<', ''));
+        } else if (filter.trim().startsWith('<=') && !isNaN(filter.trim().substring(2).trim())) {
+            return parseFloat(data) <= parseFloat(filter.replaceAll('<=', ''));
+        } else if (filter.trim().startsWith('=') && !isNaN(filter.trim().substring(1).trim())) {
+            return parseFloat(data) == parseFloat(filter.replaceAll('=', ''));
+        } else if (filter.trim().startsWith('>=') && !isNaN(filter.trim().substring(2).trim())) {
+            return parseFloat(data) >= parseFloat(filter.replaceAll('>=', ''));
+        } else if (filter.trim().startsWith('>') && !isNaN(filter.trim().substring(1).trim())) {
+            return parseFloat(data) > parseFloat(filter.replaceAll('>', ''));
+        } else {
+            return parseFloat(data) == parseFloat(filter);
+        }
+    }
+
+    let filterDates = function (data, filter) {
+        if (filter.trim() == '') {
+            return true;
+        } else if (filter.trim().startsWith('<') && isDateString(filter.trim().substring(1).trim())) {
+            return parseDate(data) < parseDate(filter.replaceAll('<', ''));
+        } else if (filter.trim().startsWith('<=') && isDateString(filter.trim().substring(2).trim())) {
+            return parseDate(data) <= parseDate(filter.replaceAll('<=', ''));
+        } else if (filter.trim().startsWith('=') && isDateString(filter.trim().substring(1).trim())) {
+            return parseDate(data) == parseDate(filter.replaceAll('=', ''));
+        } else if (filter.trim().startsWith('>=') && isDateString(filter.trim().substring(2).trim())) {
+            return parseDate(data) >= parseDate(filter.replaceAll('>=', ''));
+        } else if (filter.trim().startsWith('>') && isDateString(filter.trim().substring(1).trim())) {
+            return parseDate(data) > parseDate(filter.replaceAll('>', ''));
+        } else {
+            return parseDate(data) == parseDate(filter);
+        }
+    }
+
+    let setContainer = function (c) {
         if (container) {
             container.clear();
         }
@@ -109,11 +165,11 @@ function JsonTable(c = null) {
         return this;
     }
 
-    var getTableSettings = function () {
+    let getTableSettings = function () {
         return tableSettings;
     }
 
-    var setData = function (data) {
+    let setData = function (data) {
         try {
             edited = false;
             if (data != null) {
@@ -134,7 +190,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var resetData = function () {
+    let resetData = function () {
         try {
             tableData = Util.clone(originalTableData);
             edited = false;
@@ -144,7 +200,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var insertData = function (data) {
+    let insertData = function (data) {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 if (Array.isArray(data)) {
@@ -178,8 +234,6 @@ function JsonTable(c = null) {
                 }
                 edited = true;
                 setEdited();
-                filterRows();
-                resetPageNumbers();
             }
             return this;
         } catch (error) {
@@ -187,9 +241,9 @@ function JsonTable(c = null) {
         }
     }
 
-    var resetSelectedData = function () {
+    let resetSelectedData = function () {
         try {
-            var rows = getEdited(getSelected());
+            let rows = getEdited(getSelected());
             for (let row of rows) {
                 let oriRow = originalTableData.find(origDataRow => origDataRow['###row-index'] === row['###row-index']);
                 if (tableData != null && Array.isArray(tableData)) {
@@ -204,7 +258,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var setTableSettings = function (newSettings) {
+    let setTableSettings = function (newSettings) {
         try {
             tableSettings = { ...tableDefaultSettings, ...newSettings };
 
@@ -227,7 +281,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var setSelected = function (index, selected) {
+    let setSelected = function (index, selected) {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 tableData = tableData.map(row => row['###row-index'] === index ? { ...row, '###row-selected': selected } : row)
@@ -238,7 +292,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var setRemoved = function (index, removed) {
+    let setRemoved = function (index, removed) {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 tableData = tableData.map(row => row['###row-index'] === index ? { ...row, ...{ '###row-removed': removed, '###row-selected': false } } : row)
@@ -249,7 +303,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var setAllSelected = function (selected) {
+    let setAllSelected = function (selected) {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 tableData = tableData.map(row => ({ ...row, '###row-selected': row['###row-removed'] ? false : selected }));
@@ -260,7 +314,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var setAllFilteredSelected = function (selected) {
+    let setAllFilteredSelected = function (selected) {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 tableData = tableData.map(row => row['###row-filtered'] ? { ...row, '###row-selected': row['###row-removed'] ? false : selected } : row);
@@ -271,7 +325,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var setAllEditedSelected = function (selected) {
+    let setAllEditedSelected = function (selected) {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 tableData = tableData.map(row => row['###row-edited'] ? { ...row, '###row-selected': row['###row-removed'] ? false : selected } : row);
@@ -282,7 +336,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var deepFilter = function (arr, predicate) {
+    let deepFilter = function (arr, predicate) {
         try {
             if (arr != null && Array.isArray(arr)) {
                 let filteredArr = [];
@@ -300,7 +354,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var setEdited = function (arr) {
+    let setEdited = function (arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
@@ -327,7 +381,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var getData = function () {
+    let getData = function () {
         try {
             return tableData;
         } catch (error) {
@@ -335,7 +389,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var getSelected = function (arr) {
+    let getSelected = function (arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
@@ -348,7 +402,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var getFiltered = function (arr) {
+    let getFiltered = function (arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
@@ -361,7 +415,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var getEdited = function (arr) {
+    let getEdited = function (arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
@@ -375,7 +429,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var getInserted = function (arr) {
+    let getInserted = function (arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
@@ -388,7 +442,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var getRemoved = function (arr) {
+    let getRemoved = function (arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
@@ -401,7 +455,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var getNotRemoved = function (arr) {
+    let getNotRemoved = function (arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
@@ -414,7 +468,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var sortAsOriginal = function () {
+    let sortAsOriginal = function () {
         try {
             setSorting('###row-index', true)
             refreshTable();
@@ -424,16 +478,16 @@ function JsonTable(c = null) {
         }
     }
 
-    var filterRows = function () {
+    let filterRows = function () {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 tableData.forEach((row) => {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let a = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']];
-                            let b = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'];
-                            let matching = tableSettings['filterFunction'](a, b);
+                            let data = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']];
+                            let filter = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'];
+                            let matching = tableSettings['filterFunction'](data, filter);
                             if (!matching) {
                                 isFiltered = false;
                                 break;
@@ -449,48 +503,61 @@ function JsonTable(c = null) {
         }
     }
 
-    var setSorting = function (data, order) {
+    let setSorting = function (data, order) {
         tableSettings['sortedBy'] = data;
         tableSettings['ascending'] = order;
         return this;
     }
 
-    var sortRows = function () {
+    let sortRows = function () {
         try {
             let data = tableSettings['sortedBy'];
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
                 let sortedData = tableData.sort((a, b) => {
-                    let aValue = a[data] == null ? '' : JSON.stringify(a[data]);
-                    let bValue = b[data] == null ? '' : JSON.stringify(b[data]);
-                    if (typeof aValue === 'boolean' || typeof bValue === 'boolean') {
-                        if (aValue === bValue) {
+                    if (a[data] == null || b[data] == null) {
+                        // null exists
+                        if (a[data] == null && b[data] == null) {
                             return 0;
-                        } else if (aValue && !bValue) {
-                            return order ? -1 : 1;
                         } else {
-                            return order ? 1 : -1;
+                            return order && a[data] == null ? -1 : 1;
                         }
-                    } else if (isDateString(aValue) && isDateString(bValue)) {
-                        let aNumber = parseDate(aValue);
-                        let bNumber = parseDate(bValue);
-                        if (!isNaN(aNumber) && !isNaN(bNumber)) {
-                            return order ? aNumber - bNumber : bNumber - aNumber;
+                    } else if (typeof a[data] === 'boolean' && typeof b[data] === 'boolean') {
+                        // both boolean
+                        if (a[data] == b[data]) {
+                            return 0;
+                        } else {
+                            return order && a[data] ? 1 : -1;
                         }
-                    } else if (isNumberString(aValue) && isNumberString(bValue)) {
-                        let aNumber = parseFloat(aValue);
-                        let bNumber = parseFloat(bValue);
-                        if (!isNaN(aNumber) && !isNaN(bNumber)) {
-                            return order ? aNumber - bNumber : bNumber - aNumber;
+                    } else if (typeof a[data] === 'number' && typeof b[data] === 'number') {
+                        // both number
+                        if (a[data] == b[data]) {
+                            return 0;
+                        } else {
+                            return order ? a[data] - b[data] : b[data] - a[data];
                         }
-                    } else if (isIntegerString(aValue) && isIntegerString(bValue)) {
-                        let aInteger = parseInt(aValue);
-                        let bInteger = parseInt(bValue);
-                        if (!isNaN(aInteger) && !isNaN(bInteger)) {
-                            return order ? aInteger - bInteger : bInteger - aInteger;
+                    } else if (typeof a[data] === 'object' && typeof b[data] === 'object') {
+                        // both object
+                        let va = JSON.stringify(a[data]);
+                        let vb = JSON.stringify(b[data]);
+                        if (va == vb) {
+                            return 0;
+                        } else {
+                            return order ? va - vb : vb - va;
                         }
-                    } else if (typeof aValue === 'string' && typeof bValue === 'string') {
-                        return order ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                    } else {
+                        // else treat as strings
+                        let va = String(a[data]);
+                        let vb = String(b[data]);
+                        if (isDateString(va) && isDateString(vb)) {
+                            let aNumber = parseDate(va);
+                            let bNumber = parseDate(vb);
+                            if (!isNaN(aNumber) && !isNaN(bNumber)) {
+                                return order ? aNumber - bNumber : bNumber - aNumber;
+                            }
+                        } else {
+                            return order ? va.localeCompare(vb) : vb.localeCompare(va);
+                        }
                     }
                     return 0;
                 });
@@ -502,7 +569,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var isDateString = function (value) {
+    let isDateString = function (value) {
         try {
             return /^(\d{2})[-\/](\d{2})[-\/](\d{4})$|^(\d{4})[-\/](\d{2})[-\/](\d{2})$|^(\d{2})[-\/](\d{2})[-\/](\d{4}) (\d{2}):(\d{2}):(\d{2})$/.test(value);
         } catch (error) {
@@ -510,23 +577,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var isNumberString = function (value) {
-        try {
-            return /^(\d+|\d+\.\d+|\.\d+)$/.test(value);
-        } catch (error) {
-            throw new Error("error caught @ isNumberString(" + value + "): " + error);
-        }
-    }
-
-    var isIntegerString = function (value) {
-        try {
-            return /^(\d+)$/.test(value);
-        } catch (error) {
-            throw new Error("error caught @ isIntegerString(" + value + "): " + error);
-        }
-    }
-
-    var parseDate = function (value) {
+    let parseDate = function (value) {
         try {
             let match = null;
             let output = null;
@@ -545,14 +596,16 @@ function JsonTable(c = null) {
                 if (match) {
                     output = new Date(match[3] + '-' + match[2] + '-' + match[1] + 'T' + match[4] + ':' + match[5] + ':' + match[6]).getTime();
                 }
+            } else {
+                output = 0;
             }
             return output;
         } catch (error) {
-            throw new Error("error caught @ parseDate(" + value + "): " + error);
+            return 0;
         }
     }
 
-    var setStart = function (start) {
+    let setStart = function (start) {
         try {
             let rowNumber = parseInt(start);
             if (!Number.isNaN(rowNumber)) {
@@ -576,7 +629,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var setEnd = function (end) {
+    let setEnd = function (end) {
         try {
             let rowNumber = parseInt(end);
             if (!Number.isNaN(rowNumber)) {
@@ -600,7 +653,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var toBegining = function () {
+    let toBegining = function () {
         try {
             let length = tableSettings['end'] - tableSettings['start'] + 1;
             tableSettings['start'] = getFiltered().length === 0 ? 0 : 1;
@@ -611,7 +664,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var priviousPage = function () {
+    let priviousPage = function () {
         try {
             if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
@@ -624,7 +677,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var nextPage = function () {
+    let nextPage = function () {
         try {
             if (tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
@@ -637,7 +690,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var toEnding = function () {
+    let toEnding = function () {
         try {
             if (tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
@@ -650,7 +703,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var createSelectBox = function (row) {
+    let createSelectBox = function (row) {
         try {
             if (!haveSelection) {
                 haveSelection = true;
@@ -669,7 +722,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var createRemoveBox = function (row) {
+    let createRemoveBox = function (row) {
         try {
             if (!haveRemoval) {
                 haveRemoval = true;
@@ -685,7 +738,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var createSelectingGroup = function () {
+    let createSelectingGroup = function () {
         let output = null;
         try {
             if (tableData != null && Array.isArray(tableData)) {
@@ -724,7 +777,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var createResetFiltersButton = function () {
+    let createResetFiltersButton = function () {
         let output = null;
         if (tableSettings != null) {
             try {
@@ -738,7 +791,7 @@ function JsonTable(c = null) {
         return output;
     }
 
-    var createEditedGroup = function () {
+    let createEditedGroup = function () {
         let output = null;
         if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
             try {
@@ -770,7 +823,7 @@ function JsonTable(c = null) {
         return output;
     }
 
-    var createPaginationGroup = function () {
+    let createPaginationGroup = function () {
         let output = null;
         if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
             try {
@@ -852,7 +905,7 @@ function JsonTable(c = null) {
         return output;
     }
 
-    var setFilter = function (index, value) {
+    let setFilter = function (index, value) {
         try {
             if (tableSettings != null && tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                 tableSettings['columns'][index]['filter'] = value;
@@ -863,7 +916,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var resetFilters = function () {
+    let resetFilters = function () {
         try {
             if (tableSettings != null && tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                 tableSettings['columns'].forEach((col) => {
@@ -876,7 +929,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var resetPageNumbers = function () {
+    let resetPageNumbers = function () {
         try {
             if (tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
@@ -889,19 +942,25 @@ function JsonTable(c = null) {
         }
     }
 
-    var editData = function (index, data, value) {
+    let editData = function (index, data, value) {
         try {
             if (tableData != null && Array.isArray(tableData)) {
                 let row = tableData.find((row) => {
                     return row['###row-index'] === index;
                 });
-                if ((Util.isObjectOrArray(row[data]) ? JSON.stringify(row[data]) : row[data]) !== (Util.isObjectOrArray(value) ? JSON.stringify(value) : value)) {
+                let v;
+                try {
+                    v = JSON.parse(value);
+                } catch (e) {
+                    v = value;
+                }
+                if ((Util.isObjectOrArray(row[data]) ? JSON.stringify(row[data]) : row[data]) !== JSON.stringify(v)) {
                     if (row['###ori-' + data] === undefined) {
                         row['###ori-' + data] = row[data];
                     } else if (row['###ori-' + data] === value) {
                         delete row['###ori-' + data];
                     }
-                    row[data] = value;
+                    row[data] = v;
                     setEdited([row]);
                 }
             }
@@ -911,7 +970,7 @@ function JsonTable(c = null) {
         }
     }
 
-    var stringToAscii = function (str) {
+    let stringToAscii = function (str) {
         try {
             let ascii = "";
             for (let i = 0; i < str.length; i++) {
@@ -924,13 +983,11 @@ function JsonTable(c = null) {
         }
     }
 
-    var createTable = function () {
+    let createTable = function () {
         let output = null;
         if (true || (tableData != null && Array.isArray(tableData) && tableSettings != null)) {
             try {
 
-                sortRows();
-                filterRows();
 
                 let tbody = Util.create('tbody', null);
 
@@ -1035,10 +1092,10 @@ function JsonTable(c = null) {
                                         tableRow = Util.create('tr', null);
                                         tableSettings['columns'].forEach((col) => {
                                             try {
-                                                var cellData = row[col['data']] !== undefined ? String(row[col['data']]) : '';
+                                                let cellData = row[col['data']] !== undefined ? String(row[col['data']]) : '';
                                                 if (col['data'] === '###row-removed') {
                                                     if (typeof col.modifier === 'function') {
-                                                        var clone = Object.assign({}, row);
+                                                        let clone = Object.assign({}, row);
                                                         cellData = col.modifier(clone);
                                                     }
                                                 } else if (col['data'] === '###row-selected') {
@@ -1107,22 +1164,14 @@ function JsonTable(c = null) {
         return output;
     }
 
-    var fillTable = () => {
+    let refreshTable = (resetPage = false) => {
         try {
             if (container != null) {
-                resetPageNumbers();
-                refreshTable();
-            }
-            return this;
-        } catch (err) {
-            throw new Error("error caught @ fillTable(): " + err);
-        }
-    }
-
-    var refreshTable = () => {
-        try {
-            if (container != null) {
-                container.clear().appendContent(createTable());
+                sortRows();
+                filterRows();
+                container.clear().appendContent(
+                    createTable()
+                );
                 loadFilterHandlers();
             }
             return this;
@@ -1131,8 +1180,8 @@ function JsonTable(c = null) {
         }
     }
 
-    var loadFilterHandlers = function () {
-        var events = ['keyup', 'dragend'];
+    let loadFilterHandlers = function () {
+        let events = ['keyup', 'dragend'];
         if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
             for (let col of tableSettings['columns']) {
                 let element = col['filterElement'];
@@ -1162,7 +1211,7 @@ function JsonTable(c = null) {
         setData, getData, resetData, insertData,
         setTableSettings, getTableSettings, sortAsOriginal,
         getSelected, getFiltered, getEdited, getInserted, getRemoved, getNotRemoved,
-        createSelectBox, createRemoveBox, editData, setContainer, fillTable, refreshTable
+        createSelectBox, createRemoveBox, editData, setContainer, refreshTable
     };
 
 }

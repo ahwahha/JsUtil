@@ -857,8 +857,6 @@ Util.match = function (text, matchingText, delimiter, caseSensitive) {
     try {
         if (text == null && matchingText !== '') {
             match = false;
-        } else if (matchingText.trim() === "") {
-            match = true;
         } else {
             let regex = matchingText.trim().startsWith("regex:");
 
