@@ -103,12 +103,21 @@ function JsonTable(c = null) {
                     return false;
                 } else if (typeof data === 'boolean') {
                     // console.log('boolean');
-                    return filter.trim() == '' ? true : (data == (filter == 'true' ? true : filter == 'false' ? false : null));
+                    return filter.trim() == '' ? true : (
+                        data == (filter == 'true' ? true : filter == 'false' ? false : null)
+                        || Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false)
+                    );
                 } else if (data != '' && !isNaN(data)) {
-                    return filterNumbers(data, filter);
+                    return filter.trim() == '' ? true : (
+                        filterNumbers(data, filter)
+                        || Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false)
+                    );
                 } else if (isDateString(data)) {
                     // console.log('date');
-                    return filterDates(data, filter);
+                    return filter.trim() == '' ? true : (
+                        filterDates(data, filter)
+                        || Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false)
+                    );
                 } else {
                     // console.log('string');
                     return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false);
@@ -123,9 +132,7 @@ function JsonTable(c = null) {
 
     let filterNumbers = function (data, filter) {
         try {
-            if (filter.trim() == '') {
-                return true;
-            } else if (filter.trim().startsWith('<') && !isNaN(filter.trim().substring(1).trim())) {
+            if (filter.trim().startsWith('<') && !isNaN(filter.trim().substring(1).trim())) {
                 return parseFloat(data) < parseFloat(filter.replaceAll('<', ''));
             } else if (filter.trim().startsWith('<=') && !isNaN(filter.trim().substring(2).trim())) {
                 return parseFloat(data) <= parseFloat(filter.replaceAll('<=', ''));
@@ -144,9 +151,7 @@ function JsonTable(c = null) {
     }
 
     let filterDates = function (data, filter) {
-        if (filter.trim() == '') {
-            return true;
-        } else if (filter.trim().startsWith('<') && isDateString(filter.trim().substring(1).trim())) {
+        if (filter.trim().startsWith('<') && isDateString(filter.trim().substring(1).trim())) {
             return parseDate(data) < parseDate(filter.replaceAll('<', ''));
         } else if (filter.trim().startsWith('<=') && isDateString(filter.trim().substring(2).trim())) {
             return parseDate(data) <= parseDate(filter.replaceAll('<=', ''));
