@@ -107,7 +107,8 @@ function JsonTable(c = null) {
                         data == (filter == 'true' ? true : filter == 'false' ? false : null)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
-                } else if (data != '' && !isNaN(data)) {
+                } else if (!isNaN(data)) {
+                    // console.log('number');
                     return filter.trim() == '' ? true : (
                         filterNumbers(data, filter)
                         || Util.match(String(data), filter.trim(), '`', false)
@@ -120,57 +121,59 @@ function JsonTable(c = null) {
                     );
                 } else {
                     // console.log('string');
-                    return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false);
+                    return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
                 }
             } catch (e) {
                 // console.log('error');
-                return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false);
+                return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
             }
         }
     };
     let tableSettings = tableDefaultSettings;
 
     let filterNumbers = function (data, filter) {
+        if (isNaN(data)) {
+            throw '@ filterNumber: NaN';
+        }
+        let ft = filter.trim();
+        let f1 = ft.substring(1).trim();
+        let f2 = ft.substring(2).trim();
+        if (ft.startsWith('<') && !isNaN(f1)) {
+            return data < parseFloat(f1);
+        } else if (ft.startsWith('<=') && !isNaN(f2)) {
+            return data <= parseFloat(f2);
+        } else if (ft.startsWith('=') && !isNaN(f1)) {
+            return data == parseFloat(f1);
+        } else if (ft.startsWith('>=') && !isNaN(f2)) {
+            return data >= parseFloat(f2);
+        } else if (ft.startsWith('>') && !isNaN(f1)) {
+            return data > parseFloat(f1);
+        } else {
+            return data == parseFloat(ft);
+        }
+    }
+
+    let filterDates = function (data, filter) {
         try {
             let dt = data.trim();
             let ft = filter.trim();
             let f1 = ft.substring(1).trim();
             let f2 = ft.substring(2).trim();
-            if (ft.startsWith('<') && !isNaN(f1)) {
-                return parseFloat(dt) < parseFloat(f1);
-            } else if (ft.startsWith('<=') && !isNaN(f2)) {
-                return parseFloat(dt) <= parseFloat(f2);
-            } else if (ft.startsWith('=') && !isNaN(f1)) {
-                return parseFloat(dt) == parseFloat(f1);
-            } else if (ft.startsWith('>=') && !isNaN(f2)) {
-                return parseFloat(dt) >= parseFloat(f2);
-            } else if (ft.startsWith('>') && !isNaN(f1)) {
-                return parseFloat(dt) > parseFloat(f1);
+            if (ft.startsWith('<') && isDateString(f1)) {
+                return parseDate(dt) < parseDate(f1);
+            } else if (ft.startsWith('<=') && isDateString(f2)) {
+                return parseDate(dt) <= parseDate(f2);
+            } else if (ft.startsWith('=') && isDateString(f1)) {
+                return parseDate(dt) == parseDate(f1);
+            } else if (ft.startsWith('>=') && isDateString(f2)) {
+                return parseDate(dt) >= parseDate(f2);
+            } else if (ft.startsWith('>') && isDateString(f1)) {
+                return parseDate(dt) > parseDate(f1);
             } else {
-                return parseFloat(dt) == parseFloat(ft);
+                return parseDate(dt) == parseDate(ft);
             }
         } catch (e) {
-            console.log(e);
-        }
-    }
-
-    let filterDates = function (data, filter) {
-        let dt = data.trim();
-        let ft = filter.trim();
-        let f1 = ft.substring(1).trim();
-        let f2 = ft.substring(2).trim();
-        if (ft.startsWith('<') && isDateString(f1)) {
-            return parseDate(dt) < parseDate(f1);
-        } else if (ft.startsWith('<=') && isDateString(f2)) {
-            return parseDate(dt) <= parseDate(f2);
-        } else if (ft.startsWith('=') && isDateString(f1)) {
-            return parseDate(dt) == parseDate(f1);
-        } else if (ft.startsWith('>=') && isDateString(f2)) {
-            return parseDate(dt) >= parseDate(f2);
-        } else if (ft.startsWith('>') && isDateString(f1)) {
-            return parseDate(dt) > parseDate(f1);
-        } else {
-            return parseDate(dt) == parseDate(ft);
+            throw '@ filterDates: ' + e;
         }
     }
 
@@ -624,7 +627,7 @@ function JsonTable(c = null) {
             return output;
         } catch (error) {
             return 0;
-        } 
+        }
     }
 
     let setStart = function (start) {
