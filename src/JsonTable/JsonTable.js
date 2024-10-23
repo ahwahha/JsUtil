@@ -132,18 +132,22 @@ function JsonTable(c = null) {
 
     let filterNumbers = function (data, filter) {
         try {
-            if (filter.trim().startsWith('<') && !isNaN(filter.trim().substring(1).trim())) {
-                return parseFloat(data) < parseFloat(filter.replaceAll('<', ''));
-            } else if (filter.trim().startsWith('<=') && !isNaN(filter.trim().substring(2).trim())) {
-                return parseFloat(data) <= parseFloat(filter.replaceAll('<=', ''));
-            } else if (filter.trim().startsWith('=') && !isNaN(filter.trim().substring(1).trim())) {
-                return parseFloat(data) == parseFloat(filter.replaceAll('=', ''));
-            } else if (filter.trim().startsWith('>=') && !isNaN(filter.trim().substring(2).trim())) {
-                return parseFloat(data) >= parseFloat(filter.replaceAll('>=', ''));
-            } else if (filter.trim().startsWith('>') && !isNaN(filter.trim().substring(1).trim())) {
-                return parseFloat(data) > parseFloat(filter.replaceAll('>', ''));
+            let dt = data.trim();
+            let ft = filter.trim();
+            let f1 = ft.substring(1).trim();
+            let f2 = ft.substring(2).trim();
+            if (ft.startsWith('<') && !isNaN(f1)) {
+                return parseFloat(dt) < parseFloat(f1);
+            } else if (ft.startsWith('<=') && !isNaN(f2)) {
+                return parseFloat(dt) <= parseFloat(f2);
+            } else if (ft.startsWith('=') && !isNaN(f1)) {
+                return parseFloat(dt) == parseFloat(f1);
+            } else if (ft.startsWith('>=') && !isNaN(f2)) {
+                return parseFloat(dt) >= parseFloat(f2);
+            } else if (ft.startsWith('>') && !isNaN(f1)) {
+                return parseFloat(dt) > parseFloat(f1);
             } else {
-                return parseFloat(data) == parseFloat(filter);
+                return parseFloat(dt) == parseFloat(ft);
             }
         } catch (e) {
             console.log(e);
@@ -151,18 +155,22 @@ function JsonTable(c = null) {
     }
 
     let filterDates = function (data, filter) {
-        if (filter.trim().startsWith('<') && isDateString(filter.trim().substring(1).trim())) {
-            return parseDate(data) < parseDate(filter.replaceAll('<', ''));
-        } else if (filter.trim().startsWith('<=') && isDateString(filter.trim().substring(2).trim())) {
-            return parseDate(data) <= parseDate(filter.replaceAll('<=', ''));
-        } else if (filter.trim().startsWith('=') && isDateString(filter.trim().substring(1).trim())) {
-            return parseDate(data) == parseDate(filter.replaceAll('=', ''));
-        } else if (filter.trim().startsWith('>=') && isDateString(filter.trim().substring(2).trim())) {
-            return parseDate(data) >= parseDate(filter.replaceAll('>=', ''));
-        } else if (filter.trim().startsWith('>') && isDateString(filter.trim().substring(1).trim())) {
-            return parseDate(data) > parseDate(filter.replaceAll('>', ''));
+        let dt = data.trim();
+        let ft = filter.trim();
+        let f1 = ft.substring(1).trim();
+        let f2 = ft.substring(2).trim();
+        if (ft.startsWith('<') && isDateString(f1)) {
+            return parseDate(dt) < parseDate(f1);
+        } else if (ft.startsWith('<=') && isDateString(f2)) {
+            return parseDate(dt) <= parseDate(f2);
+        } else if (ft.startsWith('=') && isDateString(f1)) {
+            return parseDate(dt) == parseDate(f1);
+        } else if (ft.startsWith('>=') && isDateString(f2)) {
+            return parseDate(dt) >= parseDate(f2);
+        } else if (ft.startsWith('>') && isDateString(f1)) {
+            return parseDate(dt) > parseDate(f1);
         } else {
-            return parseDate(data) == parseDate(filter);
+            return parseDate(dt) == parseDate(ft);
         }
     }
 
@@ -580,7 +588,7 @@ function JsonTable(c = null) {
 
     let isDateString = function (value) {
         try {
-            return /^(\d{2})[-\/](\d{2})[-\/](\d{4})$|^(\d{4})[-\/](\d{2})[-\/](\d{2})$|^(\d{2})[-\/](\d{2})[-\/](\d{4}) (\d{2}):(\d{2}):(\d{2})$/.test(value);
+            return /^(\d{2})[-\/](\d{2})[-\/](\d{4})$|^(\d{4})[-\/](\d{2})[-\/](\d{2})$|^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2})$|^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2}):(\d{2})$/.test(value);
         } catch (error) {
             throw new Error("error caught @ isDateString(" + value + "): " + error);
         }
@@ -593,17 +601,22 @@ function JsonTable(c = null) {
             if (/^(\d{2})[-\/](\d{2})[-\/](\d{4})$/.test(value)) {
                 match = /^(\d{2})[-\/](\d{2})[-\/](\d{4})$/.exec(value);
                 if (match) {
-                    output = new Date(match[3] + '-' + match[2] + '-' + match[1]).getTime();
+                    output = new Date(match[3] + '-' + match[2] + '-' + match[1] + ' 00:00:00').getTime();
                 }
             } else if (/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/.test(value)) {
                 match = /^(\d{4})[-\/](\d{2})[-\/](\d{2})$/.exec(value);
                 if (match) {
-                    output = new Date(match[1] + '-' + match[2] + '-' + match[3]).getTime();
+                    output = new Date(match[1] + '-' + match[2] + '-' + match[3] + ' 00:00:00').getTime();
                 }
-            } else if (/^(\d{2})[-\/](\d{2})[-\/](\d{4}) (\d{2}):(\d{2}):(\d{2})$/.test(value)) {
-                match = /^(\d{2})[-\/](\d{2})[-\/](\d{4}) (\d{2}):(\d{2}):(\d{2})$/.exec(value);
+            } else if (/^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2})$/.test(value)) {
+                match = /^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2})$/.exec(value);
                 if (match) {
-                    output = new Date(match[3] + '-' + match[2] + '-' + match[1] + 'T' + match[4] + ':' + match[5] + ':' + match[6]).getTime();
+                    output = new Date(match[1] + '-' + match[2] + '-' + match[3] + ' ' + match[4] + ':' + match[5] + ':00').getTime();
+                }
+            } else if (/^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2}):(\d{2})$/.test(value)) {
+                match = /^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2}):(\d{2})$/.exec(value);
+                if (match) {
+                    output = new Date(match[1] + '-' + match[2] + '-' + match[3] + ' ' + match[4] + ':' + match[5] + ':' + match[6]).getTime();
                 }
             } else {
                 output = 0;
@@ -611,7 +624,7 @@ function JsonTable(c = null) {
             return output;
         } catch (error) {
             return 0;
-        }
+        } 
     }
 
     let setStart = function (start) {
