@@ -105,18 +105,18 @@ function JsonTable(c = null) {
                     // console.log('boolean');
                     return filter.trim() == '' ? true : (
                         data == (filter == 'true' ? true : filter == 'false' ? false : null)
-                        || Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false)
+                        || Util.match(String(data), filter.trim(), '`', false)
                     );
                 } else if (data != '' && !isNaN(data)) {
                     return filter.trim() == '' ? true : (
                         filterNumbers(data, filter)
-                        || Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false)
+                        || Util.match(String(data), filter.trim(), '`', false)
                     );
                 } else if (isDateString(data)) {
                     // console.log('date');
                     return filter.trim() == '' ? true : (
                         filterDates(data, filter)
-                        || Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : data, filter.trim(), '`', false)
+                        || Util.match(String(data), filter.trim(), '`', false)
                     );
                 } else {
                     // console.log('string');
