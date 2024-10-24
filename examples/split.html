@@ -9,10 +9,10 @@
         Util.loaded(() => {
             Util.get('body')[0].css('margin','0px');
             Util.get('#main').css('position','relative').css('margin','0px').css('padding','0px').appendContent(
-                dv = Util.createSplitedDiv(Util.directions.down, '50px', true)
+                dv = Util.createSplitedDiv(Util.directions.down, '250px', true)
             );
 
-            dv.a.appendContent('top section');
+            dv.a.appendContent(Util.create('iframe').css('width','100%').css('height','100%').css('border','none').attr('src','FileGroup.html'));
             dv.b.appendContent(dh = Util.createSplitedDiv(Util.directions.right, '30%', true));
 
             dh.a.appendContent(Util.create('iframe').css('width','100%').css('height','100%').css('border','none').attr('src','JSON_parser.html'));

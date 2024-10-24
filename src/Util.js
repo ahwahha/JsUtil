@@ -727,20 +727,29 @@ Util.createMovableDiv = function (content) {
 };
 
 Util.prototype.drag = function (target) {
+    let overlay;
+    let ground = Util.get('html')[0].css('position', 'relative');
     this.addEventHandler('mousedown', (e) => {
         this['hold'] = {};
         this['hold']['x'] = e.clientX;
         this['hold']['y'] = e.clientY;
-    }).addEventHandler('mouseup', (e) => {
-        this['hold'] = undefined;
-    });
-    Util.get('html')[0].css('position', 'relative').addEventHandler('mousemove', (e) => {
-        if (this['hold']) {
-            target.css('left', target.entity().offsetLeft + e.clientX - this['hold']['x'] + 'px');
-            target.css('top', target.entity().offsetTop + e.clientY - this['hold']['y'] + 'px');
-            this['hold']['x'] = e.clientX;
-            this['hold']['y'] = e.clientY;
-        }
+        ground.appendContent(
+            overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
+                .addEventHandler(['mouseup', 'mouseleave'], (e) => {
+                    if (this['hold']) {
+                        this['hold'] = undefined;
+                        overlay.remove();
+                    }
+                })
+                .addEventHandler('mousemove', (e) => {
+                    if (this['hold']) {
+                        target.css('left', target.entity().offsetLeft + e.clientX - this['hold']['x'] + 'px');
+                        target.css('top', target.entity().offsetTop + e.clientY - this['hold']['y'] + 'px');
+                        this['hold']['x'] = e.clientX;
+                        this['hold']['y'] = e.clientY;
+                    }
+                })
+        );
     });
     return this;
 };
@@ -806,18 +815,28 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable) {
         .css((direction % 2 === 0 ? 'width' : 'height'), '100%')
         .css((direction % 2 === 0 ? 'height' : 'width'), '3px');
 
+    let overlay;
+    let ground = Util.get('html')[0].css('position', 'relative');
+
     if (adjustable) {
         divider.addEventHandler('mousedown', (e) => {
             divider['hold'] = {};
             divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
-        }).addEventHandler('mouseup', (e) => {
-            divider['hold'] = undefined;
-        });
-        Util.get('html')[0].addEventHandler('mousemove', (e) => {
-            if (divider['hold']) {
-                a.css((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
-                divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
-            }
+            ground.appendContent(
+                overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
+                    .addEventHandler(['mouseup', 'mouseleave'], (e) => {
+                        if (divider['hold']) {
+                            divider['hold'] = undefined;
+                            overlay.remove();
+                        }
+                    })
+                    .addEventHandler('mousemove', (e) => {
+                        if (divider['hold']) {
+                            a.css((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
+                            divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
+                        }
+                    })
+            );
         });
     }
 
@@ -949,7 +968,7 @@ Util.match = function (text, matchingText, delimiter, caseSensitive) {
 
         }
         return match;
-        
+
     } catch (e) {
         throw new Error("error caught @ match: " + e);
     }
