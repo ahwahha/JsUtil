@@ -73,7 +73,8 @@ function JsonTable(c = null) {
             "margin": "1px",
             "text-align": "center",
             "font-size": "11px",
-            "overflow": "hidden"
+            "overflow": "hidden",
+            "cursor": "help"
         },
         rowsStyle: {
             "text-align": "center",
@@ -129,6 +130,14 @@ function JsonTable(c = null) {
             }
         }
     };
+    let filterGuide = "Filtering Guide:\n\n1. Boolean\n    'true' / 'false'\n\n2. Numbers\n    '<' / '<=' / '=' / '>' / '>=' + (number string)\n\n3. Dates"
+        + "\n    '<' / '<=' / '=' / '>' / '>=' + dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss\n\n4. Strings\n    String Separator: Space ( )"
+        + "\n    Delimiter: Backtick (`)\n    A condition clause:\n        Include Strings: Space-separated strings that need to be included.\n        "
+        + "Exclude Strings: Space-separated strings that need to be excluded, prefixed by a backtick (`).\n        Strings between double quotes are treated as "
+        + "a single string (eg. \"mango tart\")\n        example: (apple pear` tart)\n    Multiple Condition Clauses:\n        multiple condition clauses separate "
+        + "by double backticks (``).\n	example: (apple pear` tart `` \"mango tart\")\n    Example:\n        data strings: [\"apple pie with pear\", "
+        + "\"apple tart with pear\", \"mango apple tart\", \"apple mango tart\", \"chocolate pie\"]\n	Filter: (apple pear ` tart `` \"mango tart\" `` choco)\n	"
+        + "filtering result: [\"apple pie with pear\", \"mango tart\", \"chocolate pie\"]";
     let tableSettings = tableDefaultSettings;
 
     let filterNumbers = function (data, filter) {
@@ -1055,12 +1064,28 @@ function JsonTable(c = null) {
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let filters = Util.create('tr', null);
+                        let overlay;
                         tableSettings['columns'].forEach((col) => {
                             let filterStyle = Util.objToStyle({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
                             let filterValue = col['filter'] || '';
                             col['filterElement'] = Util.create('input', {
                                 ...{ style: 'display:block; ' + filterStyle, value: filterValue, placeholder: (col['filterPlaceholder'] || '') }
                                 , ...(col['filterEditable'] ? {} : { 'disabled': 'true' })
+                            }).addEventHandler('contextmenu', (e) => {
+                                e.preventDefault();
+                                Util.get('html')[0].appendContent(
+                                    overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999', 'background-color': 'hsla(0, 100%, 0%, 0.1)', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'center', 'align-items': 'center' }) })
+                                        .appendContent(
+                                            Util.create('textarea', { style: "padding:10px; background-color:#FFF; width:800px; height:400px; font-size:85%; border:1px solid #AAA;" })
+                                                .addEventHandler('focus', (e) => { e.target.blur(); })
+                                                .appendContent(filterGuide)
+                                        )
+                                        .appendContent(
+                                            Util.create('span', { style: "padding: 10px;" })
+                                                .appendContent('right click to close')
+                                        )
+                                        .addEventHandler('contextmenu', (e) => { e.preventDefault(); overlay.remove(); })
+                                )
                             });
                             filters.appendContent(Util.create('td', { class: col['class'] }).appendContent(col['filterElement']));
                         });

@@ -728,12 +728,11 @@ Util.createMovableDiv = function (content) {
 
 Util.prototype.drag = function (target) {
     let overlay;
-    let ground = Util.get('html')[0].css('position', 'relative');
     this.addEventHandler('mousedown', (e) => {
         this['hold'] = {};
         this['hold']['x'] = e.clientX;
         this['hold']['y'] = e.clientY;
-        ground.appendContent(
+        Util.get('html')[0].appendContent(
             overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
                 .addEventHandler(['mouseup', 'mouseleave'], (e) => {
                     if (this['hold']) {
@@ -816,13 +815,11 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable) {
         .css((direction % 2 === 0 ? 'height' : 'width'), '3px');
 
     let overlay;
-    let ground = Util.get('html')[0].css('position', 'relative');
-
     if (adjustable) {
         divider.addEventHandler('mousedown', (e) => {
             divider['hold'] = {};
             divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
-            ground.appendContent(
+            Util.get('html')[0].appendContent(
                 overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
                     .addEventHandler(['mouseup', 'mouseleave'], (e) => {
                         if (divider['hold']) {
