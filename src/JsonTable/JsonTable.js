@@ -105,7 +105,7 @@ function JsonTable(c = null) {
                     return false;
                 } else if (data == '') {
                     // console.log('empty');
-                    return filterReturnTrueWhenEmpty;
+                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else if (typeof data === 'boolean') {
                     // console.log('boolean');
                     return filter.trim() == '' ? true : (
