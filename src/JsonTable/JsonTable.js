@@ -132,7 +132,8 @@ function JsonTable(c = null) {
                 // console.log('error');
                 return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
             }
-        }
+        },
+        onrefresh: null
     };
     let filterGuide = "Filtering Guide:\n\n1. Boolean\n    'true' / 'false'\n\n2. Numbers\n    '<' / '<=' / '=' / '>' / '>=' + (number string)\n\n3. Dates"
         + "\n    '<' / '<=' / '=' / '>' / '>=' + dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss\n\n4. Strings\n    String Separator: Space ( )"
@@ -1230,6 +1231,9 @@ function JsonTable(c = null) {
                 if (resetPage) { resetPageNumbers(); }
                 container.clear().appendContent(createTable());
                 loadFilterHandlers();
+                if (typeof tableSettings['onrefresh'] === 'function') {
+                    tableSettings['onrefresh']();
+                }
             }
             return this;
         } catch (err) {

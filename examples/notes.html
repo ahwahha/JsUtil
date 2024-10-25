@@ -1,4 +1,6 @@
-<html></html>
+<html>
+
+</html>
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -13,6 +15,7 @@
 		}
 	</style>
 	<script src="../dist/util_bundle.js" type="text/javascript"></script>
+	<!-- <script src="https://ahwahha.github.io/JsUtil/dist/util_bundle.js" type="text/javascript"></script> -->
 	<link rel='stylesheet' href='button.css'>
 	<script>
 
@@ -62,19 +65,23 @@
 			let createTextarea = function (row, col, value) {
 				let e;
 				let output = typeof value === 'object' ? JSON.stringify(value, null, "  ") : String(value);
-				let height = (output.split("\n").length * 15 + 8) + 'px';
-				return e = Util.create('textarea')
+				e = Util.create('textarea', { style: "white-space: nowrap; height:0px;" })
 					.appendContent((() => {
 						if (output.charAt(0) === '"' && output.charAt(output.length - 1) === '"') {
 							output = output.substring(1, output.length - 1);
 						}
 						return output;
-					})())
-					.addEventHandler('keyup', function (event) {
+					})());
+
+				e
+					.addEventHandler(['keyup', 'focus', 'blur'], function (event) {
 						if (event.key === 'Escape') {
 							this.blur();
 						} else {
-							event.target.style.height = 'auto'; event.target.style.height = (event.target.scrollHeight + 4) + 'px';
+							e.css('height', 'auto')
+								.css('white-space', 'wrap')
+								.css('height', e.entity().scrollHeight + 2 + 'px')
+								.css('white-space', 'wrap');
 						}
 					})
 					.addEventHandler('change', function (event) {
@@ -89,10 +96,10 @@
 						}
 						myTable.editData(row['###row-index'], col, v).refreshTable();
 					})
-					.css('height', height)
-					.css('min-height', '37px')
 					.css('resize', 'none')
 					.css('outline', 'none');
+
+				return e;
 			};
 
 			function encodeBase64Unicode(str) {
@@ -122,12 +129,10 @@
 					{
 						"header": "Keys",
 						"data": "k",
-						"rowsStyle": { "width": "1%", "padding": "2px" },
+						"rowsStyle": { "width": "25%", "padding": "2px" },
 						"modifier": function (row) {
 							return createTextarea(row, 'k', row.k)
-								.attr('cols', 30)
-								.attr('rows', 'auto')
-								.attr('wrap', 'hard');
+							.css('width', '100%');
 						}
 					},
 					{
@@ -167,13 +172,17 @@
 				// sortedBy: "c1",
 				ascending: true,
 				start: 1,
-				end: 8,
-				defaultEnd: 8
+				end: 10,
+				defaultEnd: 10,
+				onrefresh: () => {
+					Util.get('textarea').forEach((t) => {
+						t.fireEvent('blur');
+					})
+				}
 			});
 			let data = await getData();
 			// console.log(data)
-			myTable.setData(data);
-			myTable.refreshTable(true);
+			myTable.setData(data).refreshTable(true);
 		})
 	</script>
 </head>
