@@ -96,12 +96,16 @@ function JsonTable(c = null) {
             "text-decoration-color": "hsl(0, 100%, 30%)"
         },
         filterDebounceDelay: 500,
+        filterReturnTrueWhenEmpty: true,
         filterFunction: function (data, filter) {
             // console.log(data + ',' + filter);
             try {
                 if (data == null) {
                     // console.log('null');
                     return false;
+                } else if (data == '') {
+                    // console.log('empty');
+                    return filterReturnTrueWhenEmpty;
                 } else if (typeof data === 'boolean') {
                     // console.log('boolean');
                     return filter.trim() == '' ? true : (
