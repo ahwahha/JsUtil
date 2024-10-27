@@ -565,7 +565,7 @@ function JsonTable(c = null) {
                         }
                     } else if (!isNaN(a[data]) && !isNaN(a[data])) {
                         // both number
-                        if (a[data] == b[data]) {
+                        if (parseFloat(a[data]) == parseFloat(b[data])) {
                             return 0;
                         } else {
                             return order ? parseFloat(a[data]) - parseFloat(b[data]) : parseFloat(b[data]) - parseFloat(a[data]);
