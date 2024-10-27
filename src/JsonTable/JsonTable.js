@@ -563,12 +563,12 @@ function JsonTable(c = null) {
                         } else {
                             return order && a[data] ? 1 : -1;
                         }
-                    } else if (typeof a[data] === 'number' && typeof b[data] === 'number') {
+                    } else if (!isNaN(a[data]) && !isNaN(a[data])) {
                         // both number
                         if (a[data] == b[data]) {
                             return 0;
                         } else {
-                            return order ? a[data] - b[data] : b[data] - a[data];
+                            return order ? parseFloat(a[data]) - parseFloat(b[data]) : parseFloat(b[data]) - parseFloat(a[data]);
                         }
                     } else if (typeof a[data] === 'object' && typeof b[data] === 'object') {
                         // both object
