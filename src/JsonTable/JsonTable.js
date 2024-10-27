@@ -103,15 +103,15 @@ function JsonTable(c = null) {
                 if (data == null) {
                     // console.log('null');
                     return false;
-                } else if (data == '') {
-                    // console.log('empty');
-                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else if (typeof data === 'boolean') {
                     // console.log('boolean');
                     return filter.trim() == '' ? true : (
                         data == (filter == 'true' ? true : filter == 'false' ? false : null)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
+                } else if (data == '') {
+                    // console.log('empty');
+                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else if (!isNaN(data)) {
                     // console.log('number');
                     return filter.trim() == '' ? true : (
