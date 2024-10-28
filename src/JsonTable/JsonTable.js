@@ -109,6 +109,9 @@ function JsonTable(c = null) {
                         data == (filter == 'true' ? true : filter == 'false' ? false : null)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
+                } else if (data === '') {
+                    // console.log('empty');
+                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else if (!isNaN(data)) {
                     // console.log('number');
                     return filter.trim() == '' ? true : (
@@ -121,9 +124,6 @@ function JsonTable(c = null) {
                         filterDates(data, filter)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
-                } else if (data == '') {
-                    // console.log('empty');
-                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else {
                     // console.log('string');
                     return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
