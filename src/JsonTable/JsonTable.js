@@ -115,15 +115,15 @@ function JsonTable(c = null) {
                         filterNumbers(data, filter)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
-                } else if (data == '') {
-                    // console.log('empty');
-                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else if (isDateString(data)) {
                     // console.log('date');
                     return filter.trim() == '' ? true : (
                         filterDates(data, filter)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
+                } else if (data == '') {
+                    // console.log('empty');
+                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else {
                     // console.log('string');
                     return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
