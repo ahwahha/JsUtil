@@ -109,15 +109,15 @@ function JsonTable(c = null) {
                         data == (filter == 'true' ? true : filter == 'false' ? false : null)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
-                } else if (data == '') {
-                    // console.log('empty');
-                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else if (!isNaN(data)) {
                     // console.log('number');
                     return filter.trim() == '' ? true : (
                         filterNumbers(data, filter)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
+                } else if (data == '') {
+                    // console.log('empty');
+                    return tableSettings['filterReturnTrueWhenEmpty'];
                 } else if (isDateString(data)) {
                     // console.log('date');
                     return filter.trim() == '' ? true : (
