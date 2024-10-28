@@ -135,14 +135,24 @@ function JsonTable(c = null) {
         },
         onrefresh: null
     };
-    let filterGuide = "Filtering Guide:\n\n1. Boolean\n    'true' / 'false'\n\n2. Numbers\n    '<' / '<=' / '=' / '>' / '>=' + (number string)\n\n3. Dates"
-        + "\n    '<' / '<=' / '=' / '>' / '>=' + dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss\n\n4. Strings\n    String Separator: Space ( )"
-        + "\n    Delimiter: Backtick (`)\n    A condition clause:\n        Include Strings: Space-separated strings that need to be included.\n        "
-        + "Exclude Strings: Space-separated strings that need to be excluded, prefixed by a backtick (`).\n        Strings between double quotes are treated as "
-        + "a single string (eg. \"mango tart\")\n        example: (apple pear` tart)\n    Multiple Condition Clauses:\n        multiple condition clauses separate "
-        + "by double backticks (``).\n	example: (apple pear` tart `` \"mango tart\")\n    Example:\n        data strings: [\"apple pie with pear\", "
-        + "\"apple tart with pear\", \"mango apple tart\", \"apple mango tart\", \"chocolate pie\"]\n	Filter: (apple pear ` tart `` \"mango tart\" `` choco)\n	"
-        + "filtering result: [\"apple pie with pear\", \"mango tart\", \"chocolate pie\"]";
+    let filterGuide = "Filtering Guide:\n\n"
+        + "1. Boolean\n    'true' / 'false'\n\n"
+        + "2. Numbers\n    '<' / '<=' / '=' / '>' / '>=' + (number string)\n\n"
+        + "3. Dates\n    '<' / '<=' / '=' / '>' / '>=' + dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss\n\n"
+        + "4. Strings\n"
+        + "    String Separator: Space ( )\n"
+        + "    Delimiter: Backtick (`)\n"
+        + "    A condition clause:\n"
+        + "        Include Strings: Space-separated strings that need to be included.\n"
+        + "        Exclude Strings: Space-separated strings that need to be excluded, prefixed by a backtick (`), placed after the Include Strings.\n"
+        + "        Strings between double quotes are treated as a single string (eg. \"mango tart\")\n"
+        + "        example: (apple pear ` tart)\n"
+        + "    Multiple Condition Clauses:\n"
+        + "        multiple condition clauses separate by double backticks (``).\n"
+        + "        example: (apple pear ` tart `` \"mango tart\")\n"
+        + "    Example:\n"
+        + "        data strings: [\"apple pie with pear\", \"apple tart with pear\", \"mango apple tart\", \"apple mango tart\", \"chocolate pie\"]\n	Filter: (apple pear ` tart `` \"mango tart\" `` choco)\n"
+        + "        filtering result: [\"apple pie with pear\", \"mango tart\", \"chocolate pie\"]";
     let tableSettings = tableDefaultSettings;
 
     let filterNumbers = function (data, filter) {
