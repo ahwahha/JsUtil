@@ -81,7 +81,7 @@ function JsonTable(c = null) {
         },
         oddRowsStyle: {},
         evenRowsStyle: {
-            "background-color": "hsla(0, 0%, 0%, 0.05)"
+            "background-color": "hsl(0, 0%, 95%)"
         },
         editedStyle: {
             "display": "revert",
@@ -89,12 +89,12 @@ function JsonTable(c = null) {
             "font-size": "70%"
         },
         insertedStyle: {
-            "background-image": "linear-gradient(to bottom, hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(160, 90%, 97%), hsl(160, 90%, 95%), hsl(160, 90%, 90%), hsl(160, 90%, 85%), hsl(160, 90%, 75%), hsl(160, 90%, 50%))",
+            "background-image": "linear-gradient(to bottom, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(160, 90%, 50%, 0.03), hsla(160, 90%, 50%, 0.05), hsla(160, 90%, 50%, 0.1), hsla(160, 90%, 50%, 0.15), hsla(160, 90%, 50%, 0.25), hsla(160, 90%, 50%, 0.5))",
         },
         removedStyle: {
             "text-decoration": "line-through",
-            "text-decoration-color": "hsl(0, 30%, 50%)",
-            "background-image": "linear-gradient(to bottom, hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 30%, 97%), hsl(0, 30%, 95%), hsl(0, 30%, 90%), hsl(0, 30%, 85%), hsl(0, 30%, 75%), hsl(0, 30%, 50%))"
+            "text-decoration-color": "hsl(0, 80%, 50%)",
+            "background-image": "linear-gradient(to bottom, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 30%, 50%, 0.03), hsla(0, 30%, 50%, 0.05), hsla(0, 30%, 50%, 0.1), hsla(0, 30%, 50%, 0.15), hsla(0, 30%, 50%, 0.25), hsla(0, 30%, 50%, 0.5))"
         },
         filterDebounceDelay: 500,
         filterReturnTrueWhenEmpty: true,
@@ -803,17 +803,17 @@ function JsonTable(c = null) {
                         .appendContent(
                             Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(
-                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                    Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                         .addEventHandler('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllFiltered)
                                 )
                                 .appendContent(
-                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                    Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                         .addEventHandler('click', (event) => { setAllFilteredSelected(false); refreshTable(); })
                                         .appendContent(tableSettings.unselectAllFiltered)
                                 )
                                 .appendContentIf(
-                                    Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                    Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                         .addEventHandler('click', (event) => { setAllEditedSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllEdited)
                                     , edited
@@ -831,7 +831,7 @@ function JsonTable(c = null) {
         let output = null;
         if (tableSettings != null) {
             try {
-                output = Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                output = Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                     .addEventHandler('click', (event) => { resetFilters(); filterRows(); resetPageNumbers(); refreshTable(); })
                     .appendContent(tableSettings.resetFilters);
             } catch (err) {
@@ -855,12 +855,12 @@ function JsonTable(c = null) {
                     .appendContentIf(
                         Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
-                                Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                     .addEventHandler('click', (event) => { resetData(); refreshTable(); })
                                     .appendContent(tableSettings.resetData)
                             )
                             .appendContent(
-                                Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                     .addEventHandler('click', (event) => { resetSelectedData(); refreshTable(); })
                                     .appendContent(tableSettings.resetSelectedData)
                             )
@@ -884,13 +884,13 @@ function JsonTable(c = null) {
                                 Util.create('div')
                                     //toBeginingButton
                                     .appendContent(
-                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                             .addEventHandler('click', (event) => { toBegining(); refreshTable(); })
                                             .appendContent(tableSettings['toBegining'])
                                     )
                                     //previousButton
                                     .appendContent(
-                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                        Util.create('span', { style: "border: 1px solid #AAAAAA; margin-left:5px;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                             .addEventHandler('click', (event) => { priviousPage(); refreshTable(); })
                                             .appendContent(tableSettings['previousPage'])
                                     )
@@ -935,13 +935,13 @@ function JsonTable(c = null) {
                                 Util.create('div')
                                     //toBeginingButton
                                     .appendContent(
-                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                             .addEventHandler('click', (event) => { nextPage(); refreshTable(); })
                                             .appendContent(tableSettings['nextPage'])
                                     )
                                     //previousButton
                                     .appendContent(
-                                        Util.create('span', { class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'], style: 'margin-left:5px;' })
+                                        Util.create('span', { style: "border: 1px solid #AAAAAA; margin-left:5px;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                             .preventDefault('click')
                                             .addEventHandler('click', (event) => { toEnding(); refreshTable(); })
                                             .appendContent(tableSettings['toEnding'])
@@ -1122,13 +1122,11 @@ function JsonTable(c = null) {
                                 let rowsStyle = (col) => {
                                     return { ...(tableSettings.rowsStyle || ''), ...(col.rowsStyle || '') };
                                 };
-                                let oddEvenRowsStyle = (col) => {
-                                    return (index % 2 === 1 ? tableSettings.evenRowsStyle : tableSettings.oddRowsStyle);
-                                };
+                                let oddEvenRowsStyle = (index % 2 === 1 ? tableSettings.evenRowsStyle : tableSettings.oddRowsStyle);
                                 let tableRow = null;
                                 if (!row['###row-removed']) {
                                     try {
-                                        tableRow = Util.create('tr', row['###row-inserted'] ? { style: Util.objToStyle(tableSettings.insertedStyle) } : null);
+                                        tableRow = Util.create('tr', { style: Util.objToStyle({ ...oddEvenRowsStyle, ...(row['###row-inserted'] ? tableSettings.insertedStyle : {}) }) });
 
                                         tableSettings['columns'].forEach((col) => {
                                             let cellData = row[col['data']] != null ? String(row[col['data']]) : '';
@@ -1144,7 +1142,7 @@ function JsonTable(c = null) {
                                                 }
                                             }
                                             tableRow.appendContent(
-                                                Util.create('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                Util.create('td', { class: col['class'], style: Util.objToStyle(rowsStyle(col)) })
                                                     .appendContent(cellData)
                                                     .appendContentIf(Util.create('br'), row['###row-edited'])
                                                     .appendContentIf(
@@ -1159,7 +1157,7 @@ function JsonTable(c = null) {
                                     }
                                 } else {
                                     try {
-                                        tableRow = Util.create('tr', { style: Util.objToStyle(tableSettings.removedStyle) });
+                                        tableRow = Util.create('tr', { style: Util.objToStyle({ ...oddEvenRowsStyle, ...tableSettings.removedStyle }) });
                                         tableSettings['columns'].forEach((col) => {
                                             try {
                                                 let cellData = row[col['data']] !== undefined ? String(row[col['data']]) : '';
@@ -1172,7 +1170,7 @@ function JsonTable(c = null) {
                                                     cellData = "";
                                                 }
                                                 tableRow.appendContent(
-                                                    Util.create('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
+                                                    Util.create('td', { class: col['class'], style: Util.objToStyle(rowsStyle(col)) })
                                                         .appendContent(
                                                             Util.create('span')
                                                                 .appendContent(cellData)
