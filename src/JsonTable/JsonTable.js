@@ -55,7 +55,7 @@ function JsonTable(c = null) {
         toEnding: '>>',
         headersStyle: {
             "border-radius": "5px",
-            "border": "#aaa solid 1px",
+            "border": "hsl(0, 0%, 75%) solid 1px",
             "height": "calc(100% - 8px)",
             "display": "flex",
             "flex-flow": "column nowrap",
@@ -63,13 +63,13 @@ function JsonTable(c = null) {
             "margin": "1px",
             "text-align": "center",
             "font-weight": "bold",
-            "background-color": "#add",
+            "background-color": "hsl(180, 50%, 90%)",
             "white-space": "nowrap"
         },
         filtersStyle: {
             "width": "calc(100% - 2px)",
             "border-radius": "5px",
-            "border": "#aaa solid 1px",
+            "border": "hsl(0, 0%, 75%) solid 1px",
             "margin": "1px",
             "text-align": "center",
             "font-size": "11px",
@@ -81,7 +81,7 @@ function JsonTable(c = null) {
         },
         oddRowsStyle: {},
         evenRowsStyle: {
-            "background-color": "hsl(0 0 95)"
+            "background-color": "hsla(0, 0%, 0%, 0.08)"
         },
         editedStyle: {
             "display": "revert",
@@ -89,11 +89,12 @@ function JsonTable(c = null) {
             "font-size": "70%"
         },
         insertedStyle: {
-            "border": "2px solid hsl(160, 100%, 50%)",
+            "background-image": "linear-gradient(to bottom, hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(160, 90%, 97%), hsl(160, 90%, 95%), hsl(160, 90%, 90%), hsl(160, 90%, 85%), hsl(160, 90%, 75%), hsl(160, 90%, 50%))",
         },
         removedStyle: {
             "text-decoration": "line-through",
-            "text-decoration-color": "hsl(0, 100%, 30%)"
+            "text-decoration-color": "hsl(0, 30%, 50%)",
+            "background-image": "linear-gradient(to bottom, hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 0%, 100%), hsl(0, 30%, 97%), hsl(0, 30%, 95%), hsl(0, 30%, 90%), hsl(0, 30%, 85%), hsl(0, 30%, 75%), hsl(0, 30%, 50%))"
         },
         filterDebounceDelay: 500,
         filterReturnTrueWhenEmpty: true,
@@ -1158,7 +1159,7 @@ function JsonTable(c = null) {
                                     }
                                 } else {
                                     try {
-                                        tableRow = Util.create('tr', null);
+                                        tableRow = Util.create('tr', { style: Util.objToStyle(tableSettings.removedStyle) });
                                         tableSettings['columns'].forEach((col) => {
                                             try {
                                                 let cellData = row[col['data']] !== undefined ? String(row[col['data']]) : '';
@@ -1173,7 +1174,7 @@ function JsonTable(c = null) {
                                                 tableRow.appendContent(
                                                     Util.create('td', { class: col['class'], style: Util.objToStyle({ ...oddEvenRowsStyle(col), ...rowsStyle(col) }) })
                                                         .appendContent(
-                                                            Util.create('span', { style: Util.objToStyle(tableSettings.removedStyle) })
+                                                            Util.create('span')
                                                                 .appendContent(cellData)
                                                         )
                                                 )

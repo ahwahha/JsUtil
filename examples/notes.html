@@ -65,7 +65,7 @@
 			let createTextarea = function (row, col, value) {
 				let e;
 				let output = typeof value === 'object' ? JSON.stringify(value, null, "  ") : String(value);
-				e = Util.create('textarea', { style: "white-space: nowrap; height:0px;" })
+				e = Util.create('textarea', { style: "white-space: wrap;" })
 					.appendContent((() => {
 						if (output.charAt(0) === '"' && output.charAt(output.length - 1) === '"') {
 							output = output.substring(1, output.length - 1);
@@ -78,10 +78,7 @@
 						if (event.key === 'Escape') {
 							this.blur();
 						} else {
-							e.css('height', 'auto')
-								.css('white-space', 'wrap')
-								.css('height', e.entity().scrollHeight + 2 + 'px')
-								.css('white-space', 'wrap');
+							e.css('height', '0px').css('height', e.entity().scrollHeight + 2 + 'px');
 						}
 					})
 					.addEventHandler('change', function (event) {
@@ -132,7 +129,7 @@
 						"rowsStyle": { "width": "25%", "padding": "2px" },
 						"modifier": function (row) {
 							return createTextarea(row, 'k', row.k)
-							.css('width', '100%');
+								.css('width', '100%');
 						}
 					},
 					{
@@ -149,8 +146,6 @@
 						"data": "###row-removed",
 						"rowsStyle": { "width": "1%", "padding": "0px 10px" },
 						"modifier": function (row) { return myTable.createRemoveBox(row); },
-						"sortable": false,
-						"filterEditable": false
 					}
 				],
 				label: Util.create('span')
