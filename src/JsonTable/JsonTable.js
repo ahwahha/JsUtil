@@ -81,7 +81,7 @@ function JsonTable(c = null) {
         },
         oddRowsStyle: {},
         evenRowsStyle: {
-            "background-color": "hsla(0, 0%, 0%, 0.08)"
+            "background-color": "hsla(0, 0%, 0%, 0.05)"
         },
         editedStyle: {
             "display": "revert",
