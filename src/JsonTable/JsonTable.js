@@ -1129,7 +1129,7 @@ function JsonTable(c = null) {
                                         tableRow = Util.create('tr', { style: Util.objToStyle({ ...oddEvenRowsStyle, ...(row['###row-inserted'] ? tableSettings.insertedStyle : {}) }) });
 
                                         tableSettings['columns'].forEach((col) => {
-                                            let cellData = row[col['data']] != null ? String(row[col['data']]) : '';
+                                            let cellData = row[col['data']] != null ? (typeof row[col['data']] === 'object' ? JSON.stringify(row[col['data']]) : String(row[col['data']])) : '';
                                             let oriData = row['###ori-' + col['data']] || '';
                                             if (col.modifier) {
                                                 try {
@@ -1160,7 +1160,7 @@ function JsonTable(c = null) {
                                         tableRow = Util.create('tr', { style: Util.objToStyle({ ...oddEvenRowsStyle, ...tableSettings.removedStyle }) });
                                         tableSettings['columns'].forEach((col) => {
                                             try {
-                                                let cellData = row[col['data']] !== undefined ? String(row[col['data']]) : '';
+                                                let cellData = row[col['data']] !== undefined ? (typeof row[col['data']] === 'object' ? JSON.stringify(row[col['data']]) : String(row[col['data']])) : '';
                                                 if (col['data'] === '###row-removed') {
                                                     if (typeof col.modifier === 'function') {
                                                         let clone = Object.assign({}, row);
