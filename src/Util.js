@@ -28,10 +28,6 @@ Util.get = function (selector) {
     }
 };
 
-Util.isObjectOrArray = function (arg) {
-    return arg != null && (typeof arg === 'object' || Array.isArray(arg));
-};
-
 Util.debounce = function (func, delay) {
     let timeout;
     return async function (...args) {

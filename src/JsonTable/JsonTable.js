@@ -127,11 +127,11 @@ function JsonTable(c = null) {
                     );
                 } else {
                     // console.log('string');
-                    return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
+                    return filter.trim() == '' ? true : Util.match(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
                 }
             } catch (e) {
                 // console.log('error');
-                return filter.trim() == '' ? true : Util.match(Util.isObjectOrArray(data) ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
+                return filter.trim() == '' ? true : Util.match(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
             }
         },
         onrefresh: null
@@ -410,7 +410,7 @@ function JsonTable(c = null) {
                     let isEdited = false;
                     for (let key in row) {
                         if (!key.startsWith('###row-') && !key.startsWith('###ori-')) {
-                            if ((Util.isObjectOrArray(row[key]) ? JSON.stringify(row[key]) : row[key]) !== (Util.isObjectOrArray(oriRow[key]) ? JSON.stringify(oriRow[key]) : oriRow[key])) {
+                            if ((typeof row[key] === 'object' ? JSON.stringify(row[key]) : row[key]) !== (typeof oriRow[key] === 'object' ? JSON.stringify(oriRow[key]) : oriRow[key])) {
                                 isEdited = true;
                                 break;
                             }
@@ -530,8 +530,8 @@ function JsonTable(c = null) {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         let isFiltered = true;
                         for (let col of tableSettings['columns']) {
-                            let data = row[col['data']] == null ? '' : Util.isObjectOrArray(row[col['data']]) ? JSON.stringify(row[col['data']]) : row[col['data']];
-                            let filter = col['filter'] == null ? '' : Util.isObjectOrArray(col['filter']) ? JSON.stringify(col['filter']) : col['filter'];
+                            let data = row[col['data']] == null ? '' : typeof row[col['data']] === 'object' ? JSON.stringify(row[col['data']]) : row[col['data']];
+                            let filter = col['filter'] == null ? '' : typeof col['filter'] === 'object' ? JSON.stringify(col['filter']) : col['filter'];
                             let matching = tableSettings['filterFunction'](data, filter);
                             if (!matching) {
                                 isFiltered = false;
@@ -998,19 +998,13 @@ function JsonTable(c = null) {
                 let row = tableData.find((row) => {
                     return row['###row-index'] === index;
                 });
-                let v;
-                try {
-                    v = JSON.parse(value);
-                } catch (e) {
-                    v = value;
-                }
-                if ((Util.isObjectOrArray(row[data]) ? JSON.stringify(row[data]) : row[data]) !== JSON.stringify(v)) {
+                if ((typeof row[data] === 'object' ? JSON.stringify(row[data]) : String(row[data])) !== (typeof value === 'object' ? JSON.stringify(value) : String(value))) {
                     if (row['###ori-' + data] === undefined) {
                         row['###ori-' + data] = row[data];
                     } else if (row['###ori-' + data] === value) {
                         delete row['###ori-' + data];
                     }
-                    row[data] = v;
+                    row[data] = value;
                     setEdited([row]);
                 }
             }
