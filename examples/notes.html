@@ -1,9 +1,48 @@
 <html>
 
-</html>
-
 <head>
+	<script>
+		const api = 'http://localhost:2001';
+		const path = 'notes/notes.json';
+		const columnSetting = [
+			{
+				"header": "sel.",
+				"data": "###row-selected",
+				"rowsStyle": { "width": "1%", "padding": "0px 10px" },
+				"modifier": function (row) { return myTable.createSelectBox(row); },
+				"sortable": true,
+				"filterEditable": true
+			},
+			{
+				"header": "Keys",
+				"data": "k",
+				"rowsStyle": { "width": "25%", "padding": "2px" },
+				"modifier": function (row) {
+					return createTextarea(row, 'k', row.k)
+						.css('width', '100%');
+				}
+			},
+			{
+				"header": "Values",
+				"data": "v",
+				"rowsStyle": { "padding": "2px" },
+				"modifier": function (row) {
+					return createTextarea(row, 'v', row.v)
+						.css('width', '100%');
+				}
+			},
+			{
+				"header": "del.",
+				"data": "###row-removed",
+				"rowsStyle": { "width": "1%", "padding": "0px 10px" },
+				"modifier": function (row) { return myTable.createRemoveBox(row); }
+			}
+		];
+	</script>
+
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<script src="../dist/util_bundle.js" type="text/javascript"></script>
+
 	<style>
 		#container {
 			border: #ddd solid 1px;
@@ -13,158 +52,61 @@
 		#container table {
 			border-collapse: collapse;
 		}
+
+		.button {
+			margin: 3px;
+			border: 1px solid #AAAAAA;
+			box-shadow: #444444 1px 1px 2px;
+			border-radius: 4px;
+			padding: 2px 10px 2px 10px;
+			text-decoration: none;
+			display: inline-block;
+			text-shadow: 0px 0px 0px #000000;
+			color: #000000;
+			background-color: #FFFFFF;
+			background-image: linear-gradient(to bottom, #cccccc, #e8e8e8, #f8f8f8, #ffffff, #f8f8f8, #e8e8e8, #cccccc);
+			outline: none;
+		}
+
+		.button:hover {
+			box-shadow: #555555 2px 2px 3px;
+			border: 1px solid #999999;
+		}
+
+		.button:active {
+			border: 1px solid #666666;
+			box-shadow: #aaaaaa 0px 0px 0px;
+			background-image: linear-gradient(to bottom, #999999, #d8d8d8, #e8e8e8, #eeeeee, #e8e8e8, #d8d8d8, #999999);
+			outline: none;
+		}
 	</style>
-	<script src="../dist/util_bundle.js" type="text/javascript"></script>
-	<!-- <script src="https://ahwahha.github.io/JsUtil/dist/util_bundle.js" type="text/javascript"></script> -->
-	<link rel='stylesheet' href='button.css'>
 	<script>
 
 		Util.loaded(async () => {
-
-			// let api = 'http://localhost:2001';
-			// let path = 'notes/notes.json';
-
-			async function getData() {
-				try {
-					// let response = await fetch(api + '/get', {
-					// 	method: 'POST',
-					// 	headers: {
-					// 		'Content-Type': 'application/json'
-					// 	},
-					// 	body: JSON.stringify({ file: path })
-					// });
-					let data = null;
-					// if (response.ok) {
-					// 	data = (await response.json()).data || null;
-					// }
-					return JSON.parse(data ? decodeBase64Unicode(data) : '[]'); // Decode base64 to text
-				} catch (error) {
-					console.error('Error fetching data:', error);
-				}
-			}
-
-			// async function putData(str) {
-			// 	try {
-			// 		let encodedData = encodeBase64Unicode(str); // Encode text to base64
-			// 		let response = await fetch(api + '/put', {
-			// 			method: 'POST',
-			// 			headers: {
-			// 				'Content-Type': 'application/json'
-			// 			},
-			// 			body: JSON.stringify({ file: path, data: encodedData })
-			// 		});
-			// 		if (!response.ok) {
-			// 			throw new Error('Network response was not ok');
-			// 		}
-			// 		return await response.json();
-			// 	} catch (error) {
-			// 		console.error('Error putting data:', error);
-			// 	}
-			// }
-
-			let createTextarea = function (row, col, value) {
-				let e;
-				let output = typeof value === 'object' ? JSON.stringify(value, null, "  ") : String(value);
-				e = Util.create('textarea', { style: "white-space: wrap;" })
-					.appendContent((() => {
-						if (output.charAt(0) === '"' && output.charAt(output.length - 1) === '"') {
-							output = output.substring(1, output.length - 1);
-						}
-						return output;
-					})());
-
-				e
-					.addEventHandler(['keyup', 'focus', 'blur'], function (event) {
-						if (event.key === 'Escape') {
-							this.blur();
-						} else {
-							e.css('height', '0px').css('height', e.entity().scrollHeight + 2 + 'px');
-						}
-					})
-					.addEventHandler('change', function (event) {
-						let v;
-						try {
-							v = JSON.parse(e.val()
-								.replaceAll("\r", "")
-								.replaceAll("\n", "")
-								.replaceAll("\t", ""))
-						} catch (err) {
-							v = e.val();
-						}
-						myTable.editData(row['###row-index'], col, v).refreshTable();
-					})
-					.css('resize', 'none')
-					.css('outline', 'none');
-
-				return e;
-			};
-
-			function encodeBase64Unicode(str) {
-				return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
-					return String.fromCharCode('0x' + p1);
-				}));
-			}
-
-			function decodeBase64Unicode(str) {
-				return decodeURIComponent(atob(str).split('').map(function (c) {
-					return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-				}).join(''));
-			}
-
-			myTable = new JsonTable(document.getElementById('container'));
+			myTable = new JsonTable();
 			myTable.setContainer(document.getElementById('container'));
 			myTable.setTableSettings({
-				columns: [
-					{
-						"header": "sel.",
-						"data": "###row-selected",
-						"rowsStyle": { "width": "1%", "padding": "0px 10px" },
-						"modifier": function (row) { return myTable.createSelectBox(row); },
-						"sortable": true,
-						"filterEditable": true
-					},
-					{
-						"header": "Keys",
-						"data": "k",
-						"rowsStyle": { "width": "25%", "padding": "2px" },
-						"modifier": function (row) {
-							return createTextarea(row, 'k', row.k)
-								.css('width', '100%');
-						}
-					},
-					{
-						"header": "Values",
-						"data": "v",
-						"rowsStyle": { "padding": "2px" },
-						"modifier": function (row) {
-							return createTextarea(row, 'v', row.v)
-								.css('width', '100%');
-						}
-					},
-					{
-						"header": "del.",
-						"data": "###row-removed",
-						"rowsStyle": { "width": "1%", "padding": "0px 10px" },
-						"modifier": function (row) { return myTable.createRemoveBox(row); },
-					}
-				],
+				columns: columnSetting,
 				label: Util.create('span')
 					.appendContent('Notes: ')
 					.appendContent(Util.create('button', { id: 'insert', class: 'button' })
 						.appendContent('Insert row')
 						.addEventHandler('click', () => { myTable.insertData({ 'k': '', 'v': '' }).refreshTable(true); })
 					)
+					// .appendContent(Util.create('button', { class: 'button' })
+					// 	.addEventHandler('click', async function () {
+					// 		await putData(JSON.stringify(Util.clone(JsonTable.cleanKeys(myTable.getNotRemoved()))));
+					// 		location.reload();
+					// 	})
+					// 	.appendContent('save')
+					// )
 					.appendContent(Util.create('button', { class: 'button' })
 						.addEventHandler('click', async function () {
-							// await putData(JSON.stringify(Util.clone(JsonTable.cleanKeys(myTable.getNotRemoved()))));
-							// location.reload();
-							await navigator.clipboard.writeText(JSON.stringify(Util.clone(myTable.getNotRemoved()), null, '  '));
+							await navigator.clipboard.writeText(JSON.stringify(Util.clone(JsonTable.cleanKeys(myTable.getNotRemoved()))));
 							alert('data copied to clipboard');
 						})
-						// .appendContent('save')
-						.appendContent('copy data to clipboard')
+						.appendContent('copy to clipboard')
 					),
-				// sortedBy: "c1",
 				ascending: true,
 				start: 1,
 				end: 10,
@@ -175,15 +117,106 @@
 					})
 				}
 			});
-			let data = await getData();
-			// console.log(data)
+			// let data = await getData();
+			let data = [];
+
 			myTable.setData(data).refreshTable(true);
-		})
+		});
+
+		// async function getData() {
+		// 	let result;
+		// 	try {
+		// 		let response = await fetch(api + '/get', {
+		// 			method: 'POST',
+		// 			headers: {
+		// 				'Content-Type': 'application/json'
+		// 			},
+		// 			body: JSON.stringify({ file: path })
+		// 		});
+		// 		let data = null;
+		// 		if (response.ok) {
+		// 			data = (await response.json()).data || null;
+		// 		}
+		// 		result = JSON.parse(data ? decodeBase64Unicode(data) : '[]'); // Decode base64 to text
+		// 	} catch (error) {
+		// 		result = '[]';
+		// 	}
+		// 	return result;
+		// }
+
+		// async function putData(str) {
+		// 	try {
+		// 		let encodedData = encodeBase64Unicode(str); // Encode text to base64
+		// 		let response = await fetch(api + '/put', {
+		// 			method: 'POST',
+		// 			headers: {
+		// 				'Content-Type': 'application/json'
+		// 			},
+		// 			body: JSON.stringify({ file: path, data: encodedData })
+		// 		});
+		// 		if (!response.ok) {
+		// 			throw new Error('Network response was not ok');
+		// 		}
+		// 		return await response.json();
+		// 	} catch (error) {
+		// 		console.error('Error putting data:', error);
+		// 	}
+		// }
+
+		let createTextarea = function (row, col, value) {
+			let e;
+			let output = typeof value === 'object' ? JSON.stringify(value, null, "  ") : String(value);
+			e = Util.create('textarea', { style: "white-space: wrap;" })
+				.appendContent((() => {
+					if (output.charAt(0) === '"' && output.charAt(output.length - 1) === '"') {
+						output = output.substring(1, output.length - 1);
+					}
+					return output;
+				})());
+
+			e
+				.addEventHandler(['keyup', 'focus', 'blur'], function (event) {
+					if (event.key === 'Escape') {
+						this.blur();
+					} else {
+						e.css('height', '0px').css('height', e.entity().scrollHeight + 2 + 'px');
+					}
+				})
+				.addEventHandler('change', function (event) {
+					let v;
+					try {
+						v = JSON.parse(e.val()
+							.replaceAll("\r", "")
+							.replaceAll("\n", "")
+							.replaceAll("\t", ""))
+					} catch (err) {
+						v = e.val();
+					}
+					myTable.editData(row['###row-index'], col, v).refreshTable();
+				})
+				.css('resize', 'none')
+				.css('outline', 'none');
+
+			return e;
+		};
+
+		function encodeBase64Unicode(str) {
+			return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+				return String.fromCharCode('0x' + p1);
+			}));
+		}
+
+		function decodeBase64Unicode(str) {
+			return decodeURIComponent(atob(str).split('').map(function (c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			}).join(''));
+		}
+
 	</script>
 </head>
 
-<body></body>
-<div id="container"></div>
+<body>
+	<div id="container"></div>
 </body>
 
 </html>
