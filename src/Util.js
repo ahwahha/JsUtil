@@ -28,15 +28,38 @@ Util.get = function (selector) {
     }
 };
 
-Util.debounce = function (func, delay) {
+Util.prototype.debounce = function (func, delay) {
     let timeout;
-    return async function (...args) {
+    return (...args) => {
         clearTimeout(timeout);
         timeout = setTimeout(function () {
             func.apply(this, args);
         }, delay);
     };
 };
+
+Util.prototype.repeat = function (func, interval) {
+    return function (...args) {
+        func.apply(this, args);
+        setTimeout(function () {
+            repeat(func, interval)();
+        }, interval);
+    };
+};
+
+Util.prototype.idleControl = function(events, onactive, onidle, interval){
+    let idle = false;
+    this.addEventHandler(events, (event)=>{
+        if(idle){
+            idle = false;
+            onactive.apply(this);
+        }
+    })
+    .addEventHandler(events, this.debounce(()=>{
+        idle = true;
+        onidle();
+    }, interval));
+}
 
 Util.create = function (type, attributes) {
     let e = document.createElement(type);

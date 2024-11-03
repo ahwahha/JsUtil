@@ -1027,6 +1027,7 @@ function JsonTable(c = null) {
         }
     }
 
+    let filters;
     let createTable = function () {
         let output = null;
         if (true || (tableData != null && Array.isArray(tableData) && tableSettings != null)) {
@@ -1073,7 +1074,7 @@ function JsonTable(c = null) {
                 /* filters */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        let filters = Util.create('tr', null);
+                        filters = Util.create('tr', null);
                         let overlay;
                         tableSettings['columns'].forEach((col) => {
                             let filterStyle = Util.objToStyle({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
@@ -1251,7 +1252,7 @@ function JsonTable(c = null) {
                 let element = col['filterElement'];
                 if (element) {
                     element.addEventHandler(events,
-                        Util.debounce(
+                        filters.debounce(
                             (event) => {
                                 let selectionStart = element.entity().selectionStart;
                                 let selectionEnd = element.entity().selectionEnd;
