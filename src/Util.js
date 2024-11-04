@@ -28,39 +28,6 @@ Util.get = function (selector) {
     }
 };
 
-Util.prototype.debounce = function (func, delay) {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(function () {
-            func.apply(this, args);
-        }, delay);
-    };
-};
-
-Util.prototype.repeat = function (func, interval) {
-    return function (...args) {
-        func.apply(this, args);
-        setTimeout(function () {
-            repeat(func, interval)();
-        }, interval);
-    };
-};
-
-Util.prototype.idleControl = function(events, onactive, onidle, interval){
-    let idle = false;
-    this.addEventHandler(events, (event)=>{
-        if(idle){
-            idle = false;
-            onactive.apply(this);
-        }
-    })
-    .addEventHandler(events, this.debounce(()=>{
-        idle = true;
-        onidle();
-    }, interval));
-}
-
 Util.create = function (type, attributes) {
     let e = document.createElement(type);
     if (attributes != null && typeof attributes === 'object') {
@@ -989,6 +956,44 @@ Util.match = function (text, matchingText, delimiter, caseSensitive) {
         throw new Error("error caught @ match: " + e);
     }
 
+}
+
+Util.prototype.debounce = function (func, delay) {
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(function () {
+            func.apply(this, args);
+        }, delay);
+    };
+};
+
+Util.prototype.repeat = function (func, interval) {
+    return function (...args) {
+        func.apply(this, args);
+        setTimeout(function () {
+            repeat(func, interval)();
+        }, interval);
+    };
+};
+
+Util.prototype.idleControl = function (events, onactive, onidle, interval) {
+    let idle = false;
+    this
+        .addEventHandler(events, (event) => {
+            if (idle) {
+                idle = false;
+                if (typeof onactive === 'function') {
+                    onactive.apply(this);
+                }
+            }
+        })
+        .addEventHandler(events, this.debounce(() => {
+            idle = true;
+            if (typeof onidle === 'function') {
+                onidle();
+            }
+        }, interval));
 }
 
 export { Util };
