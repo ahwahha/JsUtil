@@ -1251,12 +1251,12 @@ function JsonTable(c = null) {
             for (let col of tableSettings['columns']) {
                 let element = col['filterElement'];
                 if (element) {
-                    element.addEventHandler(events,
+                    element.addEventHandler(events, () => {
+                        setFilter(tableSettings['columns'].indexOf(col), element.entity().value);
                         filters.debounce(
                             (event) => {
                                 let selectionStart = element.entity().selectionStart;
                                 let selectionEnd = element.entity().selectionEnd;
-                                setFilter(tableSettings['columns'].indexOf(col), element.entity().value);
                                 filterRows();
                                 resetPageNumbers();
                                 refreshTable();
@@ -1265,8 +1265,8 @@ function JsonTable(c = null) {
                                 e.setSelectionRange(selectionStart, selectionEnd);
                                 e.focus();
                             }
-                            , tableSettings.filterDebounceDelay)
-                    );
+                            , tableSettings.filterDebounceDelay)();
+                    });
                 }
             }
         }
