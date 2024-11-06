@@ -959,18 +959,19 @@ Util.match = function (text, matchingText, delimiter, caseSensitive) {
 }
 
 Util.prototype.debounce = function (func, delay) {
-    let timeout;
+    let context = this;
     return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(function () {
-            func.apply(this, args);
+        if (context['timeout']) { clearTimeout(context['timeout']); }
+        context['timeout'] = setTimeout(function () {
+            func.apply(context, args);
         }, delay);
     };
 };
 
 Util.prototype.repeat = function (func, interval) {
-    return function (...args) {
-        func.apply(this, args);
+    let context = this;
+    return (...args) => {
+        func.apply(context, args);
         setTimeout(function () {
             repeat(func, interval)();
         }, interval);
@@ -979,16 +980,17 @@ Util.prototype.repeat = function (func, interval) {
 
 Util.prototype.idleControl = function (events, onactive, onidle, interval) {
     let idle = false;
-    this
-        .addEventHandler(events, (event) => {
+    let context = this;
+    context
+        .addEventHandler(events, () => {
             if (idle) {
                 idle = false;
                 if (typeof onactive === 'function') {
-                    onactive.apply(this);
+                    onactive.apply(context);
                 }
             }
         })
-        .addEventHandler(events, this.debounce(() => {
+        .addEventHandler(events, context.debounce(() => {
             idle = true;
             if (typeof onidle === 'function') {
                 onidle();
