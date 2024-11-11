@@ -301,9 +301,11 @@ Util.prototype.preventDefault = function (eventType) {
 
 Util.prototype.val = function (value) {
     if (value === undefined) {
-        return this['_entity']['value'];
+        return this['_entity'] ? this['_entity']['value'] : undefined;
     } else {
-        this['_entity']['value'] = value;
+        if (this['_entity']) {
+            this['_entity']['value'] = value;
+        }
         return this;
     }
 };
