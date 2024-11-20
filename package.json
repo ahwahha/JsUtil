@@ -1,6 +1,5 @@
 {
   "name": "JsUtil",
-  "version": "0.3",
   "main": "index.js",
   "scripts": {
     "build": "webpack"

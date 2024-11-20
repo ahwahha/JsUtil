@@ -574,7 +574,7 @@ function JsonTable(c = null) {
                         } else {
                             return order && a[data] ? 1 : -1;
                         }
-                    } else if (!isNaN(a[data]) && !isNaN(a[data])) {
+                    } else if (a[data] != '' && b[data] != '' && !isNaN(a[data]) && !isNaN(b[data])) {
                         // both number
                         if (parseFloat(a[data]) == parseFloat(b[data])) {
                             return 0;
@@ -595,6 +595,7 @@ function JsonTable(c = null) {
                         let va = String(a[data]);
                         let vb = String(b[data]);
                         if (isDateString(va) && isDateString(vb)) {
+                            console.log();
                             let aNumber = parseDate(va);
                             let bNumber = parseDate(vb);
                             if (!isNaN(aNumber) && !isNaN(bNumber)) {
