@@ -133,235 +133,6 @@ Util.downloadBlob = function (blob, filename = 'filename') {
     }
 };
 
-Util.prototype.parent = function () {
-    return new Util(this['_entity'].parentElement);
-};
-
-Util.prototype.entity = function (entity) {
-    if (entity == undefined) {
-        return this['_entity'];
-    } else {
-        this['_entity'] = entity;
-        return this;
-    }
-};
-
-Util.prototype.hide = function () {
-    if (this['_entity']) {
-        this.css('display', 'none');
-    }
-    return this;
-};
-
-Util.prototype.show = function () {
-    if (this['_entity']) {
-        this.css('display', 'unset');
-    }
-    return this;
-};
-
-Util.prototype.clear = function () {
-    if (this['_entity']) {
-        this['_entity'].innerHTML = '';
-    }
-    return this;
-};
-
-Util.prototype.fireEvent = function (event) {
-    if (this['_entity']) {
-        this['_entity'].dispatchEvent(new Event(event));
-    }
-    return this;
-};
-
-Util.prototype.addEventHandler = function (events, func, options) {
-    try {
-        this['_eventListenerList'] = this['_eventListenerList'] ? this['_eventListenerList'] : [];
-        if (typeof events === 'string') {
-            this['_entity'].addEventListener(events, func, options);
-            this['_eventListenerList'].push({ type: events, listener: func, options: options });
-        } else if (Array.isArray(events)) {
-            events.forEach((event) => {
-                if (typeof event === 'string') {
-                    this['_entity'].addEventListener(event, func, options);
-                    this['_eventListenerList'].push({ type: event, listener: func, options: options });
-                } else {
-                    throw 'invalid events in input list:' + events;
-                }
-            });
-        } else {
-            throw 'invalid event input list:' + events;
-        }
-        return this;
-    } catch (error) {
-        throw '@ addEventHandler: ' + error;
-    }
-};
-
-Util.prototype.addEventHandlerIf = function (events, func, options, bool) {
-    if (bool) {
-        this.addEventHandler(events, func, options);
-    }
-    return this;
-};
-
-Util.prototype.removeAllEventHandlers = function () {
-    if (this['_eventListenerList'] && this['_eventListenerList'].length > 0) {
-        this['_eventListenerList'].forEach((item) => {
-            this['_entity'].removeEventListener(item['type'], item['listener'], item['options']);
-        })
-    }
-    this['_eventListenerList'] = undefined;
-    return this;
-};
-
-Util.prototype.content = function (content) {
-    if (content === undefined) {
-        return this['_entity'].innerHTML;
-    } else {
-        if (content) {
-            this.clear().appendContent(content);
-        }
-        return this;
-    }
-};
-
-Util.prototype.appendContent = function (content) {
-    try {
-        if (content != null) {
-            if (typeof content === 'string') {
-                this['_entity'].append(content);
-            } else if (typeof content === 'number') {
-                this['_entity'].append(content);
-            } else if (content instanceof HTMLElement) {
-                this['_entity'].appendChild(content);
-            } else if (content instanceof Util) {
-                this.appendContent(content.entity());
-            } else {
-                throw 'content must be a string or number or HTMLElement or Util';
-            }
-        }
-    } catch (error) {
-        throw ("@ appendContent(" + JSON.stringify(content) + "): " + error);
-    }
-    return this;
-};
-
-Util.prototype.appendContentIf = function (content, condition = true) {
-    try {
-        if (condition) {
-            this.appendContent(content);
-        }
-    } catch (error) {
-        throw ("@ appendContentIf(" + content + "): " + error);
-    }
-    return this;
-};
-
-Util.prototype.appendContentOf = function (list, funcValue = function (item) { return item; }, funcCondition = function (item) { return true; }) {
-    try {
-        for (let item of list) {
-            this.appendContentIf(funcValue(item), funcCondition(item));
-        }
-    } catch (error) {
-        throw ("@ appendContentOf(" + list + ", " + func + "): " + error);
-    }
-};
-
-Util.prototype.appendSelect = function (items) {
-    return this.appendContent(Util.createSelect(items));
-};
-
-Util.createSelect = function (items) {
-    let select = Util.create('select');
-    if (items && Array.isArray(items) && items.length > 0) {
-        for (let i = 0; i < items.length; i++) {
-            let option = Util.create('option');
-            if (typeof items[i] === "object" && items[i] != null) {
-                for (let attr in items[i]) {
-                    if (attr === 'content') {
-                        option.appendContent(items[i][attr]);
-                    } else if (attr === 'eventHandler') {
-                        option.addEventHandler(attr['events'], attr['func']);
-                    } else {
-                        option.attr(attr, items[i][attr]);
-                    }
-                }
-            }
-            select.appendContent(option);
-        }
-    }
-    return select;
-};
-
-Util.prototype.preventDefault = function (eventType) {
-    this.addEventHandler(eventType, function (event) { event.preventDefault(); });
-    return this;
-};
-
-Util.prototype.val = function (value) {
-    if (value === undefined) {
-        return this['_entity'] ? this['_entity']['value'] : undefined;
-    } else {
-        if (this['_entity']) {
-            this['_entity']['value'] = value;
-        }
-        return this;
-    }
-};
-
-Util.prototype.attr = function (name, assignment) {
-    if (assignment === undefined) {
-        return this['_entity'].getAttribute(name);
-    } else {
-        if (assignment == 'unset') {
-            this['_entity'].removeAttribute(name);
-        } else {
-            this['_entity'].setAttribute(name, assignment);
-        }
-        return this;
-    }
-};
-
-Util.prototype.prop = function (name, assignment) {
-    if (assignment === undefined) {
-        return this[name];
-    } else {
-        if (assignment == 'unset') {
-            this[name] = undefined;
-        } else {
-            this[name] = assignment;
-        }
-        return this;
-    }
-};
-
-Util.prototype.css = function (name, assignment) {
-    if (name == null) {
-        return this.attr('style');
-    } else {
-        this.attr('style', this.attr('style') == null ? '' : this.attr('style'));
-        let obj = Util.styleToObj(this.attr('style'));
-        if (assignment === undefined) {
-            return obj == null ? null : obj[name];
-        } else {
-            if (assignment == 'unset') {
-                delete obj[name];
-            } else {
-                obj[name] = assignment;
-            }
-            this.attr('style', Util.objToStyle(obj));
-            return this;
-        }
-    }
-};
-
-Util.prototype.remove = function () {
-    this['_entity'].remove();
-    this['_entity'] = undefined;
-    return this;
-};
-
 Util.downloadBlob = function (blob, fileName = 'data') {
     try {
         let url = window.URL.createObjectURL(blob);
@@ -471,10 +242,6 @@ Util.downloadAsCsv = function (data, fileName = 'data.csv', delimiter = ',') {
     } catch (error) {
         throw new Error("error caught @ downloadAsCsv: " + error);
     }
-};
-
-Util.prototype.noFocus = function () {
-    this.addEventHandler('focus', (event) => { this.entity().blur(); })
 };
 
 Util.loaded = function (func) {
@@ -603,12 +370,6 @@ Util.createFileGroup = function (name = '', initial, max, fileElementProps = {})
     return e.prop('container', e).prop('files', files).prop('addButton', addButton);
 };
 
-Util.prototype.appendMovableDiv = function (content) {
-    this.css('position', 'relative')
-        .appendContent(Util.createMovableDiv(content));
-    return this;
-};
-
 Util.createMovableDiv = function (content) {
     let div = Util.create('div', {
         style: this.objToStyle({
@@ -712,33 +473,6 @@ Util.createMovableDiv = function (content) {
         )
         .appendContentIf(content, content);
     return div;
-};
-
-Util.prototype.drag = function (target) {
-    let overlay;
-    this.addEventHandler('mousedown', (e) => {
-        this['hold'] = {};
-        this['hold']['x'] = e.clientX;
-        this['hold']['y'] = e.clientY;
-        Util.get('html')[0].appendContent(
-            overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
-                .addEventHandler(['mouseup', 'mouseleave'], (e) => {
-                    if (this['hold']) {
-                        this['hold'] = undefined;
-                        overlay.remove();
-                    }
-                })
-                .addEventHandler('mousemove', (e) => {
-                    if (this['hold']) {
-                        target.css('left', target.entity().offsetLeft + e.clientX - this['hold']['x'] + 'px');
-                        target.css('top', target.entity().offsetTop + e.clientY - this['hold']['y'] + 'px');
-                        this['hold']['x'] = e.clientX;
-                        this['hold']['y'] = e.clientY;
-                    }
-                })
-        );
-    });
-    return this;
 };
 
 Object.defineProperty(Util, 'directions', {
@@ -960,6 +694,208 @@ Util.match = function (text, matchingText, delimiter, caseSensitive) {
 
 }
 
+Util.isIntersecting = function (A1, A2, B1, B2) {
+    if (!A1 || !A2 || !B1 || !B2) return false;
+    let [a1, a2] = A2 > A1 ? [A1, A2] : [A2, A1];
+    let [b1, b2] = B2 > B1 ? [B1, B2] : [B2, B1];
+    return b2 >= a1 && b1 <= a2;
+}
+
+Util.isOverlapping = function (A1, A2, B1, B2) {
+    if (A1 == A2 || B1 == B2) return false;
+    return Util.isIntersecting(A1, A2, B1, B2);
+}
+
+Util.createSelect = function (items) {
+    let select = Util.create('select');
+    if (items && Array.isArray(items) && items.length > 0) {
+        for (let i = 0; i < items.length; i++) {
+            let option = Util.create('option');
+            if (typeof items[i] === "object" && items[i] != null) {
+                for (let attr in items[i]) {
+                    if (attr === 'content') {
+                        option.appendContent(items[i][attr]);
+                    } else if (attr === 'eventHandler') {
+                        option.addEventHandler(attr['events'], attr['func']);
+                    } else {
+                        option.attr(attr, items[i][attr]);
+                    }
+                }
+            }
+            select.appendContent(option);
+        }
+    }
+    return select;
+};
+
+Util.prototype.appendMovableDiv = function (content) {
+    this.css('position', 'relative')
+        .appendContent(Util.createMovableDiv(content));
+    return this;
+};
+
+Util.prototype.entity = function (entity) {
+    if (entity == undefined) {
+        return this['_entity'];
+    } else {
+        this['_entity'] = entity;
+        return this;
+    }
+};
+
+Util.prototype.parent = function () {
+    return new Util(this['_entity'].parentElement);
+};
+
+Util.prototype.hide = function () {
+    if (this['_entity']) {
+        this.css('display', 'none');
+    }
+    return this;
+};
+
+Util.prototype.show = function () {
+    if (this['_entity']) {
+        this.css('display', 'unset');
+    }
+    return this;
+};
+
+Util.prototype.clear = function () {
+    if (this['_entity']) {
+        this['_entity'].innerHTML = '';
+    }
+    return this;
+};
+
+Util.prototype.fireEvent = function (event) {
+    if (this['_entity']) {
+        this['_entity'].dispatchEvent(new Event(event));
+    }
+    return this;
+};
+
+Util.prototype.addEventHandler = function (events, func, options) {
+    try {
+        this['_eventListenerList'] = this['_eventListenerList'] ? this['_eventListenerList'] : [];
+        if (typeof events === 'string') {
+            this['_entity'].addEventListener(events, func, options);
+            this['_eventListenerList'].push({ type: events, listener: func, options: options });
+        } else if (Array.isArray(events)) {
+            events.forEach((event) => {
+                if (typeof event === 'string') {
+                    this['_entity'].addEventListener(event, func, options);
+                    this['_eventListenerList'].push({ type: event, listener: func, options: options });
+                } else {
+                    throw 'invalid events in input list:' + events;
+                }
+            });
+        } else {
+            throw 'invalid event input list:' + events;
+        }
+        return this;
+    } catch (error) {
+        throw '@ addEventHandler: ' + error;
+    }
+};
+
+Util.prototype.addEventHandlerIf = function (events, func, options, bool) {
+    if (bool) {
+        this.addEventHandler(events, func, options);
+    }
+    return this;
+};
+
+Util.prototype.removeAllEventHandlers = function () {
+    if (this['_eventListenerList'] && this['_eventListenerList'].length > 0) {
+        this['_eventListenerList'].forEach((item) => {
+            this['_entity'].removeEventListener(item['type'], item['listener'], item['options']);
+        })
+    }
+    this['_eventListenerList'] = undefined;
+    return this;
+};
+
+Util.prototype.content = function (content) {
+    if (content === undefined) {
+        return this['_entity'].innerHTML;
+    } else {
+        if (content) {
+            this.clear().appendContent(content);
+        }
+        return this;
+    }
+};
+
+Util.prototype.appendContent = function (content) {
+    try {
+        if (content != null) {
+            if (typeof content === 'string') {
+                this['_entity'].append(content);
+            } else if (typeof content === 'number') {
+                this['_entity'].append(content);
+            } else if (content instanceof HTMLElement) {
+                this['_entity'].appendChild(content);
+            } else if (content instanceof Util) {
+                this.appendContent(content.entity());
+            } else {
+                throw 'content must be a string or number or HTMLElement or Util';
+            }
+        }
+    } catch (error) {
+        throw ("@ appendContent(" + JSON.stringify(content) + "): " + error);
+    }
+    return this;
+};
+
+Util.prototype.appendContentIf = function (content, condition = true) {
+    try {
+        if (condition) {
+            this.appendContent(content);
+        }
+    } catch (error) {
+        throw ("@ appendContentIf(" + content + "): " + error);
+    }
+    return this;
+};
+
+Util.prototype.appendContentOf = function (list, funcValue = function (item) { return item; }, funcCondition = function (item) { return true; }) {
+    try {
+        for (let item of list) {
+            this.appendContentIf(funcValue(item), funcCondition(item));
+        }
+    } catch (error) {
+        throw ("@ appendContentOf(" + list + ", " + func + "): " + error);
+    }
+};
+
+Util.prototype.drag = function (target) {
+    let overlay;
+    this.addEventHandler('mousedown', (e) => {
+        this['hold'] = {};
+        this['hold']['x'] = e.clientX;
+        this['hold']['y'] = e.clientY;
+        Util.get('html')[0].appendContent(
+            overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
+                .addEventHandler(['mouseup', 'mouseleave'], (e) => {
+                    if (this['hold']) {
+                        this['hold'] = undefined;
+                        overlay.remove();
+                    }
+                })
+                .addEventHandler('mousemove', (e) => {
+                    if (this['hold']) {
+                        target.css('left', target.entity().offsetLeft + e.clientX - this['hold']['x'] + 'px');
+                        target.css('top', target.entity().offsetTop + e.clientY - this['hold']['y'] + 'px');
+                        this['hold']['x'] = e.clientX;
+                        this['hold']['y'] = e.clientY;
+                    }
+                })
+        );
+    });
+    return this;
+};
+
 Util.prototype.debounce = function (func, delay) {
     let context = this;
     return (...args) => {
@@ -1000,16 +936,81 @@ Util.prototype.idleControl = function (events, onactive, onidle, interval) {
         }, interval));
 }
 
-Util.isIntersecting = function (A1, A2, B1, B2) {
-    if (!A1 || !A2 || !B1 || !B2) return false;
-    let [a1, a2] = A2 > A1 ? [A1, A2] : [A2, A1];
-    let [b1, b2] = B2 > B1 ? [B1, B2] : [B2, B1];
-    return b2 >= a1 && b1 <= a2;
-}
+Util.prototype.appendSelect = function (items) {
+    return this.appendContent(Util.createSelect(items));
+};
 
-Util.isOverlapping = function (A1, A2, B1, B2) {
-    if (A1 == A2 || B1 == B2) return false;
-    return Util.isIntersecting(A1, A2, B1, B2);
-}
+Util.prototype.preventDefault = function (eventType) {
+    this.addEventHandler(eventType, function (event) { event.preventDefault(); });
+    return this;
+};
+
+Util.prototype.val = function (value) {
+    if (value === undefined) {
+        return this['_entity'] ? this['_entity']['value'] : undefined;
+    } else {
+        if (this['_entity']) {
+            this['_entity']['value'] = value;
+        }
+        return this;
+    }
+};
+
+Util.prototype.attr = function (name, assignment) {
+    if (assignment === undefined) {
+        return this['_entity'].getAttribute(name);
+    } else {
+        if (assignment == 'unset') {
+            this['_entity'].removeAttribute(name);
+        } else {
+            this['_entity'].setAttribute(name, assignment);
+        }
+        return this;
+    }
+};
+
+Util.prototype.prop = function (name, assignment) {
+    if (assignment === undefined) {
+        return this[name];
+    } else {
+        if (assignment == 'unset') {
+            this[name] = undefined;
+        } else {
+            this[name] = assignment;
+        }
+        return this;
+    }
+};
+
+Util.prototype.css = function (name, assignment) {
+    if (name == null) {
+        return this.attr('style');
+    } else {
+        this.attr('style', this.attr('style') == null ? '' : this.attr('style'));
+        let obj = Util.styleToObj(this.attr('style'));
+        if (assignment === undefined) {
+            return obj == null ? null : obj[name];
+        } else {
+            if (assignment == 'unset') {
+                delete obj[name];
+            } else {
+                obj[name] = assignment;
+            }
+            this.attr('style', Util.objToStyle(obj));
+            return this;
+        }
+    }
+};
+
+Util.prototype.remove = function () {
+    this['_entity'].remove();
+    this['_entity'] = undefined;
+    return this;
+};
+
+Util.prototype.noFocus = function () {
+    this.addEventHandler('focus', (event) => { this.entity().blur(); })
+    return this;
+};
 
 export { Util };
