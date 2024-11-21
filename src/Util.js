@@ -1000,4 +1000,16 @@ Util.prototype.idleControl = function (events, onactive, onidle, interval) {
         }, interval));
 }
 
+Util.isIntersecting = function (A1, A2, B1, B2) {
+    if (!A1 || !A2 || !B1 || !B2) return false;
+    let [a1, a2] = A2 > A1 ? [A1, A2] : [A2, A1];
+    let [b1, b2] = B2 > B1 ? [B1, B2] : [B2, B1];
+    return b2 >= a1 && b1 <= a2;
+}
+
+Util.isOverlapping = function (A1, A2, B1, B2) {
+    if (A1 == A2 || B1 == B2) return false;
+    return Util.isIntersecting(A1, A2, B1, B2);
+}
+
 export { Util };
