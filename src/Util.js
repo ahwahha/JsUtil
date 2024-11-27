@@ -715,6 +715,8 @@ Util.createSelect = function (items) {
                 for (let attr in items[i]) {
                     if (attr === 'content') {
                         option.appendContent(items[i][attr]);
+                    } else if (attr === 'value') {
+                        option.attr('value', items[i][attr]);
                     } else if (attr === 'eventHandler') {
                         option.addEventHandler(attr['events'], attr['func']);
                     } else {
