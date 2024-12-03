@@ -97,7 +97,7 @@ function JsonTable(c = null) {
             "background-image": "linear-gradient(to bottom, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 30%, 50%, 0.03), hsla(0, 30%, 50%, 0.05), hsla(0, 30%, 50%, 0.1), hsla(0, 30%, 50%, 0.15), hsla(0, 30%, 50%, 0.25), hsla(0, 30%, 50%, 0.5))"
         },
         filterDebounceDelay: 500,
-        filterReturnTrueWhenEmpty: true,
+        filterReturnTrueWhenEmpty: false,
         filterFunction: function (data, filter) {
             // console.log(data + ',' + filter);
             try {
