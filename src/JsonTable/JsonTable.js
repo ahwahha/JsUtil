@@ -8,6 +8,7 @@ function JsonTable(c = null) {
     let haveSelection = false;
     let haveRemoval = false;
     let edited = false;
+    let inserted = false;
     let insertCount = 0;
     let tableDefaultSettings = {
         label: "",
@@ -42,6 +43,7 @@ function JsonTable(c = null) {
         maxHeight: undefined,
         selectAllFiltered: 'Select all filtered',
         unselectAllFiltered: 'Unselect all filtered',
+        selectAllInserted: 'Select all inserted',
         noOfSelected: 'No. of selected: ',
         noOfEdited: 'No. of edited: ',
         resetFilters: 'Reset filters',
@@ -110,9 +112,9 @@ function JsonTable(c = null) {
                         data == (filter == 'true' ? true : filter == 'false' ? false : null)
                         || Util.match(String(data), filter.trim(), '`', false)
                     );
-                } else if (data === '') {
+                } else if (data === '' && tableSettings['filterReturnTrueWhenEmpty']) {
                     // console.log('empty');
-                    return tableSettings['filterReturnTrueWhenEmpty'];
+                    return true;
                 } else if (!isNaN(data)) {
                     // console.log('number');
                     return filter.trim() == '' ? true : (
@@ -216,7 +218,6 @@ function JsonTable(c = null) {
 
     let setData = function (data) {
         try {
-            edited = false;
             if (data != null) {
                 data.forEach((row, index) => {
                     row['###row-index'] = index + 1;
@@ -238,7 +239,6 @@ function JsonTable(c = null) {
     let resetData = function () {
         try {
             tableData = Util.clone(originalTableData);
-            edited = false;
             return this;
         } catch (error) {
             throw new Error("error caught @ resetData(): " + error);
@@ -277,7 +277,6 @@ function JsonTable(c = null) {
                     tableData.push(row);
                     originalTableData.push(Util.clone(row));
                 }
-                edited = true;
                 setEdited();
             }
             return this;
@@ -381,6 +380,17 @@ function JsonTable(c = null) {
         }
     }
 
+    let setAllInsertedSelected = function (selected) {
+        try {
+            if (tableData != null && Array.isArray(tableData)) {
+                tableData = tableData.map(row => row['###row-inserted'] ? { ...row, '###row-selected': row['###row-removed'] ? false : selected } : row);
+            }
+            return this;
+        } catch (error) {
+            throw new Error("error caught @ setAllInsertedSelected(" + selected + "): " + error);
+        }
+    }
+
     let deepFilter = function (arr, predicate) {
         try {
             if (arr != null && Array.isArray(arr)) {
@@ -403,7 +413,6 @@ function JsonTable(c = null) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
-                edited = false;
                 for (let i = 0; i < arr.length; i++) {
                     let row = arr[i];
                     let oriRow = originalTableData.find(origDataRow => origDataRow['###row-index'] === row['###row-index']);
@@ -417,7 +426,6 @@ function JsonTable(c = null) {
                         }
                     }
                     row['###row-edited'] = isEdited;
-                    edited = !(!edited && !isEdited);
                 }
             }
             return this;
@@ -819,6 +827,12 @@ function JsonTable(c = null) {
                                         .appendContent(tableSettings.selectAllEdited)
                                     , edited
                                 )
+                                .appendContentIf(
+                                    Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
+                                        .addEventHandler('click', (event) => { setAllInsertedSelected(true); refreshTable(); })
+                                        .appendContent(tableSettings.selectAllInserted)
+                                    , inserted
+                                )
                         );
                 }
             }
@@ -1109,11 +1123,22 @@ function JsonTable(c = null) {
 
                 /* rows */
                 try {
+                    inserted = false;
+                    edited = false
                     let start = tableSettings['start'];
                     let end = tableSettings['end'];
                     let filteredData = getFiltered();
                     if (filteredData != null && Array.isArray(filteredData) && tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         filteredData.slice(start - 1, end).forEach((row, index) => {
+
+                            if(!inserted && row['###row-inserted']){
+                                inserted = true;
+                            }
+
+                            if(!edited && row['###row-edited']){
+                                edited = true;
+                            }
+
                             try {
                                 let rowsStyle = (col) => {
                                     return { ...(tableSettings.rowsStyle || ''), ...(col.rowsStyle || '') };
