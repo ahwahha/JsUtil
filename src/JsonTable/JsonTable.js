@@ -573,14 +573,14 @@ function JsonTable(c = null) {
                         if (a[data] == null && b[data] == null) {
                             return 0;
                         } else {
-                            return order && a[data] == null ? -1 : 1;
+                            return order ? (a[data] == null ? 1 : -1) : (a[data] == null ? -1 : 1);
                         }
                     } else if (typeof a[data] === 'boolean' && typeof b[data] === 'boolean') {
                         // both boolean
                         if (a[data] == b[data]) {
                             return 0;
                         } else {
-                            return order && a[data] ? 1 : -1;
+                            return order ? (a[data] ? 1 : -1) : (a[data] ? -1 : 1);
                         }
                     } else if (a[data] != '' && b[data] != '' && !isNaN(a[data]) && !isNaN(b[data])) {
                         // both number
