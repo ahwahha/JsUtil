@@ -84,14 +84,7 @@
 
 		Util.loaded(async () => {
 			myTable = new JsonTable();
-			myTable.setContainer(Util.get('#container')
-				.addEventHandler('mouseup', async function (event) {
-					var e = document.elementFromPoint(event.clientX, event.clientY);
-					console.log(event.clientX + ', ' + event.clientY);
-					e.setSelectionRange(e.value.length, e.value.length)
-					e.focus();
-				})
-			);
+			myTable.setContainer(Util.get('#container'));
 			myTable.setTableSettings({
 				columns: columnSetting,
 				label: Util.create('span')
@@ -183,12 +176,8 @@
 				})());
 
 			e
-				.addEventHandler(['keyup', 'focus', 'blur', 'mouseout'], function (event) {
-					if (event.key === 'Escape' || event.type == 'mouseout') {
-						this.blur();
-					} else {
-						e.css('height', '0px').css('height', e.entity().scrollHeight + 2 + 'px');
-					}
+				.addEventHandler(['keyup', 'focus', 'blur'], function (event) {
+					e.css('height', '0px').css('height', e.entity().scrollHeight + 2 + 'px');
 				})
 				.addEventHandler('change', function (event) {
 					let v;
@@ -200,7 +189,7 @@
 					} catch (err) {
 						v = e.val();
 					}
-					myTable.editData(row['###row-index'], col, v).refreshTable();
+					myTable.editData(row['###row-index'], col, v);
 				})
 				.css('resize', 'none')
 				.css('outline', 'none');

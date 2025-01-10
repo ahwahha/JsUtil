@@ -2,6 +2,7 @@ import { Util } from '../Util.js';
 
 function JsonTable(c = null) {
 
+    let tableBody;
     let container = c instanceof Util ? c : new Util(c);
     let tableData = null;
     let originalTableData = null;
@@ -138,6 +139,7 @@ function JsonTable(c = null) {
         },
         onrefresh: null
     };
+
     let filterGuide = "Filtering Guide:\n\n"
         + "1. Boolean\n    'true' / 'false'\n\n"
         + "2. Numbers\n    '<' / '<=' / '=' / '>' / '>=' + (number string)\n\n"
@@ -156,7 +158,8 @@ function JsonTable(c = null) {
         + "    Example:\n"
         + "        data strings: [\"apple pie with pear\", \"apple tart with pear\", \"mango apple tart\", \"apple mango tart\", \"chocolate pie\"]\n	Filter: (apple pear ` tart `` \"mango tart\" `` choco)\n"
         + "        filtering result: [\"apple pie with pear\", \"mango tart\", \"chocolate pie\"]";
-    let tableSettings = tableDefaultSettings;
+
+    let tableSettings;
 
     let filterNumbers = function (data, filter) {
         if (isNaN(data)) {
@@ -212,9 +215,7 @@ function JsonTable(c = null) {
         return this;
     }
 
-    let getTableSettings = function () {
-        return tableSettings;
-    }
+    let getTableSettings = function () { return tableSettings; }
 
     let setData = function (data) {
         try {
@@ -1131,11 +1132,11 @@ function JsonTable(c = null) {
                     if (filteredData != null && Array.isArray(filteredData) && tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         filteredData.slice(start - 1, end).forEach((row, index) => {
 
-                            if(!inserted && row['###row-inserted']){
+                            if (!inserted && row['###row-inserted']) {
                                 inserted = true;
                             }
 
-                            if(!edited && row['###row-edited']){
+                            if (!edited && row['###row-edited']) {
                                 edited = true;
                             }
 
@@ -1229,19 +1230,21 @@ function JsonTable(c = null) {
                                             .appendContent(createResetFiltersButton())
                                     )
                                 )
-                                .appendContent(
-                                    Util.create('div', {
-                                        style: 'width:100%;overflow:auto;' + (tableSettings['maxHeight'] ? " max-height:" + tableSettings['maxHeight'] + ";" : "")
-                                    }).appendContent(
-                                        Util.create('table', {
-                                            style: Util.objToStyle({
-                                                'width': '100%',
-                                                'height': 'min-content',
-                                                'border-collapse': 'collapse'
-                                            })
-                                        }).appendContent(tbody))
-                                )
-                                .appendContent(createPaginationGroup())
+                        )
+                        .appendContent(
+                            tableBody = Util.create('div', {
+                                style: 'width:100%;overflow:auto;' + (tableSettings['maxHeight'] ? " max-height:" + tableSettings['maxHeight'] + ";" : "")
+                            }).appendContent(
+                                Util.create('table', {
+                                    style: Util.objToStyle({
+                                        'width': '100%',
+                                        'height': 'min-content',
+                                        'border-collapse': 'collapse'
+                                    })
+                                }).appendContent(tbody))
+                        )
+                        .appendContent(
+                            createPaginationGroup()
                         )
                 } catch (e) {
                     throw '@ output: ' + e
@@ -1260,7 +1263,7 @@ function JsonTable(c = null) {
                 filterRows();
                 if (resetPage) { resetPageNumbers(); }
                 container.clear().appendContent(createTable());
-                loadFilterHandlers();
+                loadHandlers();
                 if (typeof tableSettings['onrefresh'] === 'function') {
                     tableSettings['onrefresh']();
                 }
@@ -1271,7 +1274,10 @@ function JsonTable(c = null) {
         }
     }
 
-    let loadFilterHandlers = function () {
+    let loadHandlers = function () {
+        tableBody.addEventHandler('mouseleave', () => {
+            refreshTable();
+        })
         let events = ['keyup', 'dragend'];
         if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
             for (let col of tableSettings['columns']) {

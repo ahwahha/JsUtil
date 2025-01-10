@@ -88,7 +88,7 @@
 							"modifier": function (row) {
 								return Util.create('input', { type: 'datetime-local', value: row["datetimeOfBirth"] })
 									.addEventHandler('change', function (event) {
-										myTable.editData(row['###row-index'], 'datetimeOfBirth', event.target.value).refreshTable();
+										myTable.editData(row['###row-index'], 'datetimeOfBirth', event.target.value);
 									})
 							}
 						},
@@ -102,7 +102,6 @@
 										if (new Number(this.value).valueOf()) {
 											myTable.editData(row['###row-index'], 'age', new Number(this.value).valueOf())
 										};
-										myTable.refreshTable();
 									})
 							}
 						},
@@ -112,7 +111,7 @@
 							"modifier": function (row) {
 								return Util.create('input', { type: 'text', style: 'width:calc(100% - 10px);', value: row.title })
 									.addEventHandler('change', function (event) {
-										myTable.editData(row['###row-index'], 'title', this.value).refreshTable();
+										myTable.editData(row['###row-index'], 'title', this.value);
 									})
 							}
 						},
