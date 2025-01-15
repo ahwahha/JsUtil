@@ -2,7 +2,9 @@ import { Util } from '../Util.js';
 
 function JsonTable(c = null) {
 
+    let controlGroup;
     let tableBody;
+    let paginationGroup;
     let container = c instanceof Util ? c : new Util(c);
     let tableData = null;
     let originalTableData = null;
@@ -137,6 +139,9 @@ function JsonTable(c = null) {
                 return filter.trim() == '' ? true : Util.match(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
             }
         },
+        controlGroupEventHandlers: [],
+        tableBodyEventHandlers: [],
+        paginationGroupEventHandlers: [],
         onrefresh: null
     };
 
@@ -219,6 +224,7 @@ function JsonTable(c = null) {
 
     let setData = function (data) {
         try {
+            edited = false;
             if (data != null) {
                 data.forEach((row, index) => {
                     row['###row-index'] = index + 1;
@@ -240,6 +246,7 @@ function JsonTable(c = null) {
     let resetData = function () {
         try {
             tableData = Util.clone(originalTableData);
+            edited = false;
             return this;
         } catch (error) {
             throw new Error("error caught @ resetData(): " + error);
@@ -248,6 +255,7 @@ function JsonTable(c = null) {
 
     let insertData = function (data) {
         try {
+            inserted = true;
             if (tableData != null && Array.isArray(tableData)) {
                 if (Array.isArray(data)) {
                     data.forEach((item) => {
@@ -278,6 +286,7 @@ function JsonTable(c = null) {
                     tableData.push(row);
                     originalTableData.push(Util.clone(row));
                 }
+                edited = true;
                 setEdited();
             }
             return this;
@@ -414,6 +423,7 @@ function JsonTable(c = null) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
+                edited = false;
                 for (let i = 0; i < arr.length; i++) {
                     let row = arr[i];
                     let oriRow = originalTableData.find(origDataRow => origDataRow['###row-index'] === row['###row-index']);
@@ -427,6 +437,7 @@ function JsonTable(c = null) {
                         }
                     }
                     row['###row-edited'] = isEdited;
+                    edited = !(!edited && !isEdited);
                 }
             }
             return this;
@@ -1124,22 +1135,11 @@ function JsonTable(c = null) {
 
                 /* rows */
                 try {
-                    inserted = false;
-                    edited = false
                     let start = tableSettings['start'];
                     let end = tableSettings['end'];
                     let filteredData = getFiltered();
                     if (filteredData != null && Array.isArray(filteredData) && tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                         filteredData.slice(start - 1, end).forEach((row, index) => {
-
-                            if (!inserted && row['###row-inserted']) {
-                                inserted = true;
-                            }
-
-                            if (!edited && row['###row-edited']) {
-                                edited = true;
-                            }
-
                             try {
                                 let rowsStyle = (col) => {
                                     return { ...(tableSettings.rowsStyle || ''), ...(col.rowsStyle || '') };
@@ -1219,7 +1219,7 @@ function JsonTable(c = null) {
                 try {
                     output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px', 'background-color': '#fff' }) })
                         .appendContent(
-                            Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                            controlGroup = Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(Util.create('div').appendContent(tableSettings['label']))
                                 .appendContent(Util.create('div', { style: 'flex:1' }))
                                 .appendContent(
@@ -1244,7 +1244,7 @@ function JsonTable(c = null) {
                                 }).appendContent(tbody))
                         )
                         .appendContent(
-                            createPaginationGroup()
+                            paginationGroup = createPaginationGroup()
                         )
                 } catch (e) {
                     throw '@ output: ' + e
@@ -1275,9 +1275,6 @@ function JsonTable(c = null) {
     }
 
     let loadHandlers = function () {
-        tableBody.addEventHandler('mouseleave', () => {
-            refreshTable();
-        })
         let events = ['keyup', 'dragend'];
         if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
             for (let col of tableSettings['columns']) {
@@ -1300,6 +1297,21 @@ function JsonTable(c = null) {
                             , tableSettings.filterDebounceDelay)();
                     });
                 }
+            }
+        }
+        if (tableSettings['controlGroupEventHandlers'] != null && Array.isArray(tableSettings['controlGroupEventHandlers'])) {
+            for(let handler of tableSettings['controlGroupEventHandlers']){
+                controlGroup.addEventHandler(handler['event'], handler['function']);
+            }
+        }
+        if (tableSettings['tableBodyEventHandlers'] != null && Array.isArray(tableSettings['tableBodyEventHandlers'])) {
+            for(let handler of tableSettings['tableBodyEventHandlers']){
+                controlGroup.addEventHandler(handler['event'], handler['function']);
+            }
+        }
+        if (tableSettings['paginationGroupEventHandlers'] != null && Array.isArray(tableSettings['paginationGroupEventHandlers'])) {
+            for(let handler of tableSettings['paginationGroupEventHandlers']){
+                controlGroup.addEventHandler(handler['event'], handler['function']);
             }
         }
     }
