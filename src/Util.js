@@ -1015,4 +1015,35 @@ Util.prototype.noFocus = function () {
     return this;
 };
 
+Util.prototype.commands = function (_bufferSize, _handlers) {
+    let handlers = [];
+    let buffer = '';
+    let element = this;
+
+    if (typeof _handlers === 'object') {
+        if (Array.isArray(_handlers)) {
+            handlers = _handlers;
+        } else {
+            handlers.push(_handlers);
+        }
+
+        element.addEventHandler('keyup', (event) => {
+            if (event.target === element || (event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA')) {
+                buffer += event.key;
+                if (buffer.length > _bufferSize) {
+                    buffer = buffer.slice(1);
+                }
+
+                for (let handler of handlers) {
+                    if (['command', 'function'].every(key => handler.hasOwnProperty(key))) {
+                        if (buffer.endsWith(handler['command'])) handler['function']();
+                    }
+                }
+            }
+        });
+    }
+
+    return this;
+};
+
 export { Util };
