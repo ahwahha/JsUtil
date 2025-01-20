@@ -777,24 +777,26 @@ Util.prototype.fireEvent = function (event) {
     return this;
 };
 
-Util.prototype.addEventHandler = function (events, func, options) {
+Util.prototype.addEventHandler = function (_events, func, options) {
     try {
+        let events = [];
         this['_eventListenerList'] = this['_eventListenerList'] ? this['_eventListenerList'] : [];
-        if (typeof events === 'string') {
-            this['_entity'].addEventListener(events, func, options);
-            this['_eventListenerList'].push({ type: events, listener: func, options: options });
-        } else if (Array.isArray(events)) {
-            events.forEach((event) => {
-                if (typeof event === 'string') {
-                    this['_entity'].addEventListener(event, func, options);
-                    this['_eventListenerList'].push({ type: event, listener: func, options: options });
-                } else {
-                    throw 'invalid events in input list:' + events;
-                }
-            });
-        } else {
-            throw 'invalid event input list:' + events;
+
+        if (Array.isArray(_events)) {
+            events = _events;
+        } else if (_events) {
+            events = [...events, _events];
         }
+
+        events.forEach((event) => {
+            if (typeof event === 'string') {
+                this['_entity'].addEventListener(event, func, options);
+                this['_eventListenerList'].push({ type: event, listener: func, options: options });
+            } else {
+                throw 'invalid events in input list:' + events;
+            }
+        });
+
         return this;
     } catch (error) {
         throw '@ addEventHandler: ' + error;
