@@ -637,44 +637,21 @@ function JsonTable(c = null) {
 
     let isDateString = function (value) {
         try {
-            return /^(\d{2})[-\/](\d{2})[-\/](\d{4})$|^(\d{4})[-\/](\d{2})[-\/](\d{2})$|^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2})$|^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2}):(\d{2})$/.test(value);
+            return !isNaN(parseDate(value));
         } catch (error) {
             throw new Error("error caught @ isDateString(" + value + "): " + error);
         }
     }
-
+    
     let parseDate = function (value) {
         try {
-            let match = null;
-            let output = null;
-            if (/^(\d{2})[-\/](\d{2})[-\/](\d{4})$/.test(value)) {
-                match = /^(\d{2})[-\/](\d{2})[-\/](\d{4})$/.exec(value);
-                if (match) {
-                    output = new Date(match[3] + '-' + match[2] + '-' + match[1] + ' 00:00:00').getTime();
-                }
-            } else if (/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/.test(value)) {
-                match = /^(\d{4})[-\/](\d{2})[-\/](\d{2})$/.exec(value);
-                if (match) {
-                    output = new Date(match[1] + '-' + match[2] + '-' + match[3] + ' 00:00:00').getTime();
-                }
-            } else if (/^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2})$/.test(value)) {
-                match = /^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2})$/.exec(value);
-                if (match) {
-                    output = new Date(match[1] + '-' + match[2] + '-' + match[3] + ' ' + match[4] + ':' + match[5] + ':00').getTime();
-                }
-            } else if (/^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2}):(\d{2})$/.test(value)) {
-                match = /^(\d{4})[-\/](\d{2})[-\/](\d{2}) (\d{2}):(\d{2}):(\d{2})$/.exec(value);
-                if (match) {
-                    output = new Date(match[1] + '-' + match[2] + '-' + match[3] + ' ' + match[4] + ':' + match[5] + ':' + match[6]).getTime();
-                }
-            } else {
-                output = 0;
-            }
-            return output;
+            let date = new Date(value);
+            return date.getTime();
         } catch (error) {
-            return 0;
+            return NaN;
         }
     }
+    
 
     let setStart = function (start) {
         try {
@@ -1109,20 +1086,22 @@ function JsonTable(c = null) {
                             col['filterElement'] = Util.create('input', {
                                 ...{ style: 'display:block; ' + filterStyle, value: filterValue, placeholder: (col['filterPlaceholder'] || '') }
                                 , ...(col['filterEditable'] ? {} : { 'disabled': 'true' })
-                            }).addEventHandler('contextmenu', (e) => {
+                            }).addEventHandler('dblclick', (e) => {
                                 e.preventDefault();
                                 Util.get('html')[0].appendContent(
-                                    overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999', 'background-color': 'hsla(0, 100%, 0%, 0.1)', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'center', 'align-items': 'center' }) })
+                                    overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9998', 'background-color': 'hsla(0, 100%, 0%, 0.1)', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'center', 'align-items': 'center' }) })
                                         .appendContent(
                                             Util.create('textarea', { style: "padding:10px; background-color:#FFF; width:800px; height:400px; font-size:85%; border:1px solid #AAA;" })
-                                                .addEventHandler('focus', (e) => { e.target.blur(); })
                                                 .appendContent(filterGuide)
                                         )
                                         .appendContent(
                                             Util.create('span', { style: "padding: 10px;" })
-                                                .appendContent('right click to close')
+                                                .appendContent('double click to close')
                                         )
-                                        .addEventHandler('contextmenu', (e) => { e.preventDefault(); overlay.remove(); })
+                                        .appendContent(
+                                            Util.create('span', { style: Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
+                                        )
+                                        .addEventHandler('dblclick', (e) => { e.preventDefault(); overlay.remove(); })
                                 )
                             });
                             filters.appendContent(Util.create('td', { class: col['class'] }).appendContent(col['filterElement']));
@@ -1300,17 +1279,17 @@ function JsonTable(c = null) {
             }
         }
         if (tableSettings['controlGroupEventHandlers'] != null && Array.isArray(tableSettings['controlGroupEventHandlers'])) {
-            for(let handler of tableSettings['controlGroupEventHandlers']){
+            for (let handler of tableSettings['controlGroupEventHandlers']) {
                 controlGroup.addEventHandler(handler['event'], handler['function']);
             }
         }
         if (tableSettings['tableBodyEventHandlers'] != null && Array.isArray(tableSettings['tableBodyEventHandlers'])) {
-            for(let handler of tableSettings['tableBodyEventHandlers']){
+            for (let handler of tableSettings['tableBodyEventHandlers']) {
                 controlGroup.addEventHandler(handler['event'], handler['function']);
             }
         }
         if (tableSettings['paginationGroupEventHandlers'] != null && Array.isArray(tableSettings['paginationGroupEventHandlers'])) {
-            for(let handler of tableSettings['paginationGroupEventHandlers']){
+            for (let handler of tableSettings['paginationGroupEventHandlers']) {
                 controlGroup.addEventHandler(handler['event'], handler['function']);
             }
         }
