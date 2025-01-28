@@ -535,8 +535,7 @@ function JsonTable(c = null) {
 
     let sortAsOriginal = function () {
         try {
-            setSorting('###row-index', true)
-            refreshTable();
+            setSorting('###row-index', true);
             return this;
         } catch (error) {
             throw new Error("error caught @ sortAsOriginal(): " + error);
@@ -642,7 +641,7 @@ function JsonTable(c = null) {
             throw new Error("error caught @ isDateString(" + value + "): " + error);
         }
     }
-    
+
     let parseDate = function (value) {
         try {
             let date = new Date(value);
@@ -651,7 +650,7 @@ function JsonTable(c = null) {
             return NaN;
         }
     }
-    
+
 
     let setStart = function (start) {
         try {
@@ -836,7 +835,7 @@ function JsonTable(c = null) {
         if (tableSettings != null) {
             try {
                 output = Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                    .addEventHandler('click', (event) => { resetFilters(); filterRows(); resetPageNumbers(); refreshTable(); })
+                    .addEventHandler('click', (event) => { resetFilters(); sortAsOriginal(); filterRows(); resetPageNumbers(); refreshTable(); })
                     .appendContent(tableSettings.resetFilters);
             } catch (err) {
                 throw new Error("error caught @ createResetFiltersButton() - " + err);
@@ -1095,13 +1094,13 @@ function JsonTable(c = null) {
                                                 .appendContent(filterGuide)
                                         )
                                         .appendContent(
-                                            Util.create('span', { style: "padding: 10px;" })
-                                                .appendContent('double click to close')
+                                            Util.create('span', { style: "margin-top: 20px; background-color: #fff; padding: 5px;" })
+                                                .appendContent('Click to close')
                                         )
                                         .appendContent(
                                             Util.create('span', { style: Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
+                                                .addEventHandler('click', (e) => { e.preventDefault(); overlay.remove(); })
                                         )
-                                        .addEventHandler('dblclick', (e) => { e.preventDefault(); overlay.remove(); })
                                 )
                             });
                             filters.appendContent(Util.create('td', { class: col['class'] }).appendContent(col['filterElement']));
