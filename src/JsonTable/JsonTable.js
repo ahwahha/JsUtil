@@ -1031,12 +1031,27 @@ function JsonTable(c = null) {
     }
 
     let filters;
+    let switchSortingPhase = function (data) {
+        if (tableSettings['sortedBy'] === data) {
+            if (tableSettings['sortingPhase'] == 1) {
+                setSorting(data, !tableSettings['ascending']);
+                tableSettings['sortingPhase'] = 2;
+            } else if (tableSettings['sortingPhase'] == 2) {
+                tableSettings['sortedBy'] = undefined;
+                tableSettings['sortingPhase'] = undefined;
+            } else {
+                setSorting(data, tableSettings['ascending']);
+                tableSettings['sortingPhase'] = 1;
+            }
+        } else {
+            setSorting(data, tableSettings['ascending']);
+            tableSettings['sortingPhase'] = 1;
+        }
+    }
     let createTable = function () {
         let output = null;
         if (true || (tableData != null && Array.isArray(tableData) && tableSettings != null)) {
             try {
-
-
                 let tbody = Util.create('tbody', null);
 
                 /* headers */
@@ -1053,7 +1068,7 @@ function JsonTable(c = null) {
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
                                             .addEventHandlerIf('click', () => {
-                                                setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
+                                                switchSortingPhase(col['data']);
                                                 refreshTable();
                                             }, undefined, col['sortable'])
                                             .appendContent(
