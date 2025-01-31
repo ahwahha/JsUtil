@@ -2,6 +2,7 @@ import { Util } from '../Util.js';
 
 function JsonTable(c = null) {
 
+    let table;
     let controlGroup;
     let tableBody;
     let paginationGroup;
@@ -757,6 +758,7 @@ function JsonTable(c = null) {
             }
             let output = Util.create('input', { ...{ type: 'checkbox' }, ...(row['###row-selected'] ? { checked: '' } : {}) })
                 .addEventHandler('click', (event) => {
+                    shieldOn();
                     if (typeof tableSettings['multiSelect'] === "boolean" && !tableSettings['multiSelect']) {
                         setAllSelected(false);
                     }
@@ -776,6 +778,7 @@ function JsonTable(c = null) {
             }
             let output = Util.create('input', { ...{ type: 'checkbox' }, ...(row['###row-removed'] ? { checked: '' } : {}) })
                 .addEventHandler('click', (event) => {
+                    shieldOn();
                     setRemoved(row['###row-index'], event.target.checked);
                     refreshTable();
                 });
@@ -801,17 +804,17 @@ function JsonTable(c = null) {
                             Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(
                                     Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventHandler('click', (event) => { setAllFilteredSelected(true); refreshTable(); })
+                                        .addEventHandler('click', (event) => { shieldOn(); setAllFilteredSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllFiltered)
                                 )
                                 .appendContent(
                                     Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventHandler('click', (event) => { setAllFilteredSelected(false); refreshTable(); })
+                                        .addEventHandler('click', (event) => { shieldOn(); setAllFilteredSelected(false); refreshTable(); })
                                         .appendContent(tableSettings.unselectAllFiltered)
                                 )
                                 .appendContentIf(
                                     Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventHandler('click', (event) => { setAllEditedSelected(true); refreshTable(); })
+                                        .addEventHandler('click', (event) => { shieldOn(); setAllEditedSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllEdited)
                                     , edited
                                 )
@@ -835,7 +838,7 @@ function JsonTable(c = null) {
         if (tableSettings != null) {
             try {
                 output = Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                    .addEventHandler('click', (event) => { resetFilters(); sortAsOriginal(); filterRows(); resetPageNumbers(); refreshTable(); })
+                    .addEventHandler('click', (event) => { shieldOn(); resetFilters(); sortAsOriginal(); filterRows(); resetPageNumbers(); refreshTable(); })
                     .appendContent(tableSettings.resetFilters);
             } catch (err) {
                 throw new Error("error caught @ createResetFiltersButton() - " + err);
@@ -859,12 +862,12 @@ function JsonTable(c = null) {
                         Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
                                 Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                    .addEventHandler('click', (event) => { resetData(); refreshTable(); })
+                                    .addEventHandler('click', (event) => { shieldOn(); resetData(); refreshTable(); })
                                     .appendContent(tableSettings.resetData)
                             )
                             .appendContent(
                                 Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                    .addEventHandler('click', (event) => { resetSelectedData(); refreshTable(); })
+                                    .addEventHandler('click', (event) => { shieldOn(); resetSelectedData(); refreshTable(); })
                                     .appendContent(tableSettings.resetSelectedData)
                             )
                         , edited
@@ -888,13 +891,13 @@ function JsonTable(c = null) {
                                     //toBeginingButton
                                     .appendContent(
                                         Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventHandler('click', (event) => { toBegining(); refreshTable(); })
+                                            .addEventHandler('click', (event) => { shieldOn(); toBegining(); refreshTable(); })
                                             .appendContent(tableSettings['toBegining'])
                                     )
                                     //previousButton
                                     .appendContent(
                                         Util.create('span', { style: "border: 1px solid #AAAAAA; margin-left:5px;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventHandler('click', (event) => { priviousPage(); refreshTable(); })
+                                            .addEventHandler('click', (event) => { shieldOn(); priviousPage(); refreshTable(); })
                                             .appendContent(tableSettings['previousPage'])
                                     )
                             )
@@ -939,14 +942,14 @@ function JsonTable(c = null) {
                                     //toBeginingButton
                                     .appendContent(
                                         Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventHandler('click', (event) => { nextPage(); refreshTable(); })
+                                            .addEventHandler('click', (event) => { shieldOn(); nextPage(); refreshTable(); })
                                             .appendContent(tableSettings['nextPage'])
                                     )
                                     //previousButton
                                     .appendContent(
                                         Util.create('span', { style: "border: 1px solid #AAAAAA; margin-left:5px;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                             .preventDefault('click')
-                                            .addEventHandler('click', (event) => { toEnding(); refreshTable(); })
+                                            .addEventHandler('click', (event) => { shieldOn(); toEnding(); refreshTable(); })
                                             .appendContent(tableSettings['toEnding'])
                                     )
                             )
@@ -1068,6 +1071,7 @@ function JsonTable(c = null) {
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
                                             .addEventHandlerIf('click', () => {
+                                                shieldOn();
                                                 switchSortingPhase(col['data']);
                                                 refreshTable();
                                             }, undefined, col['sortable'])
@@ -1210,7 +1214,7 @@ function JsonTable(c = null) {
                 }
 
                 try {
-                    output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px', 'background-color': '#fff' }) })
+                    table = output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px', 'background-color': '#fff' }) })
                         .appendContent(
                             controlGroup = Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(Util.create('div').appendContent(tableSettings['label']))
@@ -1239,6 +1243,7 @@ function JsonTable(c = null) {
                         .appendContent(
                             paginationGroup = createPaginationGroup()
                         )
+                        .css('position', 'relative')
                 } catch (e) {
                     throw '@ output: ' + e
                 }
@@ -1309,11 +1314,30 @@ function JsonTable(c = null) {
         }
     }
 
+    let shield;
+
+    let shieldOn = function () {
+        if (shield) {
+            shield.show();
+        } else {
+            table.appendContent(shield = Util.create('span', { style: "position:absolute; left: 0px; top: 0px; width: 100%; height:100%; background-color: hsla(0, 100%, 0%, 0.1); z-index: 999;" }))
+        }
+        return this;
+    }
+
+    let shieldOff = function () {
+        if (shield) {
+            shield.hide();
+        }
+        return this;
+    }
+
     return {
         setData, getData, resetData, insertData,
         setTableSettings, getTableSettings, sortAsOriginal,
         getSelected, getFiltered, getEdited, getInserted, getRemoved, getNotRemoved,
-        createSelectBox, createRemoveBox, editData, setContainer, refreshTable
+        createSelectBox, createRemoveBox, editData, setContainer, refreshTable,
+        shieldOn, shieldOff
     };
 
 }
