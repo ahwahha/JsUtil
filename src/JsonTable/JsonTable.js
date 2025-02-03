@@ -92,7 +92,13 @@ function JsonTable(c = null) {
         editedStyle: {
             "display": "revert",
             "color": "hsl(0, 100%, 30%)",
-            "font-size": "70%"
+            "font-size": "11px",
+            "height": "13px",
+            "width": "100%",
+            "resize": "none",
+            "border": "none",
+            "outline": "none",
+            "background": "none"
         },
         insertedStyle: {
             "background-image": "linear-gradient(to bottom, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(160, 90%, 50%, 0.03), hsla(160, 90%, 50%, 0.05), hsla(160, 90%, 50%, 0.1), hsla(160, 90%, 50%, 0.15), hsla(160, 90%, 50%, 0.25), hsla(160, 90%, 50%, 0.5))",
@@ -1160,13 +1166,17 @@ function JsonTable(c = null) {
                                                     throw "@ col.modifier: " + e;
                                                 }
                                             }
+                                            let t;
                                             tableRow.appendContent(
                                                 Util.create('td', { class: col['class'], style: Util.objToStyle(rowsStyle(col)) })
                                                     .appendContent(cellData)
                                                     .appendContentIf(Util.create('br'), row['###row-edited'])
                                                     .appendContentIf(
-                                                        Util.create('span', { style: Util.objToStyle(tableSettings.editedStyle) })
-                                                            .appendContentIf('(' + (typeof oriData === 'string' ? '"' + oriData + '"' : JSON.stringify(oriData)) + ')', row['###ori-' + col['data']] !== undefined),
+                                                        t = Util.create('textarea', { style: Util.objToStyle(tableSettings.editedStyle) }).attr('readonly', '')
+                                                            .appendContentIf('(' + (typeof oriData === 'string' ? '"' + oriData + '"' : JSON.stringify(oriData)) + ')', row['###ori-' + col['data']] !== undefined)
+                                                            .addEventHandler(['focus', 'blur'], () => {
+                                                                t.css('height', '0px').css('height', t.entity().scrollHeight + 2 + 'px')
+                                                            }),
                                                         row['###row-edited']
                                                     )
                                             )
