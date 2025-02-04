@@ -1167,17 +1167,18 @@ function JsonTable(c = null) {
                                                 }
                                             }
                                             let t;
+                                            let showOri = row['###row-edited'] && row['###ori-' + col['data']] !== undefined;
                                             tableRow.appendContent(
                                                 Util.create('td', { class: col['class'], style: Util.objToStyle(rowsStyle(col)) })
                                                     .appendContent(cellData)
-                                                    .appendContentIf(Util.create('br'), row['###row-edited'])
+                                                    .appendContentIf(Util.create('br'), showOri)
                                                     .appendContentIf(
                                                         t = Util.create('textarea', { style: Util.objToStyle(tableSettings.editedStyle) }).attr('readonly', '')
-                                                            .appendContentIf('(' + (typeof oriData === 'string' ? '"' + oriData + '"' : JSON.stringify(oriData)) + ')', row['###ori-' + col['data']] !== undefined)
+                                                            .appendContent('(' + (typeof oriData === 'string' ? '"' + oriData + '"' : JSON.stringify(oriData)) + ')')
                                                             .addEventHandler(['focus', 'blur'], () => {
                                                                 t.css('height', '0px').css('height', t.entity().scrollHeight + 2 + 'px')
                                                             }),
-                                                        row['###row-edited']
+                                                        showOri
                                                     )
                                             )
                                         });
