@@ -589,8 +589,103 @@ Util.getStrParts = (str, delimiter = '`', lv = 1) => {
     }
 };
 
+Util.splitString = (str, delimiters = [" "]) => {
+    try {
+        let values = [];
+        let isQuoteOpen = false;
+        let currentWord = "";
 
-Util.match = function (text, matchingText, delimiter, caseSensitive) {
+        /* push every whole string in quotes */
+        for (let i = 0; i < str.length; i++) {
+            let char = str[i];
+            if (!isQuoteOpen && delimiters.includes(char)) {
+                if (currentWord !== "") {
+                    values.push(currentWord);
+                    currentWord = "";
+                }
+            } else if (char === "\"") {
+                isQuoteOpen = !isQuoteOpen;
+                if (!isQuoteOpen && currentWord !== "") {
+                    values.push(currentWord);
+                    currentWord = "";
+                }
+            } else {
+                currentWord += char;
+            }
+        }
+
+        /* push the last part */
+        if (currentWord !== "") {
+            values.push(currentWord);
+        }
+
+        return values;
+    } catch (e) {
+        throw '@ splitString: ' + e;
+    }
+}
+
+Util.checkCriteria = (str, matchingString, delimiter, criteria) => {
+    try {
+
+        let check = (array) => {
+            let includes = array[0] ? Util.splitString(array[0], [' ', ',', '+', '\t']) : [];
+            let excludes = array[1] ? Util.splitString(array[1], [' ', ',', '+', '\t']) : [];
+
+            /*handle excludes*/
+            let exclusiveMatch = true;
+            for (let value of excludes) {
+                exclusiveMatch = exclusiveMatch && !criteria(str, value);
+                if (!exclusiveMatch) {
+                    return false;
+                }
+            }
+
+            /*handle includes*/
+            let inclusiveAndMatch = includes.length !== 0;
+            for (let value of includes) {
+                inclusiveAndMatch = inclusiveAndMatch && criteria(str, value);
+                if (!inclusiveAndMatch) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        let parts = Util.getStrParts(matchingString, delimiter, 2);
+
+        let bool = false;
+        for (let i = 0; i < parts.length; i++) {
+            if (check(parts[i])) {
+                bool = true;
+                break;
+            }
+        }
+
+        return bool;
+
+    } catch (e) {
+        throw '@ checkCriteria: ' + e;
+    }
+}
+
+Util.match = function (text, matchingText, delimiter, criteria) {
+    let match = false;
+    try {
+        if (text == null && matchingText !== '') {
+            match = false;
+        } else {
+            match = Util.checkCriteria(text, matchingText, delimiter, criteria);
+        }
+        return match;
+
+    } catch (e) {
+        throw new Error("error caught @ match: " + e);
+    }
+}
+
+Util.matchText = function (text, matchingText, delimiter, caseSensitive = false) {
     let match = false;
     try {
         if (text == null && matchingText !== '') {
@@ -608,80 +703,9 @@ Util.match = function (text, matchingText, delimiter, caseSensitive) {
                     matchingText = matchingText.toUpperCase();
                 }
 
-                let parts = Util.getStrParts(matchingText, delimiter, 2);
-
-                let splitPart = (str) => {
-                    try {
-                        let values = [];
-                        let isQuoteOpen = false;
-                        let currentWord = "";
-
-                        /* push every whole string in quotes */
-                        for (let i = 0; i < str.length; i++) {
-                            let char = str[i];
-                            if (!isQuoteOpen && (char === " " || char === "," || char === "+" || char === "\t")) {
-                                if (currentWord !== "") {
-                                    values.push(currentWord);
-                                    currentWord = "";
-                                }
-                            } else if (char === "\"") {
-                                isQuoteOpen = !isQuoteOpen;
-                                if (!isQuoteOpen && currentWord !== "") {
-                                    values.push(currentWord);
-                                    currentWord = "";
-                                }
-                            } else {
-                                currentWord += char;
-                            }
-                        }
-
-                        /* push the last part */
-                        if (currentWord !== "") {
-                            values.push(currentWord);
-                        }
-
-                        return values;
-                    } catch (e) {
-                        throw '@ splitPart: ' + e;
-                    }
-                }
-
-                let check = (str, array) => {
-                    try {
-                        let includes = array[0] ? splitPart(array[0]) : [];
-                        let excludes = array[1] ? splitPart(array[1]) : [];
-
-                        /*handle excludes*/
-                        let exclusiveMatch = true;
-                        for (let value of excludes) {
-                            exclusiveMatch = exclusiveMatch && str.indexOf(value) === -1;
-                            if (!exclusiveMatch) {
-                                return false;
-                            }
-                        }
-
-                        /*handle includes*/
-                        let inclusiveAndMatch = includes.length !== 0;
-                        for (let value of includes) {
-                            inclusiveAndMatch = inclusiveAndMatch && str.indexOf(value) !== -1;
-                            if (!inclusiveAndMatch) {
-                                return false;
-                            }
-                        }
-
-                        return true;
-                    } catch (e) {
-                        throw '@ check: ' + e;
-                    }
-                }
-
-                match = false;
-                for (let i = 0; i < parts.length; i++) {
-                    if (check(text, parts[i])) {
-                        match = true;
-                        break;
-                    }
-                }
+                match = Util.checkCriteria(text, matchingText, delimiter, (a, b) => {
+                    return b === '_' && (a == null || a.trim() == '') ? true : a.indexOf(b) !== -1;
+                });
 
             }
 
@@ -689,7 +713,7 @@ Util.match = function (text, matchingText, delimiter, caseSensitive) {
         return match;
 
     } catch (e) {
-        throw new Error("error caught @ match: " + e);
+        throw new Error("error caught @ matchText: " + e);
     }
 
 }
@@ -899,6 +923,10 @@ Util.prototype.drag = function (target) {
     });
     return this;
 };
+
+Util.deferExec = function () {
+    return new Promise((res) => { setTimeout(() => { res(); }, 0); });
+}
 
 Util.prototype.debounce = function (func, delay) {
     let context = this;

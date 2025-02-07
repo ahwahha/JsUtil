@@ -3,6 +3,7 @@ import { Util } from '../Util.js';
 function JsonTable(c = null) {
 
     let table;
+    let shield;
     let controlGroup;
     let tableBody;
     let paginationGroup;
@@ -109,41 +110,35 @@ function JsonTable(c = null) {
             "background-image": "linear-gradient(to bottom, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 30%, 50%, 0.03), hsla(0, 30%, 50%, 0.05), hsla(0, 30%, 50%, 0.1), hsla(0, 30%, 50%, 0.15), hsla(0, 30%, 50%, 0.25), hsla(0, 30%, 50%, 0.5))"
         },
         filterDebounceDelay: 500,
-        filterReturnTrueWhenEmpty: false,
         filterFunction: function (data, filter) {
-            // console.log(data + ',' + filter);
             try {
                 if (data == null) {
-                    // console.log('null');
+                    // null
                     return false;
                 } else if (typeof data === 'boolean') {
-                    // console.log('boolean');
+                    // boolean
                     return filter.trim() == '' ? true : (
-                        data == (filter == 'true' ? true : filter == 'false' ? false : null)
-                        || Util.match(String(data), filter.trim(), '`', false)
+                        Util.matchText(String(data), filter.trim(), '`', false)
                     );
-                } else if (data === '' && tableSettings['filterReturnTrueWhenEmpty']) {
-                    // console.log('empty');
-                    return true;
                 } else if (!isNaN(data)) {
-                    // console.log('number');
+                    // number
                     return filter.trim() == '' ? true : (
-                        filterNumbers(data, filter)
-                        || Util.match(String(data), filter.trim(), '`', false)
+                        Util.match(data, filter.trim(), '`', filterNumbers)
+                        || Util.matchText(String(data), filter.trim(), '`')
                     );
                 } else if (isDateString(data)) {
-                    // console.log('date');
+                    // date
                     return filter.trim() == '' ? true : (
-                        filterDates(data, filter)
-                        || Util.match(String(data), filter.trim(), '`', false)
+                        Util.match(data, filter.trim(), '`', filterDates)
+                        || Util.matchText(String(data), filter.trim(), '`')
                     );
                 } else {
-                    // console.log('string');
-                    return filter.trim() == '' ? true : Util.match(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
+                    // string
+                    return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`');
                 }
             } catch (e) {
-                // console.log('error');
-                return filter.trim() == '' ? true : Util.match(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false);
+                // error
+                return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`');
             }
         },
         controlGroupEventHandlers: [],
@@ -156,7 +151,8 @@ function JsonTable(c = null) {
         + "1. Boolean\n    'true' / 'false'\n\n"
         + "2. Numbers\n    '<' / '<=' / '=' / '>' / '>=' + (number string)\n\n"
         + "3. Dates\n    '<' / '<=' / '=' / '>' / '>=' + dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss\n\n"
-        + "4. Strings\n"
+        + "4. Text\n    any successive characters that included\n\n"
+        + "5. Combined conditions (of all above)\n"
         + "    String Separator: Space ( )\n"
         + "    Delimiter: Backtick (`)\n"
         + "    A condition clause:\n"
@@ -173,32 +169,37 @@ function JsonTable(c = null) {
 
     let tableSettings;
 
-    let filterNumbers = function (data, filter) {
-        if (isNaN(data)) {
+    let filterNumbers = function (a, b) {
+        if (isNaN(a)) {
             throw '@ filterNumber: NaN';
-        }
-        let ft = filter.trim();
-        let f1 = ft.substring(1).trim();
-        let f2 = ft.substring(2).trim();
-        if (ft.startsWith('<') && !isNaN(f1)) {
-            return data < parseFloat(f1);
-        } else if (ft.startsWith('<=') && !isNaN(f2)) {
-            return data <= parseFloat(f2);
-        } else if (ft.startsWith('=') && !isNaN(f1)) {
-            return data == parseFloat(f1);
-        } else if (ft.startsWith('>=') && !isNaN(f2)) {
-            return data >= parseFloat(f2);
-        } else if (ft.startsWith('>') && !isNaN(f1)) {
-            return data > parseFloat(f1);
+        } else if (b === '_' && (a == null || a.trim() == '')) {
+            return true;
         } else {
-            return data == parseFloat(ft);
+            let ft = b.trim();
+            let f1 = ft.substring(1).trim();
+            let f2 = ft.substring(2).trim();
+            if (ft.startsWith('<') && !isNaN(f1)) {
+                return a < parseFloat(f1);
+            } else if (ft.startsWith('<=') && !isNaN(f2)) {
+                return a <= parseFloat(f2);
+            } else if (ft.startsWith('=') && !isNaN(f1)) {
+                return a == parseFloat(f1);
+            } else if (ft.startsWith('>=') && !isNaN(f2)) {
+                return a >= parseFloat(f2);
+            } else if (ft.startsWith('>') && !isNaN(f1)) {
+                return a > parseFloat(f1);
+            } else {
+                return Sting(a).trim().indexOf(ft);
+            }
         }
     }
 
-    let filterDates = function (data, filter) {
-        try {
-            let dt = data.trim();
-            let ft = filter.trim();
+    let filterDates = function (a, b) {
+        if (b === '_' && (a == null || a.trim() == '')) {
+            return true;
+        } else {
+            let dt = a.trim();
+            let ft = b.trim();
             let f1 = ft.substring(1).trim();
             let f2 = ft.substring(2).trim();
             if (ft.startsWith('<') && isDateString(f1)) {
@@ -212,10 +213,8 @@ function JsonTable(c = null) {
             } else if (ft.startsWith('>') && isDateString(f1)) {
                 return parseDate(dt) > parseDate(f1);
             } else {
-                return parseDate(dt) == parseDate(ft);
+                return Sting(a).trim().indexOf(ft);
             }
-        } catch (e) {
-            throw '@ filterDates: ' + e;
         }
     }
 
@@ -763,8 +762,8 @@ function JsonTable(c = null) {
                 haveSelection = true;
             }
             let output = Util.create('input', { ...{ type: 'checkbox' }, ...(row['###row-selected'] ? { checked: '' } : {}) })
-                .addEventHandler('click', (event) => {
-                    shieldOn();
+                .addEventHandler('click', async (event) => {
+                    await shieldOn();
                     if (typeof tableSettings['multiSelect'] === "boolean" && !tableSettings['multiSelect']) {
                         setAllSelected(false);
                     }
@@ -783,8 +782,8 @@ function JsonTable(c = null) {
                 haveRemoval = true;
             }
             let output = Util.create('input', { ...{ type: 'checkbox' }, ...(row['###row-removed'] ? { checked: '' } : {}) })
-                .addEventHandler('click', (event) => {
-                    shieldOn();
+                .addEventHandler('click', async (event) => {
+                    await shieldOn();
                     setRemoved(row['###row-index'], event.target.checked);
                     refreshTable();
                 });
@@ -810,23 +809,23 @@ function JsonTable(c = null) {
                             Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                                 .appendContent(
                                     Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventHandler('click', (event) => { shieldOn(); setAllFilteredSelected(true); refreshTable(); })
+                                        .addEventHandler('click', async (event) => { await shieldOn(); setAllFilteredSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllFiltered)
                                 )
                                 .appendContent(
                                     Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventHandler('click', (event) => { shieldOn(); setAllFilteredSelected(false); refreshTable(); })
+                                        .addEventHandler('click', async (event) => { await shieldOn(); setAllFilteredSelected(false); refreshTable(); })
                                         .appendContent(tableSettings.unselectAllFiltered)
                                 )
                                 .appendContentIf(
                                     Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventHandler('click', (event) => { shieldOn(); setAllEditedSelected(true); refreshTable(); })
+                                        .addEventHandler('click', async (event) => { await shieldOn(); setAllEditedSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllEdited)
                                     , edited
                                 )
                                 .appendContentIf(
                                     Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                        .addEventHandler('click', (event) => { setAllInsertedSelected(true); refreshTable(); })
+                                        .addEventHandler('click', async (event) => { await shieldOn(); setAllInsertedSelected(true); refreshTable(); })
                                         .appendContent(tableSettings.selectAllInserted)
                                     , inserted
                                 )
@@ -844,7 +843,7 @@ function JsonTable(c = null) {
         if (tableSettings != null) {
             try {
                 output = Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                    .addEventHandler('click', (event) => { shieldOn(); resetFilters(); sortAsOriginal(); filterRows(); resetPageNumbers(); refreshTable(); })
+                    .addEventHandler('click', async (event) => { await shieldOn(); resetFilters(); sortAsOriginal(); filterRows(); resetPageNumbers(); refreshTable(); })
                     .appendContent(tableSettings.resetFilters);
             } catch (err) {
                 throw new Error("error caught @ createResetFiltersButton() - " + err);
@@ -868,12 +867,12 @@ function JsonTable(c = null) {
                         Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
                                 Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                    .addEventHandler('click', (event) => { shieldOn(); resetData(); refreshTable(); })
+                                    .addEventHandler('click', async (event) => { await shieldOn(); resetData(); refreshTable(); })
                                     .appendContent(tableSettings.resetData)
                             )
                             .appendContent(
                                 Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                    .addEventHandler('click', (event) => { shieldOn(); resetSelectedData(); refreshTable(); })
+                                    .addEventHandler('click', async (event) => { await shieldOn(); resetSelectedData(); refreshTable(); })
                                     .appendContent(tableSettings.resetSelectedData)
                             )
                         , edited
@@ -897,13 +896,13 @@ function JsonTable(c = null) {
                                     //toBeginingButton
                                     .appendContent(
                                         Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventHandler('click', (event) => { shieldOn(); toBegining(); refreshTable(); })
+                                            .addEventHandler('click', async (event) => { await shieldOn(); toBegining(); refreshTable(); })
                                             .appendContent(tableSettings['toBegining'])
                                     )
                                     //previousButton
                                     .appendContent(
                                         Util.create('span', { style: "border: 1px solid #AAAAAA; margin-left:5px;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventHandler('click', (event) => { shieldOn(); priviousPage(); refreshTable(); })
+                                            .addEventHandler('click', async (event) => { await shieldOn(); priviousPage(); refreshTable(); })
                                             .appendContent(tableSettings['previousPage'])
                                     )
                             )
@@ -948,14 +947,14 @@ function JsonTable(c = null) {
                                     //toBeginingButton
                                     .appendContent(
                                         Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                                            .addEventHandler('click', (event) => { shieldOn(); nextPage(); refreshTable(); })
+                                            .addEventHandler('click', async (event) => { await shieldOn(); nextPage(); refreshTable(); })
                                             .appendContent(tableSettings['nextPage'])
                                     )
                                     //previousButton
                                     .appendContent(
                                         Util.create('span', { style: "border: 1px solid #AAAAAA; margin-left:5px;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
                                             .preventDefault('click')
-                                            .addEventHandler('click', (event) => { shieldOn(); toEnding(); refreshTable(); })
+                                            .addEventHandler('click', async (event) => { await shieldOn(); toEnding(); refreshTable(); })
                                             .appendContent(tableSettings['toEnding'])
                                     )
                             )
@@ -1076,8 +1075,8 @@ function JsonTable(c = null) {
                                             style: Util.objToStyle(headerStyle),
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
-                                            .addEventHandlerIf('click', () => {
-                                                shieldOn();
+                                            .addEventHandlerIf('click', async () => {
+                                                await shieldOn();
                                                 switchSortingPhase(col['data']);
                                                 refreshTable();
                                             }, undefined, col['sortable'])
@@ -1115,7 +1114,7 @@ function JsonTable(c = null) {
                                 Util.get('html')[0].appendContent(
                                     overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9998', 'background-color': 'hsla(0, 100%, 0%, 0.1)', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'center', 'align-items': 'center' }) })
                                         .appendContent(
-                                            Util.create('textarea', { style: "padding:10px; background-color:#FFF; width:800px; height:400px; font-size:85%; border:1px solid #AAA;" })
+                                            Util.create('textarea', { style: "padding:10px; background-color:#FFF; width:800px; height:410px; font-size:85%; border:1px solid #AAA;" })
                                                 .appendContent(filterGuide)
                                         )
                                         .appendContent(
@@ -1255,6 +1254,9 @@ function JsonTable(c = null) {
                             paginationGroup = createPaginationGroup()
                         )
                         .css('position', 'relative')
+                        .appendContent(shield = Util.create('span', { style: "position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999; display:none;" })
+                            .css('background-color', 'hsla(0, 100%, 0%, 0.1)')
+                        );
                 } catch (e) {
                     throw '@ output: ' + e
                 }
@@ -1325,21 +1327,18 @@ function JsonTable(c = null) {
         }
     }
 
-    let shield;
-
-    let shieldOn = function () {
-        if (shield) {
+    let shieldOn = async function () {
+        try {
             shield.show();
-        } else {
-            table.appendContent(shield = Util.create('span', { style: "position:absolute; left: 0px; top: 0px; width: 100%; height:100%; background-color: hsla(0, 100%, 0%, 0.1); z-index: 999;" }))
-        }
+        } catch (e) { }
+        await Util.deferExec(); // to refresh rendering before exit
         return this;
     }
 
     let shieldOff = function () {
-        if (shield) {
-            shield.hide();
-        }
+        try {
+            shield.remove();
+        } catch (e) { }
         return this;
     }
 
