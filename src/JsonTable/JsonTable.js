@@ -172,7 +172,7 @@ function JsonTable(c = null) {
     let filterNumbers = function (a, b) {
         if (isNaN(a)) {
             throw '@ filterNumber: NaN';
-        } else if (b === '_' && (a == null || a.trim() == '')) {
+        } else if (b === '___' && (a == null || a.trim() == '')) {
             return true;
         } else {
             let ft = b.trim();
@@ -195,7 +195,7 @@ function JsonTable(c = null) {
     }
 
     let filterDates = function (a, b) {
-        if (b === '_' && (a == null || a.trim() == '')) {
+        if (b === '___' && (a == null || a.trim() == '')) {
             return true;
         } else {
             let dt = a.trim();
@@ -460,11 +460,11 @@ function JsonTable(c = null) {
         }
     }
 
-    let getSelected = function (arr) {
+    let getSelected = function (bool = true, arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
-                return deepFilter(arr, row => row['###row-selected']);
+                return deepFilter(arr, row => bool ? row['###row-selected'] : !row['###row-selected']);
             } else {
                 return null;
             }
@@ -473,11 +473,11 @@ function JsonTable(c = null) {
         }
     }
 
-    let getFiltered = function (arr) {
+    let getFiltered = function (bool = true, arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
-                return deepFilter(arr, row => row['###row-filtered']);
+                return deepFilter(arr, row => bool ? row['###row-filtered'] : !row['###row-filtered']);
             } else {
                 return null;
             }
@@ -486,38 +486,25 @@ function JsonTable(c = null) {
         }
     }
 
-    let getEdited = function (arr) {
+    let getRemoved = function (bool = true, arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
-                setEdited(arr);
-                return deepFilter(arr, row => row['###row-edited']);
-            } else {
-                return null;
-            }
-        } catch (error) {
-            throw new Error("error caught @ getedited(): " + error.toString());
-        }
-    }
-
-    let getInserted = function (arr) {
-        try {
-            arr = (arr || tableData);
-            if (arr != null && Array.isArray(arr)) {
-                return deepFilter(arr, row => row['###row-inserted']);
-            } else {
-                return null;
-            }
-        } catch (error) {
-            throw new Error("error caught @ getInserted(): " + error.toString());
-        }
-    }
-
-    let getRemoved = function (arr) {
-        try {
-            arr = (arr || tableData);
-            if (arr != null && Array.isArray(arr)) {
-                return deepFilter(arr, row => row['###row-removed']);
+                let temp = deepFilter(
+                    deepFilter(
+                        arr
+                        , row => bool ? row['###row-removed'] : !row['###row-removed']
+                    )
+                    , row => !row['###row-inserted']
+                );
+                for (let item of temp) {
+                    for (let key of Object.keys(item)) {
+                        if (!key.startsWith('###ori-') && item['###ori-' + key]) {
+                            item[key] = item['###ori-' + key];
+                        }
+                    };
+                }
+                return JsonTable.cleanKeys(temp);
             } else {
                 return null;
             }
@@ -526,16 +513,58 @@ function JsonTable(c = null) {
         }
     }
 
-    let getNotRemoved = function (arr) {
+    let getInserted = function (bool = true, arr) {
         try {
             arr = (arr || tableData);
             if (arr != null && Array.isArray(arr)) {
-                return deepFilter(arr, row => !row['###row-removed']);
+                let temp = deepFilter(
+                    deepFilter(
+                        arr
+                        , row => bool ? row['###row-inserted'] : !row['###row-inserted']
+                    )
+                    , row => !row['###row-removed']
+                );
+                return JsonTable.cleanKeys(temp);
             } else {
                 return null;
             }
         } catch (error) {
-            throw new Error("error caught @ getNotRemoved(): " + error.toString());
+            throw new Error("error caught @ getInserted(): " + error.toString());
+        }
+    }
+
+    let getEdited = function (bool = true, arr) {
+        try {
+            arr = (arr || tableData);
+            if (arr != null && Array.isArray(arr)) {
+                setEdited(arr);
+                let temp = deepFilter(
+                    deepFilter(
+                        deepFilter(
+                            arr
+                            , row => bool ? row['###row-edited'] : !row['###row-edited']
+                        )
+                        , row => !row['###row-removed']
+                    )
+                    , row => !row['###row-inserted']
+                );
+                let output = [];
+                for (let item of temp) {
+                    let obj = { ori: {}, current: {} };
+                    for (let key of Object.keys(item)) {
+                        if (!key.startsWith('###')) {
+                            obj.ori[key] = item.hasOwnProperty('###ori-' + key) ? item['###ori-' + key] : item[key];
+                            obj.current[key] = item[key];
+                        }
+                    }
+                    output.push(obj);
+                }
+                return output;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            throw new Error("error caught @ getEdited(): " + error.toString());
         }
     }
 
@@ -1345,7 +1374,7 @@ function JsonTable(c = null) {
     return {
         setData, getData, resetData, insertData,
         setTableSettings, getTableSettings, sortAsOriginal,
-        getSelected, getFiltered, getEdited, getInserted, getRemoved, getNotRemoved,
+        getSelected, getFiltered, getEdited, getInserted, getRemoved,
         createSelectBox, createRemoveBox, editData, setContainer, refreshTable,
         shieldOn, shieldOff
     };

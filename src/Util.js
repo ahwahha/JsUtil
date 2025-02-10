@@ -704,7 +704,7 @@ Util.matchText = function (text, matchingText, delimiter, caseSensitive = false)
                 }
 
                 match = Util.checkCriteria(text, matchingText, delimiter, (a, b) => {
-                    return b === '_' && (a == null || a.trim() == '') ? true : a.indexOf(b) !== -1;
+                    return b === '___' && (a == null || a.trim() == '') ? true : a.indexOf(b) !== -1;
                 });
 
             }
