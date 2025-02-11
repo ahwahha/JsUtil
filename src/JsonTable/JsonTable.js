@@ -3,6 +3,8 @@ import { Util } from '../Util.js';
 function JsonTable(c = null) {
 
     let table;
+    let ctrl = false;
+    let tempSortedBy = [];
     let shield;
     let controlGroup;
     let tableBody;
@@ -610,62 +612,65 @@ function JsonTable(c = null) {
 
     let sortRows = function () {
         try {
-            let data = tableSettings['sortedBy'];
+            let dataList = Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']];
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
-                let sortedData = tableData.sort((a, b) => {
-                    if (a[data] == null || b[data] == null) {
-                        // null exists
-                        if (a[data] == null && b[data] == null) {
-                            return 0;
-                        } else {
-                            return order ? (a[data] == null ? 1 : -1) : (a[data] == null ? -1 : 1);
-                        }
-                    } else if (typeof a[data] === 'boolean' && typeof b[data] === 'boolean') {
-                        // both boolean
-                        if (a[data] == b[data]) {
-                            return 0;
-                        } else {
-                            return order ? (a[data] ? 1 : -1) : (a[data] ? -1 : 1);
-                        }
-                    } else if (a[data] != '' && b[data] != '' && !isNaN(a[data]) && !isNaN(b[data])) {
-                        // both number
-                        if (parseFloat(a[data]) == parseFloat(b[data])) {
-                            return 0;
-                        } else {
-                            return order ? parseFloat(a[data]) - parseFloat(b[data]) : parseFloat(b[data]) - parseFloat(a[data]);
-                        }
-                    } else if (typeof a[data] === 'object' && typeof b[data] === 'object') {
-                        // both object
-                        let va = JSON.stringify(a[data]);
-                        let vb = JSON.stringify(b[data]);
-                        if (va == vb) {
-                            return 0;
-                        } else {
-                            return order ? va - vb : vb - va;
-                        }
-                    } else {
-                        // else treat as strings
-                        let va = String(a[data]);
-                        let vb = String(b[data]);
-                        if (isDateString(va) && isDateString(vb)) {
-                            console.log();
-                            let aNumber = parseDate(va);
-                            let bNumber = parseDate(vb);
-                            if (!isNaN(aNumber) && !isNaN(bNumber)) {
-                                return order ? aNumber - bNumber : bNumber - aNumber;
+                let sortedData = null;
+                for (let data of dataList.reverse()) {
+                    sortedData = tableData.sort((a, b) => {
+                        if (a[data] == null || b[data] == null) {
+                            // null exists
+                            if (a[data] == null && b[data] == null) {
+                                return 0;
+                            } else {
+                                return order ? (a[data] == null ? 1 : -1) : (a[data] == null ? -1 : 1);
+                            }
+                        } else if (typeof a[data] === 'boolean' && typeof b[data] === 'boolean') {
+                            // both boolean
+                            if (a[data] == b[data]) {
+                                return 0;
+                            } else {
+                                return order ? (a[data] ? 1 : -1) : (a[data] ? -1 : 1);
+                            }
+                        } else if (a[data] != '' && b[data] != '' && !isNaN(a[data]) && !isNaN(b[data])) {
+                            // both number
+                            if (parseFloat(a[data]) == parseFloat(b[data])) {
+                                return 0;
+                            } else {
+                                return order ? parseFloat(a[data]) - parseFloat(b[data]) : parseFloat(b[data]) - parseFloat(a[data]);
+                            }
+                        } else if (typeof a[data] === 'object' && typeof b[data] === 'object') {
+                            // both object
+                            let va = JSON.stringify(a[data]);
+                            let vb = JSON.stringify(b[data]);
+                            if (va == vb) {
+                                return 0;
+                            } else {
+                                return order ? va - vb : vb - va;
                             }
                         } else {
-                            return order ? va.localeCompare(vb) : vb.localeCompare(va);
+                            // else treat as strings
+                            let va = String(a[data]);
+                            let vb = String(b[data]);
+                            if (isDateString(va) && isDateString(vb)) {
+                                console.log();
+                                let aNumber = parseDate(va);
+                                let bNumber = parseDate(vb);
+                                if (!isNaN(aNumber) && !isNaN(bNumber)) {
+                                    return order ? aNumber - bNumber : bNumber - aNumber;
+                                }
+                            } else {
+                                return order ? va.localeCompare(vb) : vb.localeCompare(va);
+                            }
                         }
-                    }
-                    return 0;
-                });
+                        return 0;
+                    });
+                }
                 tableData = sortedData;
             }
             return this;
         } catch (error) {
-            throw new Error("error caught @ sort(" + data + ", " + order + "): " + error);
+            throw new Error("error caught @ sort(" + tableSettings['sortedBy'] + ", " + order + "): " + error);
         }
     }
 
@@ -1105,15 +1110,19 @@ function JsonTable(c = null) {
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         })
                                             .addEventHandlerIf('click', async () => {
-                                                await shieldOn();
-                                                switchSortingPhase(col['data']);
-                                                refreshTable();
+                                                if (!ctrl) {
+                                                    await shieldOn();
+                                                    switchSortingPhase(col['data']);
+                                                    refreshTable();
+                                                } else {
+                                                    tempSortedBy.push(col['data']);
+                                                }
                                             }, undefined, col['sortable'])
                                             .appendContent(
                                                 Util.create('div', { style: 'flex:1;' })
                                             )
                                             .appendContent(
-                                                col.header + (tableSettings['sortedBy'] === col['data'] ? (tableSettings['ascending'] ? '▲' : '▼') : '')
+                                                col.header + ((Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']]).includes(col['data']) ? (tableSettings['ascending'] ? '▲' : '▼') : '')
                                             )
                                             .appendContent(
                                                 Util.create('div', { style: 'flex:1;' })
@@ -1370,6 +1379,22 @@ function JsonTable(c = null) {
         } catch (e) { }
         return this;
     }
+
+    Util.get('body')[0].addEventHandler('keydown', (event) => {
+        if (event.key == 'Control' && !ctrl) {
+            ctrl = true;
+            tempSortedBy = [];
+        }
+    }).addEventHandler('keyup', (event) => {
+        if (event.key === 'Control' && ctrl) {
+            ctrl = false;
+            if (tempSortedBy.length > 0) {
+                tableSettings['sortedBy'] = tempSortedBy;
+                sortRows();
+                refreshTable();
+            }
+        }
+    });
 
     return {
         setData, getData, resetData, insertData,
