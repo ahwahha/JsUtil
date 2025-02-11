@@ -497,7 +497,7 @@ function JsonTable(c = null) {
                         arr
                         , row => bool ? row['###row-removed'] : !row['###row-removed']
                     )
-                    , row => !row['###row-inserted']
+                    , row => (bool ? !row['###row-inserted'] : true)
                 );
                 for (let item of temp) {
                     for (let key of Object.keys(item)) {
@@ -1073,23 +1073,6 @@ function JsonTable(c = null) {
     }
 
     let filters;
-    let switchSortingPhase = function (data) {
-        if (tableSettings['sortedBy'] === data) {
-            if (tableSettings['sortingPhase'] == 1) {
-                setSorting(data, !tableSettings['ascending']);
-                tableSettings['sortingPhase'] = 2;
-            } else if (tableSettings['sortingPhase'] == 2) {
-                tableSettings['sortedBy'] = undefined;
-                tableSettings['sortingPhase'] = undefined;
-            } else {
-                setSorting(data, tableSettings['ascending']);
-                tableSettings['sortingPhase'] = 1;
-            }
-        } else {
-            setSorting(data, tableSettings['ascending']);
-            tableSettings['sortingPhase'] = 1;
-        }
-    }
     let createTable = function () {
         let output = null;
         if (true || (tableData != null && Array.isArray(tableData) && tableSettings != null)) {
@@ -1112,11 +1095,17 @@ function JsonTable(c = null) {
                                             .addEventHandlerIf('click', async () => {
                                                 if (!ctrl) {
                                                     await shieldOn();
-                                                    switchSortingPhase(col['data']);
+                                                    setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
                                                     refreshTable();
                                                 } else {
-                                                    tempSortedBy.push(col['data']);
+                                                    tempSortedBy = [... new Set([...tempSortedBy, col['data']])];
                                                 }
+                                            }, undefined, col['sortable'])
+                                            .addEventHandlerIf('dblclick', async () => {
+                                                await shieldOn();
+                                                setSorting(undefined, tableSettings['ascending']);
+                                                tempSortedBy = [];
+                                                refreshTable();
                                             }, undefined, col['sortable'])
                                             .appendContent(
                                                 Util.create('div', { style: 'flex:1;' })
