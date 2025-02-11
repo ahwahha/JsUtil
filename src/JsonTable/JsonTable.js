@@ -616,7 +616,7 @@ function JsonTable(c = null) {
             let order = tableSettings['ascending'];
             if (tableData != null && Array.isArray(tableData)) {
                 let sortedData = null;
-                for (let data of dataList.reverse()) {
+                for (let data of [...dataList].reverse()) {
                     sortedData = tableData.sort((a, b) => {
                         if (a[data] == null || b[data] == null) {
                             // null exists
@@ -1390,7 +1390,6 @@ function JsonTable(c = null) {
             ctrl = false;
             if (tempSortedBy.length > 0) {
                 tableSettings['sortedBy'] = tempSortedBy;
-                sortRows();
                 refreshTable();
             }
         }
