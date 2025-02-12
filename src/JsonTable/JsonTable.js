@@ -952,7 +952,7 @@ function JsonTable(c = null) {
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['start']
-                                        }).addEventHandler('change', (event) => { setStart(event.target.value); refreshTable(); })
+                                        }).addEventHandler('change', async (event) => { await shieldOn(); setStart(event.target.value); refreshTable(); })
                                     )
                                     .appendContent(
                                         Util.create('span', { style: 'margin: 0px 5px;' })
@@ -968,7 +968,7 @@ function JsonTable(c = null) {
                                                 'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['end']
-                                        }).addEventHandler('change', (event) => { setEnd(event.target.value); refreshTable(); })
+                                        }).addEventHandler('change', async (event) => { await shieldOn(); setEnd(event.target.value); refreshTable(); })
                                     )
                                     .appendContent(
                                         Util.create('span', { style: 'margin: 0px 5px;' })
