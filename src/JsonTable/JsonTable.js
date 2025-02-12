@@ -1357,14 +1357,15 @@ function JsonTable(c = null) {
     let shieldOn = async function () {
         try {
             shield.show();
-        } catch (e) { }
-        await Util.deferExec(); // to refresh rendering before exit
+        } catch (e) { } finally {
+            await Util.deferExec(); // to refresh rendering before exit
+        }
         return this;
     }
 
     let shieldOff = function () {
         try {
-            shield.remove();
+            shield.hide();
         } catch (e) { }
         return this;
     }
@@ -1374,10 +1375,11 @@ function JsonTable(c = null) {
             ctrl = true;
             tempSortedBy = [];
         }
-    }).addEventHandler('keyup', (event) => {
+    }).addEventHandler('keyup', async (event) => {
         if (event.key === 'Control' && ctrl) {
             ctrl = false;
             if (tempSortedBy.length > 0) {
+                await shieldOn();
                 tableSettings['sortedBy'] = tempSortedBy;
                 refreshTable();
             }

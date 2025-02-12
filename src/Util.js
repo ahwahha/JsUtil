@@ -925,8 +925,13 @@ Util.prototype.drag = function (target) {
 };
 
 Util.deferExec = function () {
-    return new Promise((res) => { setTimeout(() => { res(); }, 0); });
-}
+    return new Promise((res) => {
+        requestIdleCallback(() => {
+            res();
+        });
+    });
+};
+
 
 Util.prototype.debounce = function (func, delay) {
     let context = this;
