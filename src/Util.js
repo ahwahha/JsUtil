@@ -933,7 +933,7 @@ Util.deferExec = function (delay = 100) {
                 res();
             }
         }
-        if (requestIdleCallback in window) {
+        if ('requestIdleCallback' in window) {
             requestIdleCallback(quit);
         } else {
             setTimeout(quit, delay);
