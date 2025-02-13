@@ -961,8 +961,8 @@ Util.prototype.countClicks = function (handlers = [], delay) {
             this.debounce((_count) => {
                 if (handlers[_count - 1]) {
                     handlers[_count - 1].apply(context, [event, ...args]);
-                    count = 0;
                 }
+                count = 0;
             }, delay)(count);
         })
         return context;
