@@ -3,8 +3,6 @@ import { Util } from '../Util.js';
 function JsonTable(c = null) {
 
     let table;
-    let ctrl = false;
-    let tempSortedBy = [];
     let shield;
     let controlGroup;
     let tableBody;
@@ -63,6 +61,7 @@ function JsonTable(c = null) {
         nextPage: Util.create('span', { style: 'padding:0px 8px;' }).appendContent('>'),
         toEnding: '>>',
         headersStyle: {
+            "position": "relative",
             "border-radius": "5px",
             "border": "hsl(0, 0%, 75%) solid 1px",
             "height": "calc(100% - 8px)",
@@ -111,7 +110,9 @@ function JsonTable(c = null) {
             "text-decoration-color": "hsl(0, 80%, 50%)",
             "background-image": "linear-gradient(to bottom, hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 0%, 100%, 0), hsla(0, 30%, 50%, 0.03), hsla(0, 30%, 50%, 0.05), hsla(0, 30%, 50%, 0.1), hsla(0, 30%, 50%, 0.15), hsla(0, 30%, 50%, 0.25), hsla(0, 30%, 50%, 0.5))"
         },
-        filterDebounceDelay: 500,
+        filterDebounce: 500,
+        sortingDebounce: 250,
+        shieldRefreshGap: 100,
         filterFunction: function (data, filter) {
             try {
                 if (data == null) {
@@ -614,7 +615,7 @@ function JsonTable(c = null) {
         try {
             let dataList = Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']];
             let order = tableSettings['ascending'];
-            if (tableData != null && Array.isArray(tableData)) {
+            if (tableData != null && Array.isArray(tableData) && dataList.length > 0) {
                 let sortedData = null;
                 for (let data of [...dataList].reverse()) {
                     sortedData = tableData.sort((a, b) => {
@@ -1091,33 +1092,40 @@ function JsonTable(c = null) {
                                         Util.create('div', {
                                             style: Util.objToStyle(headerStyle),
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
-                                        })
-                                            .addEventHandlerIf('click', async () => {
-                                                if (!ctrl) {
-                                                    await shieldOn();
-                                                    setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
-                                                    refreshTable();
-                                                } else {
-                                                    tempSortedBy = [... new Set([...tempSortedBy, col['data']])];
-                                                }
-                                            }, undefined, col['sortable'])
-                                            .addEventHandlerIf('dblclick', async () => {
-                                                await shieldOn();
-                                                setSorting(undefined, tableSettings['ascending']);
-                                                tempSortedBy = [];
-                                                refreshTable();
-                                            }, undefined, col['sortable'])
-                                            .appendContent(
-                                                Util.create('div', { style: 'flex:1;' })
-                                            )
-                                            .appendContent(
-                                                col.header + ((Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']]).includes(col['data']) ? (tableSettings['ascending'] ? '▲' : '▼') : '')
-                                            )
-                                            .appendContent(
-                                                Util.create('div', { style: 'flex:1;' })
-                                            )
+                                        }).appendContent(
+                                            Util.create('div', { style: 'flex:1;' })
+                                        ).appendContent(
+                                            col.header + ((Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']]).includes(col['data']) ? (tableSettings['ascending'] ? '▲' : '▼') : '')
+                                        ).appendContent(
+                                            Util.create('div', { style: 'flex:1;' })
+                                        ).appendContent(
+                                            Util.create('div', { style: 'position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999;' })
+                                                .countClicks([
+                                                    async (event, ...args) => {
+                                                        if (col['sortable']) {
+                                                            await shieldOn();
+                                                            setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
+                                                            refreshTable();
+                                                        }
+                                                    },
+                                                    async (event, ...args) => {
+                                                        if (col['sortable']) {
+                                                            let list = Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']];
+                                                            list = list.includes(col['data']) ? list.filter(item => item != col['data']) : [...new Set([...list, col['data']])];
+                                                            await shieldOn();
+                                                            setSorting(list, tableSettings['ascending']);
+                                                            refreshTable();
+                                                        }
+                                                    },
+                                                    async (event, ...args) => {
+                                                        await shieldOn();
+                                                        setSorting(undefined, tableSettings['ascending']);
+                                                        refreshTable();
+                                                    }
+                                                ], tableSettings['sortingDebounce'])()
+                                        )
                                     )
-                            )
+                            );
                         });
                         tbody.appendContent(headers);
                     }
@@ -1332,7 +1340,7 @@ function JsonTable(c = null) {
                                 e.setSelectionRange(selectionStart, selectionEnd);
                                 e.focus();
                             }
-                            , tableSettings.filterDebounceDelay)();
+                            , tableSettings.filterDebounce)();
                     });
                 }
             }
@@ -1358,7 +1366,7 @@ function JsonTable(c = null) {
         try {
             shield.show();
         } catch (e) { } finally {
-            await Util.deferExec(); // to refresh rendering before exit
+            await Util.deferExec(tableSettings['shieldRefreshGap']); // to refresh rendering before exit
         }
         return this;
     }
@@ -1369,22 +1377,6 @@ function JsonTable(c = null) {
         } catch (e) { }
         return this;
     }
-
-    Util.get('body')[0].addEventHandler('keydown', (event) => {
-        if (event.key == 'Control' && !ctrl) {
-            ctrl = true;
-            tempSortedBy = [];
-        }
-    }).addEventHandler('keyup', async (event) => {
-        if (event.key === 'Control' && ctrl) {
-            ctrl = false;
-            if (tempSortedBy.length > 0) {
-                await shieldOn();
-                tableSettings['sortedBy'] = tempSortedBy;
-                refreshTable();
-            }
-        }
-    });
 
     return {
         setData, getData, resetData, insertData,

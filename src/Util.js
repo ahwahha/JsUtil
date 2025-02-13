@@ -924,32 +924,59 @@ Util.prototype.drag = function (target) {
     return this;
 };
 
-Util.deferExec = function () {
+Util.deferExec = function (delay = 100) {
     return new Promise((res) => {
-        requestIdleCallback(() => {
-            res();
-        });
+        let exit = false;
+        let quit = () => {
+            if (!exit) {
+                exit = true;
+                res();
+            }
+        }
+        if (requestIdleCallback in window) {
+            requestIdleCallback(quit);
+        } else {
+            setTimeout(quit, delay);
+        }
     });
 };
-
 
 Util.prototype.debounce = function (func, delay) {
     let context = this;
     return (...args) => {
-        if (context['timeout']) { clearTimeout(context['timeout']); }
-        context['timeout'] = setTimeout(function () {
-            func.apply(context, args);
+        if (context['###timeout']) { clearTimeout(context['###timeout']); }
+        context['###timeout'] = setTimeout(async function () {
+            await func.apply(context, args);
         }, delay);
+        return context;
     };
 };
+
+Util.prototype.countClicks = function (handlers = [], delay) {
+    let context = this;
+    let count = 0;
+    return (...args) => {
+        this.addEventHandler('click', (event) => {
+            count++;
+            this.debounce((_count) => {
+                if (handlers[_count - 1]) {
+                    handlers[_count - 1].apply(context, [event, ...args]);
+                    count = 0;
+                }
+            }, delay)(count);
+        })
+        return context;
+    };
+}
 
 Util.prototype.repeat = function (func, interval) {
     let context = this;
     return (...args) => {
         func.apply(context, args);
-        setTimeout(function () {
-            repeat(func, interval)();
+        setInterval(function () {
+            func.apply(context, args);
         }, interval);
+        return context;
     };
 };
 
