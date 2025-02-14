@@ -1101,14 +1101,14 @@ function JsonTable(c = null) {
                                         ).appendContent(
                                             Util.create('div', { style: 'position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999;' })
                                                 .countClicks([
-                                                    async (event, ...args) => {
+                                                    async function (event, ...args) {
                                                         if (col['sortable']) {
                                                             await shieldOn();
                                                             setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
                                                             refreshTable();
                                                         }
                                                     },
-                                                    async (event, ...args) => {
+                                                    async function (event, ...args) {
                                                         if (col['sortable']) {
                                                             let list = Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']];
                                                             list = list.includes(col['data']) ? list.filter(item => item != col['data']) : [...new Set([...list, col['data']])];
@@ -1117,7 +1117,7 @@ function JsonTable(c = null) {
                                                             refreshTable();
                                                         }
                                                     },
-                                                    async (event, ...args) => {
+                                                    async function (event, ...args) {
                                                         await shieldOn();
                                                         setSorting(undefined, tableSettings['ascending']);
                                                         refreshTable();

@@ -933,11 +933,7 @@ Util.deferExec = function (delay = 100) {
                 res();
             }
         }
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(quit);
-        } else {
-            setTimeout(quit, delay);
-        }
+        setTimeout(quit, delay);
     });
 };
 
@@ -1089,16 +1085,20 @@ Util.prototype.commands = function (_bufferSize, _handlers) {
             handlers.push(_handlers);
         }
 
-        element.addEventHandler('keyup', (event) => {
+        element.addEventHandler('keyup', async (event) => {
             if (event.target === element || (event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA')) {
-                buffer += event.key;
-                if (buffer.length > _bufferSize) {
-                    buffer = buffer.slice(1);
-                }
-
-                for (let handler of handlers) {
-                    if (['command', 'function'].every(key => handler.hasOwnProperty(key))) {
-                        if (buffer.endsWith(handler['command'])) handler['function']();
+                if (event.key == 'Enter') {
+                    for (let handler of handlers) {
+                        if (['command', 'function'].every(key => handler.hasOwnProperty(key))) {
+                            if (buffer.endsWith(handler['command'])) {
+                                await handler['function']();
+                            }
+                        }
+                    }
+                } else {
+                    buffer += event.key;
+                    if (buffer.length > _bufferSize) {
+                        buffer = buffer.slice(1);
                     }
                 }
             }
