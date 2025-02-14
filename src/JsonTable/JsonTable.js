@@ -700,10 +700,12 @@ function JsonTable(c = null) {
                 tableSettings = {
                     ...tableSettings
                     , start: Math.max(
+                        //lower bound
                         Math.min(
                             rowNumber,
                             tableSettings['end']
                         ),
+                        //maximum possible
                         Math.max(
                             (getFiltered().length === 0 ? 0 : 1),
                             tableSettings['end'] - tableSettings['maxRows'] + 1
@@ -724,10 +726,12 @@ function JsonTable(c = null) {
                 tableSettings = {
                     ...tableSettings
                     , end: Math.min(
+                        //lower bound
                         Math.max(
                             rowNumber,
                             tableSettings['start']
                         ),
+                        //minimum possible
                         Math.min(
                             getFiltered().length,
                             tableSettings['start'] + tableSettings['maxRows'] - 1
@@ -878,7 +882,7 @@ function JsonTable(c = null) {
         if (tableSettings != null) {
             try {
                 output = Util.create('span', { style: "border: 1px solid #AAAAAA;", class: tableSettings['tableClass'] + ' ' + tableSettings['buttonClass'] })
-                    .addEventHandler('click', async (event) => { await shieldOn(); resetFilters(); sortAsOriginal(); filterRows(); resetPageNumbers(); refreshTable(); })
+                    .addEventHandler('click', async (event) => { await shieldOn(); resetFilters(); filterRows(); refreshTable(true); })
                     .appendContent(tableSettings.resetFilters);
             } catch (err) {
                 throw new Error("error caught @ createResetFiltersButton() - " + err);
@@ -1029,8 +1033,12 @@ function JsonTable(c = null) {
         try {
             if (tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
-                setStart(getFiltered().length === 0 ? 0 : 1);
-                setEnd(Math.max(length, tableSettings['defaultEnd']));
+                let start = getFiltered().length === 0 ? 0 : 1;
+                let end = Math.max(length, tableSettings['defaultEnd']);
+                tableSettings['start'] = start;
+                tableSettings['end'] = end;
+                setStart(start);
+                setEnd(end);
             }
             return this;
         } catch (err) {
@@ -1330,11 +1338,15 @@ function JsonTable(c = null) {
                         setFilter(tableSettings['columns'].indexOf(col), element.entity().value);
                         filters.debounce(
                             (event) => {
+                                //cursor position
                                 let selectionStart = element.entity().selectionStart;
                                 let selectionEnd = element.entity().selectionEnd;
+
+                                //refresh table
                                 filterRows();
-                                resetPageNumbers();
-                                refreshTable();
+                                refreshTable(true);
+
+                                //set cursor position
                                 let e = tableSettings['columns'][tableSettings['columns'].indexOf(col)]['filterElement'].entity();
                                 element.entity(e);
                                 e.setSelectionRange(selectionStart, selectionEnd);
