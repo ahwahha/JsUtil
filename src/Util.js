@@ -939,41 +939,35 @@ Util.deferExec = function (delay = 100) {
 
 Util.prototype.debounce = function (func, delay) {
     let context = this;
-    return (...args) => {
-        if (context['###timeout']) { clearTimeout(context['###timeout']); }
-        context['###timeout'] = setTimeout(async function () {
-            await func.apply(context, args);
-        }, delay);
-        return context;
-    };
+    if (context['###timeout']) { clearTimeout(context['###timeout']); }
+    context['###timeout'] = setTimeout(async function () {
+        await func.apply(context);
+    }, delay);
+    return this;
 };
 
 Util.prototype.countClicks = function (handlers = [], delay) {
     let context = this;
     let count = 0;
-    return (...args) => {
-        this.addEventHandler('click', (event) => {
-            count++;
-            this.debounce((_count) => {
-                if (handlers[_count - 1]) {
-                    handlers[_count - 1].apply(context, [event, ...args]);
-                }
-                count = 0;
-            }, delay)(count);
-        })
-        return context;
-    };
+    this.addEventHandler('click', (event) => {
+        count++;
+        this.debounce(() => {
+            if (handlers[count - 1]) {
+                handlers[count - 1].apply(context, event);
+            }
+            count = 0;
+        }, delay);
+    })
+    return this;
 }
 
 Util.prototype.repeat = function (func, interval) {
     let context = this;
-    return (...args) => {
-        func.apply(context, args);
-        setInterval(function () {
-            func.apply(context, args);
-        }, interval);
-        return context;
-    };
+    func.apply(context);
+    setInterval(function () {
+        func.apply(context);
+    }, interval);
+    return this;
 };
 
 Util.prototype.idleControl = function (events, onactive, onidle, interval) {
@@ -1107,5 +1101,36 @@ Util.prototype.commands = function (_bufferSize, _handlers) {
 
     return this;
 };
+
+Util.prototype.holdKeys = function (combinations) {
+    let element = this;
+    element.keys = [];
+    element.holding = false;
+
+    let checkKeySet = function (_combinations) {
+        if (Array.isArray(_combinations)) {
+            for (let combination of _combinations) {
+                if (combination != null && combination.keySet != null && combination.handler != null) {
+                    if (JSON.stringify(combination.keySet.sort()) == JSON.stringify(element.keys.sort())) {
+                        combination.handler.apply(element);
+                    }
+                }
+            }
+        }
+    }
+
+    element.addEventHandler('keydown', (event) => {
+        if (element.keys.indexOf(event.key) < 0) {
+            element.keys = [...new Set([...element.keys, event.key])]
+            element.holding = true;
+            checkKeySet(combinations);
+        }
+    }).addEventHandler('keyup', (event) => {
+        element.keys = element.keys.filter(key => key != event.key);
+        element.holding = element.keys.length != 0;
+        checkKeySet(combinations);
+    });
+    return this;
+}
 
 export { Util };

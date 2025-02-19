@@ -1130,7 +1130,7 @@ function JsonTable(c = null) {
                                                         setSorting(undefined, tableSettings['ascending']);
                                                         refreshTable();
                                                     }
-                                                ], tableSettings['sortingDebounce'])()
+                                                ], tableSettings['sortingDebounce'])
                                         )
                                     )
                             );
@@ -1352,7 +1352,7 @@ function JsonTable(c = null) {
                                 e.setSelectionRange(selectionStart, selectionEnd);
                                 e.focus();
                             }
-                            , tableSettings.filterDebounce)();
+                            , tableSettings.filterDebounce);
                     });
                 }
             }
