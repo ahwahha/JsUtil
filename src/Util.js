@@ -1108,4 +1108,22 @@ Util.prototype.commands = function (_bufferSize, _handlers) {
     return this;
 };
 
+Util.prototype.holdKeys = function () {
+    let element = this;
+    element.keys = [];
+    element.holding = false;
+    element.addEventHandler('keydown', (event) => {
+        if (element.keys.indexOf(event.key) < 0) {
+            element.keys = [...new Set([...element.keys, event.key])]
+            element.holding = true;
+        }
+    }).addEventHandler('keyup', (event) => {
+        if (element.keys.indexOf(event.key) >= 0) {
+            element.keys = element.keys.filter(key => key != event.key);
+            element.holding = element.keys.length != 0;
+        }
+    });
+    return this;
+}
+
 export { Util };
