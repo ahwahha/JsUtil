@@ -2,6 +2,7 @@ import { Util } from '../Util.js';
 
 function JsonTable(c = null) {
 
+    let body = Util.get('body')[0];
     let table;
     let shield;
     let controlGroup;
@@ -1088,6 +1089,26 @@ function JsonTable(c = null) {
             try {
                 let tbody = Util.create('tbody', null);
 
+                let selectSortedBy = async function (col) {
+                    await shieldOn();
+                    setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']));
+                    refreshTable();
+                }
+
+                let amendSortedBy = async function (col) {
+                    let list = Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']];
+                    list = list.includes(col['data']) ? list.filter(item => item != col['data']) : [...new Set([...list, col['data']])];
+                    await shieldOn();
+                    setSorting(list, tableSettings['ascending']);
+                    refreshTable();
+                }
+
+                let removeSortedBy = async function () {
+                    await shieldOn();
+                    setSorting(undefined, tableSettings['ascending']);
+                    refreshTable();
+                }
+
                 /* headers */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
@@ -1098,6 +1119,7 @@ function JsonTable(c = null) {
                                 Util.create('td', { class: col['class'] })
                                     .appendContent(
                                         Util.create('div', {
+                                            tabindex: '0',
                                             style: Util.objToStyle(headerStyle),
                                             class: tableSettings['tableClass'] + ' ' + 'sort-header ' + (tableSettings['sortedBy'] === col['data'] ? 'sorting' : '')
                                         }).appendContent(
@@ -1109,27 +1131,9 @@ function JsonTable(c = null) {
                                         ).appendContent(
                                             Util.create('div', { style: 'position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999;' })
                                                 .countClicks([
-                                                    async function (event, ...args) {
-                                                        if (col['sortable']) {
-                                                            await shieldOn();
-                                                            setSorting(col['data'], (tableSettings['sortedBy'] === col['data'] ? !tableSettings['ascending'] : tableSettings['ascending']))
-                                                            refreshTable();
-                                                        }
-                                                    },
-                                                    async function (event, ...args) {
-                                                        if (col['sortable']) {
-                                                            let list = Array.isArray(tableSettings['sortedBy']) ? tableSettings['sortedBy'] : [tableSettings['sortedBy']];
-                                                            list = list.includes(col['data']) ? list.filter(item => item != col['data']) : [...new Set([...list, col['data']])];
-                                                            await shieldOn();
-                                                            setSorting(list, tableSettings['ascending']);
-                                                            refreshTable();
-                                                        }
-                                                    },
-                                                    async function (event, ...args) {
-                                                        await shieldOn();
-                                                        setSorting(undefined, tableSettings['ascending']);
-                                                        refreshTable();
-                                                    }
+                                                    async function (event) { if (col['sortable']) { if (body.keys.length == 1 && body.keys[0] == 'Control') { await amendSortedBy(col); } else { await selectSortedBy(col); } } },
+                                                    async function (event) { if (col['sortable']) { await amendSortedBy(col); } },
+                                                    async function (event) { await removeSortedBy() }
                                                 ], tableSettings['sortingDebounce'])
                                         )
                                     )
@@ -1310,7 +1314,7 @@ function JsonTable(c = null) {
         return output;
     }
 
-    let refreshTable = (resetPage = false) => {
+    let refreshTable = function (resetPage = false) {
         try {
             if (container != null) {
                 sortRows();
@@ -1389,6 +1393,8 @@ function JsonTable(c = null) {
         } catch (e) { }
         return this;
     }
+
+    body.holdKeys();
 
     return {
         setData, getData, resetData, insertData,

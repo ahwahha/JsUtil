@@ -1102,34 +1102,48 @@ Util.prototype.commands = function (_bufferSize, _handlers) {
     return this;
 };
 
-Util.prototype.holdKeys = function (combinations) {
+Util.prototype.holdKeys = function (_combinations, flushDelay = 1000) {
     let element = this;
     element.keys = [];
     element.holding = false;
+    let combinations = (!Array.isArray(_combinations)) ? [...(_combinations || [])] : _combinations;
 
-    let checkKeySet = function (_combinations) {
-        if (Array.isArray(_combinations)) {
-            for (let combination of _combinations) {
-                if (combination != null && combination.keySet != null && combination.handler != null) {
-                    if (JSON.stringify(combination.keySet.sort()) == JSON.stringify(element.keys.sort())) {
-                        combination.handler.apply(element);
-                    }
+    let checkKeySet = function () {
+        let reorder = function (arr) {
+            let temp = [...arr];
+            let last = temp.pop();
+            temp = [...temp.sort(), ...(last != null ? [last] : [])];
+            return temp;
+        }
+        for (let combination of combinations) {
+            if (combination != null && combination.keySet != null && combination.handler != null) {
+                if (JSON.stringify(reorder(combination.keySet)) == JSON.stringify(reorder(element.keys))) {
+                    combination.handler.apply(element);
                 }
             }
         }
+    }
+
+    let clean = function () {
+        element.debounce(function () {
+            element.keys = [];
+        }, flushDelay)
     }
 
     element.addEventHandler('keydown', (event) => {
         if (element.keys.indexOf(event.key) < 0) {
             element.keys = [...new Set([...element.keys, event.key])]
             element.holding = true;
-            checkKeySet(combinations);
+            checkKeySet();
+            clean();
         }
     }).addEventHandler('keyup', (event) => {
         element.keys = element.keys.filter(key => key != event.key);
         element.holding = element.keys.length != 0;
-        checkKeySet(combinations);
+        checkKeySet();
+        clean();
     });
+
     return this;
 }
 
