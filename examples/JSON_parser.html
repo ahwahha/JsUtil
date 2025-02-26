@@ -14,23 +14,23 @@
 
 		dv['a'].css('display', 'flex').css('flex-flow', 'column nowrap')
 			.appendContent(Util.create('div').appendContent('Unindented JSON'))
-			.appendContent(unindented = Util.create('textarea', { id: 'unindented' }).css('margin-bottom', '5px').css('outline','none').css('flex', '1'));
+			.appendContent(unindented = Util.create('textarea', { id: 'unindented' }).css('margin-bottom', '5px').css('outline', 'none').css('flex', '1'));
 
 		dv['b'].css('display', 'flex').css('flex-flow', 'column nowrap')
 			.appendContent(Util.create('div').appendContent('Indented JSON').css('margin-top', '5px'))
-			.appendContent(indented = Util.create('textarea', { id: 'indented' }).css('outline','none').css('flex', '1'))
+			.appendContent(indented = Util.create('textarea', { id: 'indented' }).css('outline', 'none').css('flex', '1'))
 
 		function update(source, target, wrap) {
 			let text = source.value;
-			if (text != null && text.length > 0) {
-				try {
+			try {
+				if (text != null && text.length > 0) {
 					let converted = wrap ? JSON.stringify(sortNested(JSON.parse(text)), null, '  ') : JSON.stringify(sortNested(JSON.parse(text)));
 					target.value = converted;
-				} catch (e) {
-					console.log("error: " + e);
+				} else {
+					target.value = "";
 				}
-			} else {
-				target.value = "";
+			} catch (e) {
+				target.value = e;
 			}
 		}
 
@@ -73,12 +73,12 @@
 			}
 		}
 
-		var events = ['change', 'keyup', 'mouseup', 'dragend', 'selectionchange'];
+		var events = ['input'];
 		unindented.addEventHandler(events, update.bind(null, unindented.entity(), indented.entity(), true));
 		indented.addEventHandler(events, update.bind(null, indented.entity(), unindented.entity(), !true));
 
 		unindented.entity().value = '{"test":"value"}';
-		unindented.fireEvent('change');
+		unindented.fireEvent('input');
 	</script>
 </body>
 

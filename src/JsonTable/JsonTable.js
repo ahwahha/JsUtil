@@ -440,7 +440,7 @@ function JsonTable(c = null) {
                     let isEdited = false;
                     for (let key in row) {
                         if (!key.startsWith('###row-') && !key.startsWith('###ori-')) {
-                            if ((typeof row[key] === 'object' ? JSON.stringify(row[key]) : row[key]) !== (typeof oriRow[key] === 'object' ? JSON.stringify(oriRow[key]) : oriRow[key])) {
+                            if ((typeof row[key] === 'object' ? JSON.stringify(row[key]) : row[key]) != (typeof oriRow[key] === 'object' ? JSON.stringify(oriRow[key]) : oriRow[key])) {
                                 isEdited = true;
                                 break;
                             }
@@ -1053,9 +1053,9 @@ function JsonTable(c = null) {
                 let row = tableData.find((row) => {
                     return row['###row-index'] === index;
                 });
-                if ((typeof row[data] === 'object' ? JSON.stringify(row[data]) : String(row[data])) !== (typeof value === 'object' ? JSON.stringify(value) : String(value))) {
+                if ((typeof row[data] === 'object' ? JSON.stringify(row[data]) : String(row[data])) != (typeof value === 'object' ? JSON.stringify(value) : String(value))) {
                     if (row['###ori-' + data] === undefined) {
-                        row['###ori-' + data] = row[data];
+                        row['###ori-' + data] = row[data] || '';
                     } else if (row['###ori-' + data] === value) {
                         delete row['###ori-' + data];
                     }
@@ -1201,7 +1201,7 @@ function JsonTable(c = null) {
 
                                         tableSettings['columns'].forEach((col) => {
                                             let cellData = row[col['data']] != null ? (typeof row[col['data']] === 'object' ? JSON.stringify(row[col['data']]) : String(row[col['data']])) : '';
-                                            let oriData = row['###ori-' + col['data']] || '';
+                                            let oriData = row['###ori-' + col['data']];
                                             if (col.modifier) {
                                                 try {
                                                     if (typeof col.modifier === 'function') {
@@ -1213,13 +1213,13 @@ function JsonTable(c = null) {
                                                 }
                                             }
                                             let t;
-                                            let showOri = row['###row-edited'] && row['###ori-' + col['data']] !== undefined;
+                                            let showOri = row['###row-edited'] && oriData !== undefined;
                                             tableRow.appendContent(
                                                 Util.create('td', { class: col['class'], style: Util.objToStyle(rowsStyle(col)) })
                                                     .appendContent(cellData)
                                                     .appendContentIf(Util.create('br'), showOri)
                                                     .appendContentIf(
-                                                        t = Util.create('textarea', { style: Util.objToStyle(tableSettings.editedStyle) }).attr('readonly', '')
+                                                        t = Util.create('textarea', { style: Util.objToStyle({ ...rowsStyle(col), ...tableSettings.editedStyle }) }).attr('readonly', '')
                                                             .appendContent('(' + (typeof oriData === 'string' ? '"' + oriData + '"' : JSON.stringify(oriData)) + ')')
                                                             .addEventHandler(['focus', 'blur'], () => {
                                                                 t.css('height', '0px').css('height', t.entity().scrollHeight + 2 + 'px')
