@@ -482,10 +482,11 @@ Object.defineProperty(Util, 'directions', {
     , enumerable: false
 });
 
-Util.createSplitedDiv = function (direction, firstSpan, adjustable) {
+Util.createSplitedDiv = function (direction, firstSpan, adjustable, drag) {
     direction = direction == null ? 1 : direction;
     firstSpan = firstSpan == null ? '50%' : firstSpan;
     adjustable = adjustable == null ? false : adjustable;
+    drag = drag || false;
 
     let container = Util.create('div', {
         style: Util.objToStyle({
@@ -506,7 +507,8 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable) {
         style: Util.objToStyle({
             'padding': '0px',
             'margin': '0px',
-            'box-sizing': 'border-box'
+            'box-sizing': 'border-box',
+            'overflow': 'hidden'
         })
     })
         .css((direction % 2 === 0 ? 'width' : 'height'), '100%')
@@ -534,29 +536,41 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable) {
         })
     })
         .css((direction % 2 === 0 ? 'width' : 'height'), '100%')
-        .css((direction % 2 === 0 ? 'height' : 'width'), '3px');
+        .css((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '3px' : drag ? '5px' : '8');
 
     let overlay;
     if (adjustable) {
-        divider.addEventHandler('mousedown', (e) => {
-            divider['hold'] = {};
-            divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
-            Util.get('html')[0].appendContent(
-                overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
-                    .addEventHandler(['mouseup', 'mouseleave'], (e) => {
-                        if (divider['hold']) {
-                            divider['hold'] = undefined;
-                            overlay.remove();
-                        }
-                    })
-                    .addEventHandler('mousemove', (e) => {
-                        if (divider['hold']) {
-                            a.css((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
-                            divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
-                        }
-                    })
-            );
-        });
+        if (drag == false) {
+            let isCollapsed = false;
+            divider.addEventHandler('click', (e) => {
+                if (!isCollapsed) {
+                    a.css((direction % 2 === 0 ? 'height' : 'width'), '0px');
+                } else {
+                    a.css((direction % 2 === 0 ? 'height' : 'width'), firstSpan);
+                }
+                isCollapsed = !isCollapsed;
+            });
+        } else {
+            divider.addEventHandler('mousedown', (e) => {
+                divider['hold'] = {};
+                divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
+                Util.get('html')[0].appendContent(
+                    overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
+                        .addEventHandler(['mouseup', 'mouseleave'], (e) => {
+                            if (divider['hold']) {
+                                divider['hold'] = undefined;
+                                overlay.remove();
+                            }
+                        })
+                        .addEventHandler('mousemove', (e) => {
+                            if (divider['hold']) {
+                                a.css((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
+                                divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
+                            }
+                        })
+                );
+            });
+        }
     }
 
     return container

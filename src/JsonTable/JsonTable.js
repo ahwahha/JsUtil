@@ -1,8 +1,7 @@
 import { Util } from '../Util.js';
 
-function JsonTable(c = null) {
+function JsonTable(c = null, kh = null) {
 
-    let body = Util.get('body')[0];
     let table;
     let shield;
     let controlGroup;
@@ -1131,7 +1130,7 @@ function JsonTable(c = null) {
                                         ).appendContent(
                                             Util.create('div', { style: 'position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999;' })
                                                 .countClicks([
-                                                    async function (event) { if (col['sortable']) { if (body.keys.length == 1 && body.keys[0] == 'Control') { await amendSortedBy(col); } else { await selectSortedBy(col); } } },
+                                                    async function (event) { if (col['sortable']) { console.log(kh); if (kh && kh.keys && kh.keys.length == 1 && kh.keys[0] == 'Control') { await amendSortedBy(col); } else { await selectSortedBy(col); } } },
                                                     async function (event) { if (col['sortable']) { await amendSortedBy(col); } },
                                                     async function (event) { await removeSortedBy() }
                                                 ], tableSettings['sortingDebounce'])
@@ -1393,8 +1392,6 @@ function JsonTable(c = null) {
         } catch (e) { }
         return this;
     }
-
-    body.holdKeys();
 
     return {
         setData, getData, resetData, insertData,
