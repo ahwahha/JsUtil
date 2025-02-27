@@ -768,6 +768,68 @@ Util.createSelect = function (items) {
     return select;
 };
 
+Util.getHierarchicalTree = function (arr, prop_id, prop_parent_id) {
+    const trees = [];
+    const seen = new Set();
+
+    function getTree(parentId) {
+        return arr
+            .filter(item => item[prop_parent_id] === parentId && !seen.has(item[prop_id]))
+            .map(item => {
+                seen.add(item[prop_id]);
+                const node = { ...item, children: getTree(item[prop_id]) };
+                delete node[prop_parent_id];
+                return node;
+            });
+    }
+
+    const allIds = new Set(arr.map(item => item[prop_id]));
+    arr.forEach(item => {
+        const parentId = item[prop_parent_id];
+        if ((parentId === null || !allIds.has(parentId)) && !seen.has(item[prop_id])) {
+            trees.push(...getTree(parentId));
+        }
+    });
+
+    return trees;
+}
+
+Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'handler', prop_children = 'children') {
+    if (!Array.isArray(trees) || !prop_label || prop_label === '') {
+        throw new Error('Invalid input: trees must be an array, prop_label must be a non-empty string');
+    }
+
+    let output = Util.create('div');
+
+    let createSubMenu = function (node, level = 0) {
+        let div = Util.create('div', { class: ('menu_branch') });
+
+        if (!node || typeof node !== 'object') { return div };
+
+        let haveChildren = Array.isArray(node[prop_children]) && node[prop_children].length > 0;
+
+        let label = Util.create('div', { class: ('menu_level_' + level) })
+            .appendContent(node[prop_label] ?? '---')
+            .addEventHandlerIf('click', node[prop_handler], typeof node[prop_handler] == 'Function')
+            .addEventHandlerIf('click', childrenContainer.css('display', childrenContainer.css('display') === 'none' ? 'unset' : 'none'), haveChildren);
+
+        let childrenContainer = Util.create('div', { class: ('menu_children'), style: "display:none;" });
+        if (haveChildren) {
+            for (let child of node[prop_children]) {
+                childrenContainer.appendContent(createSubMenu(child, level + 1));
+            }
+        }
+
+        div.appendContent(label).appendContentIf(childrenContainer, haveChildren)
+    }
+
+    for (let tree of trees) {
+        output.appendContent(createSubMenu(tree, 0));
+    }
+
+    return output;
+}
+
 Util.prototype.appendMovableDiv = function (content) {
     this.css('position', 'relative')
         .appendContent(Util.createMovableDiv(content));
@@ -1022,6 +1084,30 @@ Util.prototype.val = function (value) {
         }
         return this;
     }
+};
+
+Util.prototype.class = function (className) {
+    this['_entity'].className = className;
+    return this;
+};
+
+Util.prototype.addClass = function (className) {
+    this['_entity'].classList.add(className);
+    return this;
+};
+
+Util.prototype.removeClass = function (className) {
+    this['_entity'].classList.remove(className);
+    return this;
+};
+
+Util.prototype.containClass = function (className) {
+    return this['_entity'].classList.contains(className);
+};
+
+Util.prototype.class = function (className) {
+    this['_entity'].className = className;
+    return this;
 };
 
 Util.prototype.attr = function (name, assignment) {
