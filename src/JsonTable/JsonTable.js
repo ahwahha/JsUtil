@@ -44,7 +44,6 @@ function JsonTable(c = null, kh = null) {
         showSelectingGroup: true,
         multiSelect: true,
         actionsGroupStyle: {},
-        paginationGroupStyle: { 'width': '100%', 'text-align': 'center' },
         maxHeight: undefined,
         selectAllFiltered: 'Select all filtered',
         unselectAllFiltered: 'Unselect all filtered',
@@ -927,9 +926,9 @@ function JsonTable(c = null, kh = null) {
         let output = null;
         if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
             try {
-                output = Util.create('div', { style: Util.objToStyle(tableSettings['paginationGroupStyle']) })
+                output = Util.create('div', { style: Util.objToStyle({ 'text-align': 'left' }) })
                     .appendContent(
-                        Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'center', 'align-items': 'center', 'column-gap': '3px' }) })
+                        Util.create('div', { style: Util.objToStyle({ 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
                             .appendContent(
                                 Util.create('div')
                                     //toBeginingButton
@@ -1271,9 +1270,10 @@ function JsonTable(c = null, kh = null) {
 
                 try {
                     table = output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px', 'background-color': '#fff' }) })
+                        .appendContent(Util.create('div', { style: Util.objToStyle({ 'width': '100%;' }) }).appendContent(tableSettings['label']))
                         .appendContent(
-                            controlGroup = Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
-                                .appendContent(Util.create('div').appendContent(tableSettings['label']))
+                            controlGroup = Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap-reverse', 'justify-content': 'flex-start', 'align-items': 'center', 'column-gap': '3px' }) })
+                                .appendContent(paginationGroup = createPaginationGroup())
                                 .appendContent(Util.create('div', { style: 'flex:1' }))
                                 .appendContent(
                                     Util.create('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
@@ -1295,9 +1295,6 @@ function JsonTable(c = null, kh = null) {
                                         'border-collapse': 'collapse'
                                     })
                                 }).appendContent(tbody))
-                        )
-                        .appendContent(
-                            paginationGroup = createPaginationGroup()
                         )
                         .css('position', 'relative')
                         .appendContent(shield = Util.create('span', { style: "position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999; display:none;" })

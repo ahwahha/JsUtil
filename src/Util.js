@@ -808,19 +808,20 @@ Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'ha
 
         let haveChildren = Array.isArray(node[prop_children]) && node[prop_children].length > 0;
 
-        let label = Util.create('div', { class: ('menu_level_' + level) })
-            .appendContent(node[prop_label] ?? '---')
-            .addEventHandlerIf('click', node[prop_handler], typeof node[prop_handler] == 'Function')
-            .addEventHandlerIf('click', childrenContainer.css('display', childrenContainer.css('display') === 'none' ? 'unset' : 'none'), haveChildren);
-
-        let childrenContainer = Util.create('div', { class: ('menu_children'), style: "display:none;" });
+        let label, childrenContainer;
+        label = Util.create('div', { style: "position: relative;", class: ('menu_unit menu_level_' + level) })
+            .appendContent(Util.create('div').appendContent(node[prop_label] ?? '---'))
+            .appendContent(Util.create('div', { style: "position: absolute; left: 0px; top: 0px; height: 100%; width: 100%; z-index: 9999;" }))
+            .addEventHandlerIf('click', node[prop_handler], null, typeof node[prop_handler] == 'function')
+            .addEventHandlerIf('click', function () { childrenContainer.css('display', childrenContainer.css('display') === 'none' ? 'unset' : 'none'); }, null, haveChildren);
+        childrenContainer = Util.create('div', { class: ('menu_children'), style: "display:none;" });
         if (haveChildren) {
             for (let child of node[prop_children]) {
                 childrenContainer.appendContent(createSubMenu(child, level + 1));
             }
         }
 
-        div.appendContent(label).appendContentIf(childrenContainer, haveChildren)
+        return div.appendContent(label).appendContentIf(childrenContainer, haveChildren)
     }
 
     for (let tree of trees) {
@@ -896,7 +897,6 @@ Util.prototype.addEventHandler = function (_events, func, options) {
                 throw 'invalid events in input list:' + events;
             }
         });
-
         return this;
     } catch (error) {
         throw '@ addEventHandler: ' + error;
@@ -922,7 +922,7 @@ Util.prototype.removeAllEventHandlers = function () {
 
 Util.prototype.content = function (content) {
     if (content === undefined) {
-        return this['_entity'].innerHTML;
+        return this['_entity'];
     } else {
         if (content) {
             this.clear().appendContent(content);
