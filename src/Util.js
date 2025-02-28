@@ -532,11 +532,11 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable, drag) {
             'cursor': !adjustable ? 'unset' : direction % 2 === 0 ? 'row-resize' : 'col-resize',
             'box-sizing': 'border-box',
             'border': '0px',
-            'background-image': 'linear-gradient(to ' + (direction % 2 === 0 ? 'bottom' : 'right') + ',  #eee, #eee, #f8f8f8, #eee, #eee)'
+            'background-image': 'linear-gradient(to ' + (direction % 2 === 0 ? 'bottom' : 'right') + ', #eee, #eee, #f5f5f5, #ffffff, #f5f5f5, #eee, #eee)'
         })
     })
         .css((direction % 2 === 0 ? 'width' : 'height'), '100%')
-        .css((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '3px' : drag ? '5px' : '8');
+        .css((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px');
 
     let overlay;
     if (adjustable) {
