@@ -333,6 +333,7 @@ function JsonTable(c = null, kh = null) {
 
             for (let i = 0; i < tableSettings['columns'].length; i++) {
                 tableSettings['columns'][i] = { ...tableDefaultSettings.columns[0], ...tableSettings['columns'][i] };
+                tableSettings['columns'][i]['ori-filter'] = tableSettings['columns'][i]['filter'];
             }
 
             return this;
@@ -1028,7 +1029,7 @@ function JsonTable(c = null, kh = null) {
         try {
             if (tableSettings != null && tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
                 tableSettings['columns'].forEach((col) => {
-                    col['filter'] = "";
+                    col['filter'] = col['ori-filter'];
                 });
             }
             return this;
