@@ -794,7 +794,7 @@ Util.getHierarchicalTree = function (arr, prop_id, prop_parent_id) {
     return trees;
 }
 
-Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'handler', prop_children = 'children') {
+Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'handler', prop_children = 'children', mode = 0) {
     if (!Array.isArray(trees) || !prop_label || prop_label === '') {
         throw new Error('Invalid input: trees must be an array, prop_label must be a non-empty string');
     }
@@ -1033,6 +1033,28 @@ Util.prototype.countClicks = function (handlers = [], delay) {
             }
             count = 0;
         }, delay);
+    })
+    return this;
+}
+
+Util.prototype.holdClick = function (clickhandler, holdHandler, holdTime) {
+    let context = this;
+    let timeout;
+    context.addEventHandler(['mousedown'], (event) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(async () => {
+            await holdHandler();
+            clearTimeout(timeout);
+        }, holdTime);
+    })
+    context.addEventHandler(['mouseleave'], (event) => {
+        clearTimeout(timeout);
+    })
+    context.addEventHandler(['mouseup'], (event) => {
+        if (timeout) {
+            clearTimeout(timeout);
+            clickhandler();
+        }
     })
     return this;
 }
