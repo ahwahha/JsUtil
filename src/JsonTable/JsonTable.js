@@ -1120,7 +1120,7 @@ function JsonTable(c = null, kh = null) {
                 /* headers */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        let headers = Util.create('tr', { class: tableSettings['headers'] });
+                        let headers = Util.create('tr', { class: tableSettings['headersClass'] });
                         tableSettings['columns'].forEach((col) => {
                             let headerStyle = { ...(tableSettings['headersStyle'] || {}), ...(col['headerStyle'] || {}) };
                             headers.appendContent(
@@ -1156,7 +1156,7 @@ function JsonTable(c = null, kh = null) {
                 /* filters */
                 try {
                     if (tableSettings['columns'] != null && Array.isArray(tableSettings['columns'])) {
-                        filters = Util.create('tr', { class: tableSettings['filters'] });
+                        filters = Util.create('tr', { class: tableSettings['filtersClass'] });
                         let overlay;
                         tableSettings['columns'].forEach((col) => {
                             let filterStyle = Util.objToStyle({ ... { ...(tableSettings['filtersStyle'] || {}), ...(col['filterStyle'] || {}) }, ...(col['filterEditable'] ? {} : { 'background-color': '#DDD' }) });
