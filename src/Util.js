@@ -1037,23 +1037,19 @@ Util.prototype.countClicks = function (handlers = [], delay) {
     return this;
 }
 
-Util.prototype.holdClick = function (clickhandler, holdHandler, holdTime) {
+Util.prototype.holdClick = function (handler, holdTime) {
     let context = this;
     let timeout;
     context.addEventHandler(['mousedown'], (event) => {
         clearTimeout(timeout);
         timeout = setTimeout(async () => {
-            await holdHandler();
+            await handler();
             clearTimeout(timeout);
         }, holdTime);
     })
-    context.addEventHandler(['mouseleave'], (event) => {
-        clearTimeout(timeout);
-    })
-    context.addEventHandler(['mouseup'], (event) => {
+    context.addEventHandler(['mouseup', 'mouseleave'], (event) => {
         if (timeout) {
             clearTimeout(timeout);
-            clickhandler();
         }
     })
     return this;
