@@ -482,7 +482,7 @@ Object.defineProperty(Util, 'directions', {
     , enumerable: false
 });
 
-Util.createSplitedDiv = function (direction, firstSpan, adjustable, drag) {
+Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
     direction = direction == null ? 1 : direction;
     firstSpan = firstSpan == null ? '50%' : firstSpan;
     adjustable = adjustable == null ? false : adjustable;
@@ -493,10 +493,8 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable, drag) {
             'padding': '0px',
             'margin': '0px',
             'box-sizing': 'border-box',
-            'width': '100%',
-            'height': '100%',
             'display': 'flex',
-            'align-items': 'center'
+            'align-items': 'stretch'
         })
     })
         .css('flex-flow', (direction % 2 === 0 ? 'column' : 'row') + ' nowrap')
@@ -511,7 +509,6 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable, drag) {
             'overflow': 'hidden'
         })
     })
-        .css((direction % 2 === 0 ? 'width' : 'height'), '100%')
         .css((direction % 2 === 0 ? 'height' : 'width'), firstSpan);
 
     let b = Util.create('div', {
@@ -521,8 +518,7 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable, drag) {
             'box-sizing': 'border-box',
             'flex': '1'
         })
-    })
-        .css((direction % 2 === 0 ? 'width' : 'height'), '100%');
+    });
 
     let divider = Util.create('div', {
         style: Util.objToStyle({
@@ -535,7 +531,6 @@ Util.createSplitedDiv = function (direction, firstSpan, adjustable, drag) {
             'background-image': 'linear-gradient(to ' + (direction % 2 === 0 ? 'bottom' : 'right') + ', #eee, #eee, #f5f5f5, #ffffff, #f5f5f5, #eee, #eee)'
         })
     })
-        .css((direction % 2 === 0 ? 'width' : 'height'), '100%')
         .css((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px');
 
     let overlay;
