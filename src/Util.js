@@ -509,7 +509,8 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
             'overflow': 'hidden'
         })
     })
-        .css((direction % 2 === 0 ? 'height' : 'width'), firstSpan);
+        .css((direction % 2 === 0 ? 'height' : 'width'), firstSpan)
+        .css('min-' + (direction % 2 === 0 ? 'height' : 'width'), firstSpan);
 
     let b = Util.create('div', {
         style: Util.objToStyle({
@@ -531,7 +532,8 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
             'background-image': 'linear-gradient(to ' + (direction % 2 === 0 ? 'bottom' : 'right') + ', #eee, #eee, #f5f5f5, #ffffff, #f5f5f5, #eee, #eee)'
         })
     })
-        .css((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px');
+        .css((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px')
+        .css('min-' + (direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px');
 
     let overlay;
     if (adjustable) {
@@ -540,8 +542,10 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
             divider.addEventHandler('click', (e) => {
                 if (!isCollapsed) {
                     a.css((direction % 2 === 0 ? 'height' : 'width'), '0px');
+                    a.css('min-' + (direction % 2 === 0 ? 'height' : 'width'), '0px');
                 } else {
                     a.css((direction % 2 === 0 ? 'height' : 'width'), firstSpan);
+                    a.css('min-' + (direction % 2 === 0 ? 'height' : 'width'), firstSpan);
                 }
                 isCollapsed = !isCollapsed;
             });
@@ -560,6 +564,7 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
                         .addEventHandler('mousemove', (e) => {
                             if (divider['hold']) {
                                 a.css((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
+                                a.css('min-' + (direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
                                 divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
                             }
                         })
@@ -789,14 +794,14 @@ Util.getHierarchicalTree = function (arr, prop_id, prop_parent_id) {
     return trees;
 }
 
-Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'handler', prop_children = 'children', mode = 0) {
+Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'handlers', prop_children = 'children', mode = 0) {
     if (!Array.isArray(trees) || !prop_label || prop_label === '') {
         throw new Error('Invalid input: trees must be an array, prop_label must be a non-empty string');
     }
 
     let output = Util.create('div');
 
-    let createSubMenu = function (node, level = 0) {
+    let createSubMenu = function (node, level = 0, debounce = 250) {
         let div = Util.create('div', { class: ('menu_branch') });
 
         if (!node || typeof node !== 'object') { return div };
@@ -809,6 +814,11 @@ Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'ha
             .appendContent(Util.create('div', { style: "position: absolute; left: 0px; top: 0px; height: 100%; width: 100%; z-index: 9999;" }))
             .addEventHandlerIf('click', node[prop_handler], null, typeof node[prop_handler] == 'function')
             .addEventHandlerIf('click', function () { childrenContainer.css('display', childrenContainer.css('display') === 'none' ? 'unset' : 'none'); }, null, haveChildren);
+        if (typeof node[prop_handler] == 'function') {
+            label.addEventHandler('click', node[prop_handler], null);
+        } else if (Array.isArray(node[prop_handler])) {
+            label.countClicks(node[prop_handler], debounce);
+        }
         childrenContainer = Util.create('div', { class: ('menu_children'), style: "display:none;" });
         if (haveChildren) {
             for (let child of node[prop_children]) {

@@ -42,10 +42,10 @@
         };
 
         let menuItems = [
-            { id: '1', label: 'File Group', handler: () => { open('FileGroup.html'); } },
-            { id: '2', label: 'Json Parser', handler: () => { open('JSON_parser.html'); } },
-            { id: '3', label: "JsonTable usage 1", handler: () => { open('JsonTable.html'); } },
-            { id: '4', label: "JsonTable usage 2", handler: () => { open('notes.html'); } }
+            { id: '1', label: 'File Group', handlers: () => { open('FileGroup.html'); } },
+            { id: '2', label: 'Json Parser', handlers: () => { open('JSON_parser.html'); } },
+            { id: '3', label: "JsonTable usage 1", handlers: () => { open('JsonTable.html'); } },
+            { id: '4', label: "JsonTable usage 2", handlers: () => { open('notes.html'); } }
         ]
 
         Util.loaded(() => {
