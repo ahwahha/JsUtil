@@ -19,6 +19,15 @@
         .menu_level_2 {
             padding-left: 40px;
         }
+
+        html,
+        body,
+        main {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 
@@ -42,24 +51,56 @@
         Util.loaded(() => {
             b = Util.get('body')[0].css('margin', '0px').css('padding', '0px').holdKeys();
 
-            Util.get('#main').css('height', '100%').css('position', 'relative').css('margin', '0px').css('padding', '0px').appendContent(
-                vertical_divs = Util.createSplittedDiv(Util.directions.down, '28px', !true).css('height', '100%')
-            );
+            Util.get('#main')
+                .css('height', '100%')
+                .css('position', 'relative')
+                .css('margin', '0px')
+                .css('padding', '0px')
+                .css('overflow', 'hidden')
+                .appendContent(
+                    vertical_divs = Util.createSplittedDiv(Util.directions.down, '28px', true, !true)
+                        .css('height', '100%')
+                );
 
-            vertical_divs.a.appendContent(
-                Util.create('div', { style: "padding: 5px; display:flex; flex-flow: row nowrap; justify-content:flex-start; align-items: center; gap: 5px;" })
-                    .appendContent(Util.create('span', { style: "font-size:120%; flex: 1;" }).appendContent("JsUtil Usage Examples"))
-            );
-            vertical_divs.b.css('display','flex').css('flex-direction','column')
-                .appendContent(horizontal_divs = Util.createSplittedDiv(Util.directions.right, '150px', true, !true).css('flex', 1));
+            vertical_divs.a
+                .css('transition', 'min-height, height, 0.3s')
+                .appendContent(
+                    Util.create('div', { style: "padding: 5px; display:flex; flex-flow: row nowrap; justify-content:flex-start; align-items: center; gap: 5px;" })
+                        .appendContent(
+                            Util.create('span', { style: "font-size:120%; flex: 1;" }).appendContent("JsUtil Usage Examples")
+                        )
+                );
+
+            vertical_divs.b
+                .css('display', 'flex')
+                .css('flex-direction', 'column')
+                .appendContent(
+                    horizontal_divs = Util.createSplittedDiv(Util.directions.right, '150px', true, !true)
+                        .css('flex', 1)
+                );
 
 
-            horizontal_divs.a.css('transition', 'width 0.3s').appendContent(
-                Util.createMenu(Util.getHierarchicalTree(menuItems, 'id', 'parent')).css('width', '400px')
-            );
+            horizontal_divs.a
+                .css('transition', 'min-width, width 0.3s')
+                .css('position', 'relative')
+                .appendContent(
+                    Util.createMenu(Util.getHierarchicalTree(menuItems, 'id', 'parent'))
+                        .css('position', 'absolute')
+                        .css('width', '150px')
+                        .css('height', '100%')
+                        .css('overflow', 'auto')
+                );
 
-            horizontal_divs.b.css('display','flex').css('flex-direction','column')
-                .appendContent(main_frame = Util.create('iframe', { style: "width:100%; flex: 1; border:none; text-align: top;", srcdoc: '<html><body>Welcome</body></html>' }));
+            horizontal_divs.b
+                .css('position', 'relative')
+                .appendContent(
+                    main_frame = Util.create('iframe', { srcdoc: '<html><body>Welcome</body></html>' })
+                        .css('width', '100%')
+                        .css('border', 'none')
+                        .css('position', 'absolute')
+                        .css('height', '100%')
+                        .css('overflow', 'auto')
+                );
 
         });
     </script>
