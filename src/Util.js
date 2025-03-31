@@ -510,7 +510,6 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
         })
     })
         .css((direction % 2 === 0 ? 'height' : 'width'), firstSpan)
-        .css('min-' + (direction % 2 === 0 ? 'height' : 'width'), firstSpan);
 
     let b = Util.create('div', {
         style: Util.objToStyle({
@@ -533,7 +532,6 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
         })
     })
         .css((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px')
-        .css('min-' + (direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px');
 
     let overlay;
     if (adjustable) {
@@ -542,10 +540,8 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
             divider.addEventHandler('click', (e) => {
                 if (!isCollapsed) {
                     a.css((direction % 2 === 0 ? 'height' : 'width'), '0px');
-                    a.css('min-' + (direction % 2 === 0 ? 'height' : 'width'), '0px');
                 } else {
                     a.css((direction % 2 === 0 ? 'height' : 'width'), firstSpan);
-                    a.css('min-' + (direction % 2 === 0 ? 'height' : 'width'), firstSpan);
                 }
                 isCollapsed = !isCollapsed;
             });
@@ -564,7 +560,6 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
                         .addEventHandler('mousemove', (e) => {
                             if (divider['hold']) {
                                 a.css((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
-                                a.css('min-' + (direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
                                 divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
                             }
                         })

@@ -63,7 +63,7 @@
                 );
 
             vertical_divs.a
-                .css('transition', 'min-height, height, 0.3s')
+                .css('transition', 'height, 0.3s')
                 .appendContent(
                     Util.create('div', { style: "padding: 5px; display:flex; flex-flow: row nowrap; justify-content:flex-start; align-items: center; gap: 5px;" })
                         .appendContent(
@@ -81,7 +81,7 @@
 
 
             horizontal_divs.a
-                .css('transition', 'min-width, width 0.3s')
+                .css('transition', 'width 0.3s')
                 .css('position', 'relative')
                 .appendContent(
                     Util.createMenu(Util.getHierarchicalTree(menuItems, 'id', 'parent'))

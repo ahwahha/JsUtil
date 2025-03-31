@@ -10,8 +10,9 @@
 
 		let dv, unindented, indented;
 
-		Util.get('#main').appendContent(dv = Util.createSplittedDiv(Util.directions.down, '20%', true));
+		Util.get('#main').css('height','100%').appendContent(dv = Util.createSplittedDiv(Util.directions.down, '150px', true, true));
 
+		dv.css('height','100%')
 		dv['a'].css('display', 'flex').css('flex-flow', 'column nowrap')
 			.appendContent(Util.create('div').appendContent('Unindented JSON'))
 			.appendContent(unindented = Util.create('textarea', { id: 'unindented' }).css('margin-bottom', '5px').css('outline', 'none').css('flex', '1'));
