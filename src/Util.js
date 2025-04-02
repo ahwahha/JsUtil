@@ -750,8 +750,6 @@ Util.createSelect = function (items) {
                         option.appendContent(items[i][attr]);
                     } else if (attr === 'value') {
                         option.attr('value', items[i][attr]);
-                    } else if (attr === 'eventHandler') {
-                        option.addEventHandler(attr['events'], attr['func']);
                     } else {
                         option.attr(attr, items[i][attr]);
                     }
