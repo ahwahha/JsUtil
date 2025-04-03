@@ -123,33 +123,34 @@ function JsonTable(c = null, kh = null) {
                 } else if (typeof data === 'boolean') {
                     // boolean
                     return filter.trim() == '' ? true : (
-                        Util.matchText(String(data), filter.trim(), '`', false)
+                        Util.matchText(String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation'])
                     );
                 } else if (!isNaN(data)) {
                     // number
                     return filter.trim() == '' ? true : (
                         Util.match(data, filter.trim(), '`', filterNumbers)
-                        || Util.matchText(String(data), filter.trim(), '`')
+                        || Util.matchText(String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation'])
                     );
                 } else if (isDateString(data)) {
                     // date
                     return filter.trim() == '' ? true : (
                         Util.match(data, filter.trim(), '`', filterDates)
-                        || Util.matchText(String(data), filter.trim(), '`')
+                        || Util.matchText(String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation'])
                     );
                 } else {
                     // string
-                    return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`');
+                    return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation']);
                 }
             } catch (e) {
                 // error
-                return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`');
+                return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation']);
             }
         },
         controlGroupEventHandlers: [],
         tableBodyEventHandlers: [],
         paginationGroupEventHandlers: [],
-        onrefresh: null
+        onrefresh: null,
+        emptyRepresentation: '___'
     };
 
     let filterGuide = "Filtering Guide:\n\n"
@@ -172,7 +173,7 @@ function JsonTable(c = null, kh = null) {
     let filterNumbers = function (a, b) {
         if (isNaN(a)) {
             throw '@ filterNumber: NaN';
-        } else if (b === '___' && (a == null || a.trim() == '')) {
+        } else if (b === tableSettings['emptyRepresentation'] && (a == null || a.trim() == '')) {
             return true;
         } else {
             let ft = b.trim();
@@ -195,7 +196,7 @@ function JsonTable(c = null, kh = null) {
     }
 
     let filterDates = function (a, b) {
-        if (b === '___' && (a == null || a.trim() == '')) {
+        if (b === tableSettings['emptyRepresentation'] && (a == null || a.trim() == '')) {
             return true;
         } else {
             let dt = a.trim();

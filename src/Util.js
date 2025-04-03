@@ -694,7 +694,7 @@ Util.match = function (text, matchingText, delimiter, criteria) {
     }
 }
 
-Util.matchText = function (text, matchingText, delimiter, caseSensitive = false) {
+Util.matchText = function (text, matchingText, delimiter, caseSensitive = false, emptyRepresentation = '___') {
     let match = false;
     try {
         if (text == null && matchingText !== '') {
@@ -706,16 +706,9 @@ Util.matchText = function (text, matchingText, delimiter, caseSensitive = false)
                 let regexPattern = new RegExp(matchingText.trim().substring(6));
                 match = regexPattern.test(text);
             } else {
-
-                if (!caseSensitive) {
-                    text = text.toUpperCase();
-                    matchingText = matchingText.toUpperCase();
-                }
-
                 match = Util.checkCriteria(text, matchingText, delimiter, (a, b) => {
-                    return b === '___' && (a == null || a.trim() == '') ? true : a.indexOf(b) !== -1;
+                    return b === emptyRepresentation && (a == null || a.trim() == '') ? true : (caseSensitive ? a : a.toUpperCase()).indexOf(caseSensitive ? b : b.toUpperCase()) !== -1;
                 });
-
             }
 
         }
