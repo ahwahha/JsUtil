@@ -661,7 +661,7 @@ function JsonTable(c = null, kh = null) {
                             let va = String(a[data]);
                             let vb = String(b[data]);
                             if (isDateString(va) && isDateString(vb)) {
-                                console.log();
+                                // console.log();
                                 let aNumber = parseDate(va);
                                 let bNumber = parseDate(vb);
                                 if (!isNaN(aNumber) && !isNaN(bNumber)) {
@@ -1159,7 +1159,7 @@ function JsonTable(c = null, kh = null) {
                                         ).appendContent(
                                             Util.create('div', { style: 'position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999;' })
                                                 .countClicks([
-                                                    async function (event) { if (col['sortable']) { console.log(kh); if (kh && kh.keys && kh.keys.length == 1 && kh.keys[0] == 'Control') { await amendSortedBy(col); } else { await selectSortedBy(col); } } },
+                                                    async function (event) { if (col['sortable']) { if (kh && kh.keys && kh.keys.length == 1 && kh.keys[0] == 'Control') { await amendSortedBy(col); } else { await selectSortedBy(col); } } },
                                                     async function (event) { if (col['sortable']) { await amendSortedBy(col); } },
                                                     async function (event) { await removeSortedBy() }
                                                 ], tableSettings['multiClickDebounce'])
