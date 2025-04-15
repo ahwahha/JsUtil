@@ -154,19 +154,19 @@ function JsonTable(c = null, kh = null) {
     };
 
     let filterGuide = "Filtering Guide:\n\n"
-        + "1. Type Boolean\n    'true' / 'false'\n\n"
-        + "2. Type Numbers\n    [ < / <= / = / > / >= ][number string]\n    e.g. <100\n\n"
-        + "3. Type Dates\n    [ < / <= / = / > / >= ][ dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss]\n    e.g. >=01-07-1997\n\n"
-        + "4. Type Text\n    [ any successive characters / double quoted characters (e.g. \"mango tart\") ]\n\n"
+        + "1. Type Boolean\n'true' / 'false'\n\n"
+        + "2. Type Numbers\n[ < / <= / = / > / >= ][number string]\ne.g. <100\n\n"
+        + "3. Type Dates\n[ < / <= / = / > / >= ][ dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss]\ne.g. >=01-07-1997\n\n"
+        + "4. Type Text\n[ any successive characters / double quoted characters (e.g. \"mango tart\") ]\n\n"
         + "5. Combined conditions ( single type only )\n"
-        + "    String Separator: Space \" \" ( AND operator )\n"
-        + "    Delimiter: Backtick \"`\" ( NOT operator )\n"
-        + "    Condition:\n"
-        + "        [ Space-separated conditions to be included ] ` [ Space-separated conditions to be excluded ]\n"
-        + "        e.g. apple pear ` tart\n"
-        + "    Multiple Conditions:\n"
-        + "        multiple conditions separate by double backticks \"``\" ( OR operator ).\n"
-        + "        e.g. apple pear ` tart `` \"mango tart\" [ ... `` other conditions ]\n";
+        + "String Separator: Space \" \" ( AND operator )\n"
+        + "Delimiter: Backtick \"`\" ( NOT operator )\n"
+        + "Condition:\n"
+        + "[ Space-separated conditions to be included ] ` [ Space-separated conditions to be excluded ]\n"
+        + "e.g. apple pear ` tart\n"
+        + "Multiple Conditions:\n"
+        + "multiple conditions separate by double backticks \"``\" ( OR operator ).\n"
+        + "e.g. apple pear ` tart `` \"mango tart\" [ ... `` other conditions ]";
 
     let tableSettings;
 
@@ -661,7 +661,7 @@ function JsonTable(c = null, kh = null) {
                             let va = String(a[data]);
                             let vb = String(b[data]);
                             if (isDateString(va) && isDateString(vb)) {
-                                console.log();
+                                // console.log();
                                 let aNumber = parseDate(va);
                                 let bNumber = parseDate(vb);
                                 if (!isNaN(aNumber) && !isNaN(bNumber)) {
@@ -1159,7 +1159,7 @@ function JsonTable(c = null, kh = null) {
                                         ).appendContent(
                                             Util.create('div', { style: 'position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999;' })
                                                 .countClicks([
-                                                    async function (event) { if (col['sortable']) { console.log(kh); if (kh && kh.keys && kh.keys.length == 1 && kh.keys[0] == 'Control') { await amendSortedBy(col); } else { await selectSortedBy(col); } } },
+                                                    async function (event) { if (col['sortable']) { if (kh && kh.keys && kh.keys.length == 1 && kh.keys[0] == 'Control') { await amendSortedBy(col); } else { await selectSortedBy(col); } } },
                                                     async function (event) { if (col['sortable']) { await amendSortedBy(col); } },
                                                     async function (event) { await removeSortedBy() }
                                                 ], tableSettings['multiClickDebounce'])
@@ -1184,24 +1184,24 @@ function JsonTable(c = null, kh = null) {
                             col['filterElement'] = Util.create('input', {
                                 ...{ style: 'display:block; ' + filterStyle, value: filterValue, placeholder: (col['filterPlaceholder'] || '') }
                                 , ...(col['filterEditable'] ? {} : { 'disabled': 'true' })
-                            }).addEventHandler('dblclick', (e) => {
-                                e.preventDefault();
+                            }).countClicks([null, function () {
+                                this.preventDefault();
                                 Util.get('html')[0].appendContent(
                                     overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9998', 'background-color': 'hsla(0, 100%, 0%, 0.1)', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'center', 'align-items': 'center' }) })
                                         .appendContent(
-                                            Util.create('textarea', { style: "padding:10px; background-color:#FFF; width:800px; height:430px; border:1px solid #AAA;" })
+                                            Util.create('textarea', { style: "padding:5px; background-color:#FFF; width:800px; max-width:95%; height:500px; border:1px solid #AAA;" })
                                                 .appendContent(filterGuide)
                                         )
                                         .appendContent(
                                             Util.create('span', { style: "margin-top: 20px; background-color: #fff; padding: 5px;" })
-                                                .appendContent('Click to close')
+                                                .appendContent('Double-Click to close')
                                         )
                                         .appendContent(
                                             Util.create('span', { style: Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
-                                                .addEventHandler('click', (e) => { e.preventDefault(); overlay.remove(); })
+                                                .countClicks([null, function () { this.preventDefault(); overlay.remove(); }], tableSettings['multiClickDebounce'])
                                         )
                                 )
-                            });
+                            }], tableSettings['multiClickDebounce']);
                             filters.appendContent(Util.create('td', { class: col['class'] }).appendContent(col['filterElement']));
                         });
                         tbody.appendContent(filters);
