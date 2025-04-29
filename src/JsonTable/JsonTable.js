@@ -150,7 +150,8 @@ function JsonTable(c = null, kh = null) {
         tableBodyEventHandlers: [],
         paginationGroupEventHandlers: [],
         onrefresh: null,
-        emptyRepresentation: '___'
+        emptyRepresentation: '___',
+        overlayZIndex: 99
     };
 
     let filterGuide = "Filtering Guide:\n\n"
@@ -1157,7 +1158,7 @@ function JsonTable(c = null, kh = null) {
                                         ).appendContent(
                                             Util.create('div', { style: 'flex:1;' })
                                         ).appendContent(
-                                            Util.create('div', { style: 'position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999;' })
+                                            Util.create('div', { style: 'position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: ' + tableSettings['overlayZIndex'] + ';' })
                                                 .countClicks([
                                                     async function (event) { if (col['sortable']) { if (kh && kh.keys && kh.keys.length == 1 && kh.keys[0] == 'Control') { await amendSortedBy(col); } else { await selectSortedBy(col); } } },
                                                     async function (event) { if (col['sortable']) { await amendSortedBy(col); } },
@@ -1187,7 +1188,7 @@ function JsonTable(c = null, kh = null) {
                             }).countClicks([null, function () {
                                 this.preventDefault();
                                 Util.get('html')[0].appendContent(
-                                    overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9998', 'background-color': 'hsla(0, 100%, 0%, 0.1)', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'center', 'align-items': 'center' }) })
+                                    overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': tableSettings['overlayZIndex'], 'background-color': 'hsla(0, 100%, 0%, 0.1)', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'center', 'align-items': 'center' }) })
                                         .appendContent(
                                             Util.create('textarea', { style: "padding:5px; background-color:#FFF; width:800px; max-width:95%; height:500px; border:1px solid #AAA;" })
                                                 .appendContent(filterGuide)
@@ -1197,7 +1198,7 @@ function JsonTable(c = null, kh = null) {
                                                 .appendContent('Double-Click to close')
                                         )
                                         .appendContent(
-                                            Util.create('span', { style: Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': '9999' }) })
+                                            Util.create('span', { style: Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': tableSettings['overlayZIndex'] + 1 }) })
                                                 .countClicks([null, function () { this.preventDefault(); overlay.remove(); }], tableSettings['multiClickDebounce'])
                                         )
                                 )
@@ -1327,7 +1328,7 @@ function JsonTable(c = null, kh = null) {
                                 }).appendContent(tbody))
                         )
                         .css('position', 'relative')
-                        .appendContent(shield = Util.create('span', { style: "position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: 999; display:none;" })
+                        .appendContent(shield = Util.create('span', { style: "position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: " + (tableSettings['overlayZIndex'] + 2) + "; display:none;" })
                             .css('background-color', 'hsla(0, 100%, 0%, 0.1)')
                         );
                 } catch (e) {
