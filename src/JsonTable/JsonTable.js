@@ -705,21 +705,13 @@ function JsonTable(c = null, kh = null) {
         try {
             let rowNumber = parseInt(start);
             if (!Number.isNaN(rowNumber)) {
-                tableSettings = {
-                    ...tableSettings
-                    , start: Math.max(
-                        //lower bound
-                        Math.min(
-                            rowNumber,
-                            tableSettings['end']
-                        ),
-                        //maximum possible
-                        Math.max(
-                            (getFiltered().length === 0 ? 0 : 1),
-                            tableSettings['end'] - tableSettings['maxRows'] + 1
-                        )
-                    )
-                };
+                tableSettings['start'] = rowNumber > tableSettings['end']
+                    ? tableSettings['end']
+                    : (
+                        rowNumber < tableSettings['end'] - tableSettings['maxRows'] + 1
+                            ? tableSettings['end'] - tableSettings['maxRows'] + 1
+                            : rowNumber < 1 ? 1 : rowNumber
+                    );
             }
             return this;
         } catch (err) {
@@ -731,21 +723,13 @@ function JsonTable(c = null, kh = null) {
         try {
             let rowNumber = parseInt(end);
             if (!Number.isNaN(rowNumber)) {
-                tableSettings = {
-                    ...tableSettings
-                    , end: Math.min(
-                        //lower bound
-                        Math.max(
-                            rowNumber,
-                            tableSettings['start']
-                        ),
-                        //minimum possible
-                        Math.min(
-                            getFiltered().length,
-                            tableSettings['start'] + tableSettings['maxRows'] - 1
-                        )
-                    )
-                };
+                tableSettings['end'] = rowNumber < tableSettings['start']
+                    ? tableSettings['start']
+                    : (
+                        rowNumber > tableSettings['start'] + tableSettings['maxRows'] - 1
+                            ? tableSettings['start'] + tableSettings['maxRows'] - 1
+                            : rowNumber
+                    );
             }
             return this;
         } catch (err) {
@@ -756,8 +740,8 @@ function JsonTable(c = null, kh = null) {
     let toBegining = function () {
         try {
             let length = tableSettings['end'] - tableSettings['start'] + 1;
-            tableSettings['start'] = getFiltered().length === 0 ? 0 : 1;
-            tableSettings['end'] = Math.min(getFiltered().length, tableSettings['start'] + length - 1);
+            tableSettings['start'] = 1;
+            tableSettings['end'] = tableSettings['start'] + length - 1;
             return this;
         } catch (err) {
             throw new Error("error caught @ toBegining() - " + err);
@@ -768,8 +752,8 @@ function JsonTable(c = null, kh = null) {
         try {
             if (tableData != null && Array.isArray(tableData) && tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
-                tableSettings['start'] = Math.max(getFiltered().length === 0 ? 0 : 1, tableSettings['start'] - length);
-                tableSettings['end'] = Math.min(tableData.length, tableSettings['start'] + length - 1);
+                tableSettings['start'] = Math.max(1, tableSettings['start'] - length);
+                tableSettings['end'] = tableSettings['start'] + length - 1;
             }
             return this;
         } catch (err) {
@@ -781,8 +765,8 @@ function JsonTable(c = null, kh = null) {
         try {
             if (tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
-                tableSettings['end'] = Math.min(tableSettings['end'] + length, Math.ceil(getFiltered().length / length) * length);
-                tableSettings['start'] = Math.max(1, tableSettings['end'] - length + 1);
+                tableSettings['end'] = tableSettings['end'] > getFiltered().length ? tableSettings['end'] : tableSettings['end'] + length;
+                tableSettings['start'] = tableSettings['end'] - length + 1;
             }
             return this;
         } catch (err) {
@@ -794,8 +778,8 @@ function JsonTable(c = null, kh = null) {
         try {
             if (tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
-                tableSettings['end'] = Math.ceil(getFiltered().length / length) * length;
-                tableSettings['start'] = Math.max(1, tableSettings['end'] - length + 1);
+                tableSettings['end'] = Math.floor(getFiltered().length < 1 ? 0 : getFiltered().length / length) * length + length;
+                tableSettings['start'] = tableSettings['end'] - length + 1;
             }
             return this;
         } catch (err) {
