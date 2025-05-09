@@ -966,7 +966,7 @@ function JsonTable(c = null, kh = null) {
                                             style: Util.objToStyle({
                                                 'text-align': 'center',
                                                 'padding': '3px 8px',
-                                                'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
+                                                'width': (Math.max(1, Math.floor(Math.log10(tableData.length) + 2)) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['start']
                                         }).addEventHandler('change', async (event) => { await shieldOn(); setStart(event.target.value); refreshTable(); })
@@ -982,7 +982,7 @@ function JsonTable(c = null, kh = null) {
                                             style: Util.objToStyle({
                                                 'text-align': 'center',
                                                 'padding': '3px 8px',
-                                                'width': (Math.max(1, Math.ceil(Math.log10(tableData.length + 1))) * 8 + 20) + 'px'
+                                                'width': (Math.max(1, Math.floor(Math.log10(tableData.length) + 2)) * 8 + 20) + 'px'
                                             }),
                                             value: tableSettings['end']
                                         }).addEventHandler('change', async (event) => { await shieldOn(); setEnd(event.target.value); refreshTable(); })
