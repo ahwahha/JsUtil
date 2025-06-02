@@ -764,9 +764,10 @@ function JsonTable(c = null, kh = null) {
     let nextPage = function () {
         try {
             if (tableSettings != null) {
-                let length = tableSettings['end'] - tableSettings['start'] + 1;
-                tableSettings['end'] = tableSettings['end'] > getFiltered().length ? tableSettings['end'] : tableSettings['end'] + length;
-                tableSettings['start'] = tableSettings['end'] - length + 1;
+                let pageLength = tableSettings['end'] - tableSettings['start'] + 1;
+                let listLength = getFiltered().length;
+                tableSettings['end'] = tableSettings['end'] >= listLength ? tableSettings['end'] : tableSettings['end'] + (listLength % pageLength == 0 ? 0 : pageLength);
+                tableSettings['start'] = tableSettings['end'] - pageLength + 1;
             }
             return this;
         } catch (err) {
@@ -777,9 +778,10 @@ function JsonTable(c = null, kh = null) {
     let toEnding = function () {
         try {
             if (tableSettings != null) {
-                let length = tableSettings['end'] - tableSettings['start'] + 1;
-                tableSettings['end'] = Math.floor(getFiltered().length < 1 ? 0 : getFiltered().length / length) * length + length;
-                tableSettings['start'] = tableSettings['end'] - length + 1;
+                let pageLength = tableSettings['end'] - tableSettings['start'] + 1;
+                let listLength = getFiltered().length;
+                tableSettings['end'] = Math.floor(listLength < 1 ? 0 : listLength / pageLength) * pageLength + (listLength % pageLength == 0 ? 0 : pageLength);
+                tableSettings['start'] = tableSettings['end'] - pageLength + 1;
             }
             return this;
         } catch (err) {
@@ -1409,7 +1411,7 @@ function JsonTable(c = null, kh = null) {
         setData, getData, resetData, insertData,
         setTableSettings, getTableSettings, sortAsOriginal,
         getSelected, getFiltered, getEdited, getInserted, getRemoved,
-        createSelectBox, createRemoveBox, editData, setContainer, refreshTable,
+        createSelectBox, createRemoveBox, editData, setContainer, refreshTable, setFilter,
         shieldOn, shieldOff
     };
 
