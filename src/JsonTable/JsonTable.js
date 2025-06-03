@@ -766,7 +766,7 @@ function JsonTable(c = null, kh = null) {
             if (tableSettings != null) {
                 let pageLength = tableSettings['end'] - tableSettings['start'] + 1;
                 let listLength = getFiltered().length;
-                tableSettings['end'] = tableSettings['end'] >= listLength ? tableSettings['end'] : tableSettings['end'] + (listLength % pageLength == 0 ? 0 : pageLength);
+                tableSettings['end'] = tableSettings['end'] >= listLength ? tableSettings['end'] : tableSettings['end'] + pageLength;
                 tableSettings['start'] = tableSettings['end'] - pageLength + 1;
             }
             return this;
