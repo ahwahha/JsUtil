@@ -1437,41 +1437,21 @@ JsonTable.cleanKeys = function (arr) {
  * @param {*} keys [String] or [String][]
  * @returns 
  */
-JsonTable.removeKeys = function (arr, keys) {
+JsonTable.removeKeys = function (arr, _keys) {
     try {
         if (arr != null && Array.isArray(arr)) {
-            if (typeof keys === 'string') {
-                if (keys.endsWith('%')) {
-                    let prefix = keys.slice(0, -1);
-                    for (let i = 0; i < arr.length; i++) {
-                        for (let key in arr[i]) {
-                            if (key.startsWith(prefix)) {
-                                delete arr[i][key];
-                            }
-                        }
-                    }
-                } else {
-                    for (let i = 0; i < arr.length; i++) {
-                        delete arr[i][keys];
-                    }
+            let keys = Array.isArray(_keys) ? _keys : [..._keys];
+            if (keys.some(k => typeof k !== 'string')) throw new Error("keys argument must be a string or an array of strings");
+
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = 0; j < keys.length; j++) {
+                    keys.forEach(k => {
+                        let r = k.includes('%') ? new RegExp('^' + k.replace(/([.+^${}()|[\]\\])/g, '\\$1').replace(/%/g, '.*') + '$') : null;
+                        Object.keys(arr[i]).forEach(key => {
+                            if (r ? r.test(key) : key === k) delete arr[i][key];
+                        });
+                    });
                 }
-            } else if (Array.isArray(keys)) {
-                for (let i = 0; i < arr.length; i++) {
-                    for (let j = 0; j < keys.length; j++) {
-                        if (keys[j].endsWith('%')) {
-                            let prefix = keys[j].slice(0, -1);
-                            for (let key in arr[i]) {
-                                if (key.startsWith(prefix)) {
-                                    delete arr[i][key];
-                                }
-                            }
-                        } else {
-                            delete arr[i][keys[j]];
-                        }
-                    }
-                }
-            } else {
-                throw new Error("keys argument must be a string or an array of strings");
             }
         }
         return arr;
