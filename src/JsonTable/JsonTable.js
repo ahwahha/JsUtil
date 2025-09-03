@@ -687,18 +687,48 @@ function JsonTable(c = null, kh = null) {
         try {
             return !isNaN(parseDate(value));
         } catch (error) {
+            console.log(error);
             throw new Error("error caught @ isDateString(" + value + "): " + error);
         }
     }
 
-    let parseDate = function (value) {
-        try {
-            let date = new Date(value);
-            return date.getTime();
-        } catch (error) {
+    const parseDate = function (value) {
+        if (typeof value !== 'string' || !value.trim()) {
             return NaN;
         }
-    }
+
+        // Validate against common patterns first
+        const patterns = [
+            /^\d{4}-\d{2}-\d{2}$/,           // YYYY-MM-DD
+            /^\d{2}\/\d{2}\/\d{4}$/,         // DD/MM/YYYY or MM/DD/YYYY
+            /^\d{4}\/\d{2}\/\d{2}$/,         // YYYY/MM/DD
+            /^\d{2}-\d{2}-\d{4}$/,           // DD-MM-YYYY or MM-DD-YYYY
+        ];
+
+        const matchesPattern = patterns.some(pattern => pattern.test(value));
+        if (!matchesPattern) {
+            return NaN;
+        }
+
+        const date = new Date(value);
+
+        // Check if date is valid and matches input
+        if (isNaN(date.getTime())) {
+            return NaN;
+        }
+
+        // Validate the date components match input to catch rollovers
+        const isoString = date.toISOString().split('T');
+        const inputNormalized = value.replace(/\//g, '-');
+
+        // For YYYY-MM-DD format, direct comparison
+        if (/^\d{4}-\d{2}-\d{2}$/.test(inputNormalized)) {
+            return isoString === inputNormalized ? date.getTime() : NaN;
+        }
+
+        return date.getTime();
+    };
+
 
 
     let setStart = function (start) {
