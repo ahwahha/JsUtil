@@ -1272,8 +1272,9 @@ function JsonTable(c = null, kh = null) {
                                             let showOri = row['###row-edited'] && oriData !== undefined;
                                             tableRow.appendContent(
                                                 Util.create('td', { class: col['class'], style: Util.objToStyle(rowsStyle(col)) })
-                                                    .appendContent(cellData)
-                                                    .appendContentIf(Util.create('br'), showOri)
+                                                    .appendContent(
+                                                        Util.create('div', { style: 'width: 100%' }).appendContent(cellData)
+                                                    )
                                                     .appendContentIf(
                                                         t = Util.create('textarea', { style: Util.objToStyle({ ...rowsStyle(col), ...tableSettings.editedStyle }) }).attr('readonly', '')
                                                             .appendContent('(' + (typeof oriData === 'string' ? '"' + oriData + '"' : JSON.stringify(oriData)) + ')')
