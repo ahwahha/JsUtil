@@ -133,21 +133,6 @@ Util.downloadBlob = function (blob, filename = 'filename') {
     }
 };
 
-Util.downloadBlob = function (blob, fileName = 'data') {
-    try {
-        let url = window.URL.createObjectURL(blob);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-    } catch (error) {
-        throw new Error("error caught @ downloadBlob: " + error);
-    }
-};
-
 Util.parseCsv = function (csv, delimiter = ',') {
     function splitCSVLines(input) {
         const lines = [];
@@ -1112,11 +1097,6 @@ Util.prototype.removeClass = function (className) {
 
 Util.prototype.containClass = function (className) {
     return this['_entity'].classList.contains(className);
-};
-
-Util.prototype.class = function (className) {
-    this['_entity'].className = className;
-    return this;
 };
 
 Util.prototype.attr = function (name, assignment) {

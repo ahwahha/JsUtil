@@ -191,7 +191,7 @@ function JsonTable(c = null, kh = null) {
             } else if (ft.startsWith('>') && !isNaN(f1)) {
                 return a > parseFloat(f1);
             } else {
-                return Sting(a).trim().indexOf(ft);
+                return String(a).trim().indexOf(ft);
             }
         }
     }
@@ -215,7 +215,7 @@ function JsonTable(c = null, kh = null) {
             } else if (ft.startsWith('>') && isDateString(f1)) {
                 return parseDate(dt) > parseDate(f1);
             } else {
-                return Sting(a).trim().indexOf(ft);
+                return String(a).trim().indexOf(ft);
             }
         }
     }
