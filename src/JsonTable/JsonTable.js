@@ -1002,8 +1002,8 @@ function JsonTable(c = null, kh = null) {
                                             }),
                                             value: tableSettings['start']
                                         }).addEventHandler(['change', 'keydown'], async (event) => {
-                                            if (event.type === 'change' || (('Escape' === event.key || 'Enter' === event.key) && !event.nativeEvent.isComposing)) {
-						event.stopPropagation();
+                                            if (event.type === 'change' || (('Escape' === event.key || 'Enter' === event.key) && !event.isComposing)) {
+                                                event.stopPropagation();
                                                 await shieldOn(); setStart(event.target.value); refreshTable();
                                             }
                                         })
@@ -1024,8 +1024,8 @@ function JsonTable(c = null, kh = null) {
                                             }),
                                             value: tableSettings['end']
                                         }).addEventHandler(['change', 'keydown'], async (event) => {
-                                            if (event.type === 'change' || (('Escape' === event.key || 'Enter' === event.key) && !event.nativeEvent.isComposing)) {
-						event.stopPropagation();
+                                            if (event.type === 'change' || (('Escape' === event.key || 'Enter' === event.key) && !event.isComposing)) {
+                                                event.stopPropagation();
                                                 await shieldOn(); setEnd(event.target.value); refreshTable();
                                             }
                                         })
