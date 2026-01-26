@@ -183,18 +183,18 @@ function JsonTable(c = null, kh = null) {
             let ft = b.trim();
             let f1 = ft.substring(1).trim();
             let f2 = ft.substring(2).trim();
-            if (ft.startsWith('<') && !isNaN(f1)) {
-                return a < parseFloat(f1);
-            } else if (ft.startsWith('<=') && !isNaN(f2)) {
+            if (ft.startsWith('<=') && !isNaN(f2)) {
                 return a <= parseFloat(f2);
-            } else if (ft.startsWith('=') && !isNaN(f1)) {
-                return a == parseFloat(f1);
             } else if (ft.startsWith('>=') && !isNaN(f2)) {
                 return a >= parseFloat(f2);
+            } else if (ft.startsWith('=') && !isNaN(f1)) {
+                return a == parseFloat(f1);
+            } else if (ft.startsWith('<') && !isNaN(f1)) {
+                return a < parseFloat(f1);
             } else if (ft.startsWith('>') && !isNaN(f1)) {
                 return a > parseFloat(f1);
             } else {
-                return String(a).trim().indexOf(ft);
+                return String(a).trim().indexOf(ft) !== -1;
             }
         }
     }
