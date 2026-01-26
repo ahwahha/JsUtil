@@ -123,27 +123,27 @@ function JsonTable(c = null, kh = null) {
                 } else if (typeof data === 'boolean') {
                     // boolean
                     return filter.trim() == '' ? true : (
-                        Util.matchText(String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation'])
+                        Util.matchText(String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
                     );
                 } else if (!isNaN(data)) {
                     // number
                     return filter.trim() == '' ? true : (
-                        Util.match(data, filter.trim(), '`', filterNumbers)
-                        || Util.matchText(String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation'])
+                        Util.match(data, filter.trim(), tableSettings['filterDelimiter'], filterNumbers)
+                        || Util.matchText(String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
                     );
                 } else if (isDateString(data)) {
                     // date
                     return filter.trim() == '' ? true : (
-                        Util.match(data, filter.trim(), '`', filterDates)
-                        || Util.matchText(String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation'])
+                        Util.match(data, filter.trim(), tableSettings['filterDelimiter'], filterDates)
+                        || Util.matchText(String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
                     );
                 } else {
                     // string
-                    return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation']);
+                    return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation']);
                 }
             } catch (e) {
                 // error
-                return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), '`', false, tableSettings['emptyRepresentation']);
+                return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation']);
             }
         },
         controlGroupEventHandlers: [],
@@ -151,23 +151,26 @@ function JsonTable(c = null, kh = null) {
         paginationGroupEventHandlers: [],
         onrefresh: null,
         emptyRepresentation: '___',
+        filterDelimiter: '`',
         overlayZIndex: 99
     };
 
-    let filterGuide = "Filtering Guide:\n\n"
-        + "1. Type Boolean\n'true' / 'false'\n\n"
-        + "2. Type Numbers\n[ < / <= / = / > / >= ][number string]\ne.g. <100\n\n"
-        + "3. Type Dates\n[ < / <= / = / > / >= ][ dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss]\ne.g. >=01-07-1997\n\n"
-        + "4. Type Text\n[ any successive characters / double quoted characters (e.g. \"mango tart\") ]\n\n"
-        + "5. Combined conditions ( single type only )\n"
-        + "String Separator: Space \" \" ( AND operator )\n"
-        + "Delimiter: Backtick \"`\" ( NOT operator )\n"
-        + "Condition:\n"
-        + "[ Space-separated conditions to be included ] ` [ Space-separated conditions to be excluded ]\n"
-        + "e.g. apple pear ` tart\n"
-        + "Multiple Conditions:\n"
-        + "multiple conditions separate by double backticks \"``\" ( OR operator ).\n"
-        + "e.g. apple pear ` tart `` \"mango tart\" [ ... `` other conditions ]";
+    let filterGuide = function () {
+        return "Filtering Guide:\n\n"
+            + "1. Type Boolean\n'true' / 'false'\n\n"
+            + "2. Type Numbers\n[ < / <= / = / > / >= ][number string]\ne.g. <100\n\n"
+            + "3. Type Dates\n[ < / <= / = / > / >= ][ dd-MM-yyyy / yyyy-MM-dd / yyyy-MM-dd hh:mm / yyyy-MM-dd hh:mm:ss]\ne.g. >=01-07-1997\n\n"
+            + "4. Type Text\n[ any successive characters / double quoted characters (e.g. \"mango tart\") ]\n\n"
+            + "5. Combined conditions ( single type only )\n"
+            + "String Separator: Space \" \" ( AND operator )\n"
+            + "Delimiter: " + tableSettings['filterDelimiter'] + " ( NOT operator )\n"
+            + "Condition:\n"
+            + "[ Space-separated conditions to be included ] ` [ Space-separated conditions to be excluded ]\n"
+            + "e.g. apple pear ` tart\n"
+            + "Multiple Conditions:\n"
+            + "multiple conditions separate by double backticks \"``\" ( OR operator ).\n"
+            + "e.g. apple pear ` tart `` \"mango tart\" [ ... `` other conditions ]";
+    }
 
     let tableSettings;
 
@@ -1218,7 +1221,7 @@ function JsonTable(c = null, kh = null) {
                                     overlay = Util.create('div', { "style": Util.objToStyle({ 'position': 'fixed', 'top': '0px', 'left': '0px', 'width': '100%', 'height': '100%', 'z-index': tableSettings['overlayZIndex'], 'background-color': 'hsla(0, 100%, 0%, 0.1)', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'center', 'align-items': 'center' }) })
                                         .appendContent(
                                             Util.create('textarea', { style: "padding:5px; background-color:#FFF; width:800px; max-width:95%; height:500px; border:1px solid #AAA;" })
-                                                .appendContent(filterGuide)
+                                                .appendContent(filterGuide())
                                         )
                                         .appendContent(
                                             Util.create('span', { style: "margin-top: 20px; background-color: #fff; padding: 5px;" })
