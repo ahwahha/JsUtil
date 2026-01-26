@@ -207,14 +207,14 @@ function JsonTable(c = null, kh = null) {
             let ft = b.trim();
             let f1 = ft.substring(1).trim();
             let f2 = ft.substring(2).trim();
-            if (ft.startsWith('<') && isDateString(f1)) {
-                return parseDate(dt) < parseDate(f1);
-            } else if (ft.startsWith('<=') && isDateString(f2)) {
+            if (ft.startsWith('<=') && isDateString(f2)) {
                 return parseDate(dt) <= parseDate(f2);
-            } else if (ft.startsWith('=') && isDateString(f1)) {
-                return parseDate(dt) == parseDate(f1);
             } else if (ft.startsWith('>=') && isDateString(f2)) {
                 return parseDate(dt) >= parseDate(f2);
+            } else if (ft.startsWith('=') && isDateString(f1)) {
+                return parseDate(dt) == parseDate(f1);
+            } else if (ft.startsWith('<') && isDateString(f1)) {
+                return parseDate(dt) < parseDate(f1);
             } else if (ft.startsWith('>') && isDateString(f1)) {
                 return parseDate(dt) > parseDate(f1);
             } else {
