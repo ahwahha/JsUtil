@@ -115,35 +115,31 @@ function JsonTable(c = null, kh = null) {
         filterDebounce: 500,
         multiClickDebounce: 250,
         shieldRefreshGap: 100,
-        filterFunction: function (data, filter) {
+        filterFunction: function (data, _filter) {
             try {
-                if (data == null) {
-                    // null
+				let filter = _filter.trim();
+				let matchText = (d) => {
+					return Util.matchText(d, filter, tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
+				}
+                if (data == null) { // data is null always return false
                     return false;
-                } else if (typeof data === 'boolean') {
-                    // boolean
-                    return filter.trim() == '' ? true : (
-                        Util.matchText(String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
-                    );
-                } else if (!isNaN(data)) {
-                    // number
-                    return filter.trim() == '' ? true : (
-                        Util.match(data, filter.trim(), tableSettings['filterDelimiter'], filterNumbers)
-                        || Util.matchText(String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
-                    );
-                } else if (isDateString(data)) {
-                    // date
-                    return filter.trim() == '' ? true : (
-                        Util.match(data, filter.trim(), tableSettings['filterDelimiter'], filterDates)
-                        || Util.matchText(String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
-                    );
-                } else {
-                    // string
-                    return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation']);
-                }
-            } catch (e) {
-                // error
-                return filter.trim() == '' ? true : Util.matchText(typeof data === 'object' ? JSON.stringify(data) : String(data), filter.trim(), tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation']);
+                } else if (filter.trim() === '') { // empty filter always return true
+					return true;
+				} else if (typeof data === 'boolean') { // boolean
+                    return matchText(String(data))
+					|| (String(data) === 'true' && filter === '1')
+					|| (String(data) === 'false' && filter === '0');
+                } else if (!isNaN(data)) { // number
+                    return Util.match(data, filter, tableSettings['filterDelimiter'], filterNumbers)
+                        || matchText(String(data));
+                } else if (isDateString(data)) { // date
+                    return Util.match(data, filter, tableSettings['filterDelimiter'], filterDates)
+                        || matchText(String(data));
+                } else { // string or string of object
+                    return matchText(String(typeof data === 'object' ? JSON.stringify(data) : String(data)));
+				}
+            } catch (e) { // error
+                return matchText(String(typeof data === 'object' ? JSON.stringify(data) : String(data)));
             }
         },
         controlGroupEventHandlers: [],
@@ -177,8 +173,6 @@ function JsonTable(c = null, kh = null) {
     let filterNumbers = function (a, b) {
         if (isNaN(a)) {
             throw '@ filterNumber: NaN';
-        } else if (b === tableSettings['emptyRepresentation'] && (a == null || a.trim() == '')) {
-            return true;
         } else {
             let ft = b.trim();
             let f1 = ft.substring(1).trim();
@@ -200,27 +194,23 @@ function JsonTable(c = null, kh = null) {
     }
 
     let filterDates = function (a, b) {
-        if (b === tableSettings['emptyRepresentation'] && (a == null || a.trim() == '')) {
-            return true;
-        } else {
-            let dt = a.trim();
-            let ft = b.trim();
-            let f1 = ft.substring(1).trim();
-            let f2 = ft.substring(2).trim();
-            if (ft.startsWith('<=') && isDateString(f2)) {
-                return parseDate(dt) <= parseDate(f2);
-            } else if (ft.startsWith('>=') && isDateString(f2)) {
-                return parseDate(dt) >= parseDate(f2);
-            } else if (ft.startsWith('=') && isDateString(f1)) {
-                return parseDate(dt) == parseDate(f1);
-            } else if (ft.startsWith('<') && isDateString(f1)) {
-                return parseDate(dt) < parseDate(f1);
-            } else if (ft.startsWith('>') && isDateString(f1)) {
-                return parseDate(dt) > parseDate(f1);
-            } else {
-                return String(a).trim().indexOf(ft);
-            }
-        }
+		let dt = a.trim();
+		let ft = b.trim();
+		let f1 = ft.substring(1).trim();
+		let f2 = ft.substring(2).trim();
+		if (ft.startsWith('<=') && isDateString(f2)) {
+			return parseDate(dt) <= parseDate(f2);
+		} else if (ft.startsWith('>=') && isDateString(f2)) {
+			return parseDate(dt) >= parseDate(f2);
+		} else if (ft.startsWith('=') && isDateString(f1)) {
+			return parseDate(dt) == parseDate(f1);
+		} else if (ft.startsWith('<') && isDateString(f1)) {
+			return parseDate(dt) < parseDate(f1);
+		} else if (ft.startsWith('>') && isDateString(f1)) {
+			return parseDate(dt) > parseDate(f1);
+		} else {
+			return String(a).trim().indexOf(ft) !== -1;
+		}
     }
 
     let setContainer = function (c) {
@@ -700,33 +690,11 @@ function JsonTable(c = null, kh = null) {
             return NaN;
         }
 
-        // Validate against common patterns first
-        const patterns = [
-            /^\d{4}-\d{2}-\d{2}$/,           // YYYY-MM-DD
-            /^\d{2}\/\d{2}\/\d{4}$/,         // DD/MM/YYYY or MM/DD/YYYY
-            /^\d{4}\/\d{2}\/\d{2}$/,         // YYYY/MM/DD
-            /^\d{2}-\d{2}-\d{4}$/,           // DD-MM-YYYY or MM-DD-YYYY
-        ];
-
-        const matchesPattern = patterns.some(pattern => pattern.test(value));
-        if (!matchesPattern) {
-            return NaN;
-        }
-
         const date = new Date(value);
 
         // Check if date is valid and matches input
         if (isNaN(date.getTime())) {
             return NaN;
-        }
-
-        // Validate the date components match input to catch rollovers
-        const isoString = date.toISOString().split('T');
-        const inputNormalized = value.replace(/\//g, '-');
-
-        // For YYYY-MM-DD format, direct comparison
-        if (/^\d{4}-\d{2}-\d{2}$/.test(inputNormalized)) {
-            return isoString === inputNormalized ? date.getTime() : NaN;
         }
 
         return date.getTime();

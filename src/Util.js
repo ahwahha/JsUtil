@@ -667,7 +667,7 @@ Util.checkCriteria = (str, matchingString, delimiter, criteria) => {
 Util.match = function (text, matchingText, delimiter, criteria) {
     let match = false;
     try {
-        if (text == null && matchingText !== '') {
+        if (text == null) {
             match = false;
         } else {
             match = Util.checkCriteria(text, matchingText, delimiter, criteria);
@@ -682,7 +682,7 @@ Util.match = function (text, matchingText, delimiter, criteria) {
 Util.matchText = function (text, matchingText, delimiter, caseSensitive = false, emptyRepresentation = '___') {
     let match = false;
     try {
-        if (text == null && matchingText !== '') {
+        if (text === null) {
             match = false;
         } else {
             let regex = matchingText.trim().startsWith("regex:");
