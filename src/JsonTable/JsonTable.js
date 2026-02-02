@@ -117,19 +117,19 @@ function JsonTable(c = null, kh = null) {
         shieldRefreshGap: 100,
         filterFunction: function (data, _filter) {
             try {
-				let filter = _filter.trim();
-				let matchText = (d) => {
-					return Util.matchText(d, filter, tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
-				}
-                if (data == null) { // data is null always return false
+                let filter = _filter.trim();
+                let matchText = (d) => {
+                    return Util.matchText(d, filter, tableSettings['filterDelimiter'], false, tableSettings['emptyRepresentation'])
+                }
+                if (data === null || data === undefined) { // data is null always return false
                     return false;
                 } else if (filter.trim() === '') { // empty filter always return true
-					return true;
-				} else if (typeof data === 'boolean') { // boolean
+                    return true;
+                } else if (typeof data === 'boolean') { // boolean
                     return matchText(String(data))
-					|| (String(data) === 'true' && filter === '1')
-					|| (String(data) === 'false' && filter === '0');
-                } else if (!isNaN(data)) { // number
+                    || (String(data) === 'true' && filter === '1')
+                    || (String(data) === 'false' && filter === '0');
+                } else if (typeof data === 'number' && !isNaN(data)) { // number
                     return Util.match(data, filter, tableSettings['filterDelimiter'], filterNumbers)
                         || matchText(String(data));
                 } else if (isDateString(data)) { // date
@@ -137,7 +137,7 @@ function JsonTable(c = null, kh = null) {
                         || matchText(String(data));
                 } else { // string or string of object
                     return matchText(String(typeof data === 'object' ? JSON.stringify(data) : String(data)));
-				}
+                }
             } catch (e) { // error
                 return matchText(String(typeof data === 'object' ? JSON.stringify(data) : String(data)));
             }
@@ -194,23 +194,23 @@ function JsonTable(c = null, kh = null) {
     }
 
     let filterDates = function (a, b) {
-		let dt = a.trim();
-		let ft = b.trim();
-		let f1 = ft.substring(1).trim();
-		let f2 = ft.substring(2).trim();
-		if (ft.startsWith('<=') && isDateString(f2)) {
-			return parseDate(dt) <= parseDate(f2);
-		} else if (ft.startsWith('>=') && isDateString(f2)) {
-			return parseDate(dt) >= parseDate(f2);
-		} else if (ft.startsWith('=') && isDateString(f1)) {
-			return parseDate(dt) == parseDate(f1);
-		} else if (ft.startsWith('<') && isDateString(f1)) {
-			return parseDate(dt) < parseDate(f1);
-		} else if (ft.startsWith('>') && isDateString(f1)) {
-			return parseDate(dt) > parseDate(f1);
-		} else {
-			return String(a).trim().indexOf(ft) !== -1;
-		}
+        let dt = a.trim();
+        let ft = b.trim();
+        let f1 = ft.substring(1).trim();
+        let f2 = ft.substring(2).trim();
+        if (ft.startsWith('<=') && isDateString(f2)) {
+            return parseDate(dt) <= parseDate(f2);
+        } else if (ft.startsWith('>=') && isDateString(f2)) {
+            return parseDate(dt) >= parseDate(f2);
+        } else if (ft.startsWith('=') && isDateString(f1)) {
+            return parseDate(dt) == parseDate(f1);
+        } else if (ft.startsWith('<') && isDateString(f1)) {
+            return parseDate(dt) < parseDate(f1);
+        } else if (ft.startsWith('>') && isDateString(f1)) {
+            return parseDate(dt) > parseDate(f1);
+        } else {
+            return String(a).trim().indexOf(ft) !== -1;
+        }
     }
 
     let setContainer = function (c) {
