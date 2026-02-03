@@ -1,6 +1,6 @@
 # JsUtil Library
 
-> **Note:** This README was generated with assistance from generative AI and reviewed for accuracy.
+> **Note:** This README was generated with assistance from generative AI and content is subject to be changed for improving accuracy.
 
 A lightweight, vanilla JavaScript utility library providing DOM manipulation helpers and a powerful data table component with advanced filtering, sorting, and editing capabilities.
 
