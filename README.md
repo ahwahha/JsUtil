@@ -675,10 +675,10 @@ Matching syntax:
 - `regex:^test.*` - regex pattern
 
 ```javascript
-Util.matchText('apple pie', 'apple', '`', false, 'mt');  // true
+Util.matchText('apple pie', 'apple', '`', false, '___');  // true
 Util.matchText('apple pie', 'apple`tart', '`');          // true (apple, no tart)
 Util.matchText('apple tart', 'apple`tart', '`');         // false (has tart)
-Util.matchText('', 'mt', '`', false, 'mt');              // true (empty match)
+Util.matchText('', '___', '`', false, '___');              // true (empty match)
 ```
 
 **`Util.match(text, matchingText, delimiter, criteria)`**
@@ -1301,7 +1301,7 @@ table.setTableSettings({
     maxHeight: "600px",
     multiSelect: true,
     showSelectingGroup: true,
-    emptyRepresentation: 'mt',
+    emptyRepresentation: '___',
     filterDelimiter: '`',
     
     columns: [
