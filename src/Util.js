@@ -1157,39 +1157,61 @@ Util.prototype.noFocus = function () {
 };
 
 Util.prototype.commands = function (_bufferSize, _handlers) {
-    let handlers = [];
-    let buffer = '';
     let element = this;
+    let buffer = [];
+    let handlers = Array.isArray(_handlers) ? _handlers : [_handlers];
 
-    if (typeof _handlers === 'object') {
-        if (Array.isArray(_handlers)) {
-            handlers = _handlers;
-        } else {
-            handlers.push(_handlers);
+    let normalizeCommand = function (cmd) {
+        if (Array.isArray(cmd)) return cmd;
+        if (typeof cmd === 'string') {
+            return [...cmd.split(''), 'Enter'];
         }
+        return null;
+    };
 
-        element.addEventHandler('keyup', async (event) => {
-            if (event.target === element || (event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA')) {
-                if (event.key == 'Enter') {
-                    for (let handler of handlers) {
-                        if (['command', 'function'].every(key => handler.hasOwnProperty(key))) {
-                            if (buffer.endsWith(handler['command'])) {
-                                await handler['function']();
-                            }
-                        }
-                    }
-                } else {
-                    buffer += event.key;
-                    if (buffer.length > _bufferSize) {
-                        buffer = buffer.slice(1);
-                    }
+    handlers = handlers
+        .map(h => {
+            if (!h) return null;
+            let norm = normalizeCommand(h.command);
+            if (!norm || typeof h.function !== 'function') return null;
+            return {
+                command: norm,
+                function: h.function
+            };
+        })
+        .filter(Boolean);
+
+    let matchTail = function (buf, pattern) {
+        if (pattern.length > buf.length) return false;
+        for (let i = 0; i < pattern.length; i++) {
+            if (buf[buf.length - pattern.length + i] !== pattern[i]) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    element.addEventHandler('keyup', async (event) => {
+        if (event.target === element ||
+            (event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA')) {
+
+            buffer.push(event.key);
+
+            if (buffer.length > _bufferSize) {
+                buffer = buffer.slice(buffer.length - _bufferSize);
+            }
+
+            for (let h of handlers) {
+                if (matchTail(buffer, h.command)) {
+                    await h.function.call(element, event);
                 }
             }
-        });
-    }
+        }
+    });
 
     return this;
 };
+
 
 Util.prototype.holdKeys = function (_combinations, flushDelay = 1000) {
     let element = this;
