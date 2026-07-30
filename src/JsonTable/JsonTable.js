@@ -127,8 +127,8 @@ function JsonTable(c = null, kh = null) {
                     return true;
                 } else if (typeof data === 'boolean') { // boolean
                     return matchText(String(data))
-                    || (String(data) === 'true' && filter === '1')
-                    || (String(data) === 'false' && filter === '0');
+                        || (String(data) === 'true' && filter === '1')
+                        || (String(data) === 'false' && filter === '0');
                 } else if (typeof data === 'number' && !isNaN(data)) { // number
                     return Util.match(data, filter, tableSettings['filterDelimiter'], filterNumbers)
                         || matchText(String(data));
@@ -620,7 +620,12 @@ function JsonTable(c = null, kh = null) {
                 let sortedData = null;
                 for (let data of [...dataList].reverse()) {
                     sortedData = tableData.sort((a, b) => {
-                        if (a[data] == null || b[data] == null) {
+                        if (a['###row-index'] < 0 || b['###row-index'] < 0) {
+                            if (a['###row-index'] < 0 && b['###row-index'] < 0) {
+                                return a['###row-index'] - b['###row-index'] < 0 ? -1 : 1;
+                            }
+                            return a['###row-index'] < 0 ? -1 : 1; 
+                        } else if (a[data] == null || b[data] == null) {
                             // null exists
                             if (a[data] == null && b[data] == null) {
                                 return 0;
@@ -1438,7 +1443,7 @@ function JsonTable(c = null, kh = null) {
 
     return {
         setData, getData, resetData, insertData,
-        setTableSettings, getTableSettings, sortAsOriginal,
+        setTableSettings, getTableSettings, sortAsOriginal, setSorting,
         getSelected, getFiltered, getEdited, getInserted, getRemoved,
         createSelectBox, createRemoveBox, editData, setContainer, refreshTable, setFilter, setSorting,
         shieldOn, shieldOff
