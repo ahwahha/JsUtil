@@ -7,6 +7,7 @@ function JsonTable(c = null, kh = null) {
     let controlGroup;
     let tableBody;
     let paginationGroup;
+    let bottomPaginationGroup;
     let container = c instanceof Util ? c : new Util(c);
     let tableData = null;
     let originalTableData = null;
@@ -59,8 +60,8 @@ function JsonTable(c = null, kh = null) {
         label_resetData: '↺ data',
         label_resetSelectedData: '↺ selected data',
         label_toBegining: '<<',
-        label_previousPage: Util.create('span', { style: 'padding:0px 8px;' }).appendContent('<'),
-        label_nextPage: Util.create('span', { style: 'padding:0px 8px;' }).appendContent('>'),
+        label_previousPage: '  <  ',
+        label_nextPage: '  >  ',
         label_toEnding: '>>',
         headersStyle: {
             "position": "relative",
@@ -624,7 +625,7 @@ function JsonTable(c = null, kh = null) {
                             if (a['###row-index'] < 0 && b['###row-index'] < 0) {
                                 return a['###row-index'] - b['###row-index'] < 0 ? -1 : 1;
                             }
-                            return a['###row-index'] < 0 ? -1 : 1; 
+                            return a['###row-index'] < 0 ? -1 : 1;
                         } else if (a[data] == null || b[data] == null) {
                             // null exists
                             if (a[data] == null && b[data] == null) {
@@ -1347,6 +1348,11 @@ function JsonTable(c = null, kh = null) {
                                     })
                                 }).appendContent(tbody))
                         )
+                        .appendContent(
+                            bottomPaginationGroup = Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap-reverse', 'justify-content': 'flex-start', 'align-items': 'flex-start', 'column-gap': '3px' }) })
+                                .appendContent(paginationGroup = createPaginationGroup()
+                                )
+                        )
                         .css('position', 'relative')
                         .appendContent(shield = Util.create('span', { style: "position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: " + (tableSettings['overlayZIndex'] + 2) + "; display:none;" })
                             .css('background-color', 'hsla(0, 100%, 0%, 0.1)')
@@ -1415,12 +1421,13 @@ function JsonTable(c = null, kh = null) {
         }
         if (tableSettings['tableBodyEventHandlers'] != null && Array.isArray(tableSettings['tableBodyEventHandlers'])) {
             for (let handler of tableSettings['tableBodyEventHandlers']) {
-                controlGroup.addEventHandler(handler['event'], handler['function']);
+                tableBody.addEventHandler(handler['event'], handler['function']);
             }
         }
         if (tableSettings['paginationGroupEventHandlers'] != null && Array.isArray(tableSettings['paginationGroupEventHandlers'])) {
             for (let handler of tableSettings['paginationGroupEventHandlers']) {
                 controlGroup.addEventHandler(handler['event'], handler['function']);
+                bottomPaginationGroup.addEventHandler(handler['event'], handler['function']);
             }
         }
     }
