@@ -1445,7 +1445,7 @@ function JsonTable(c = null, kh = null) {
         setData, getData, resetData, insertData,
         setTableSettings, getTableSettings, sortAsOriginal, setSorting,
         getSelected, getFiltered, getEdited, getInserted, getRemoved,
-        createSelectBox, createRemoveBox, editData, setContainer, refreshTable, setFilter, setSorting,
+        createSelectBox, createRemoveBox, editData, setContainer, refreshTable, setFilter, setSorting, setStart, setEnd,
         shieldOn, shieldOff
     };
 
