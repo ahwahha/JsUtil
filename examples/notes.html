@@ -2,8 +2,8 @@
 
 <head>
 	<script>
-		const api = 'http://localhost:2001';
-		const path = 'notes/notes.json';
+		let data = [];
+		
 		const columnSetting = [
 			{
 				"header": "sel.",
@@ -27,8 +27,25 @@
 				"data": "v",
 				"rowsStyle": { "padding": "2px" },
 				"modifier": function (row) {
-					return createTextarea(row, 'v', row.v)
-						.css('width', '100%');
+					return String(row['v']).indexOf('http://') === 0 || String(row['v']).indexOf('https://') === 0
+						? Util.create('span', { style: 'width:100%; display: flex; flex-flow: row wrap; align-items: center;' })
+							.appendContent(
+								createTextarea(row, 'v')
+									.css('flex', '1')
+									.attr('disabled', row.deprecated_at ? '' : 'unset')
+							).appendContent(
+								Util.create('span', { class: 'button', style: 'height:18px;' })
+									.appendContent('>>')
+									.countClicks([
+										() => { window.open(row.v.split('\n')[0], '_blank', ''); },
+										() => { window.open(row.v.split('\n')[0], '_self', ''); },
+										() => { window.open(row.v.split('\n')[0], '', 'width=1000,height=600'); },
+										() => { navigator.clipboard.writeText(row.v.split('\n')[0]); }
+									], 250)
+							)
+						: createTextarea(row, 'v')
+							.css('width', '100%')
+							.attr('disabled', row.deprecated_at ? '' : 'unset');
 				}
 			},
 			{
@@ -93,19 +110,12 @@
 						.appendContent('Insert row')
 						.addEventHandler('click', () => { myTable.insertData({ 'k': '', 'v': '' }).refreshTable(true); })
 					)
-					// .appendContent(Util.create('button', { class: 'button' })
-					// 	.addEventHandler('click', async function () {
-					// 		await putData(JSON.stringify(Util.clone(JsonTable.cleanKeys(myTable.getNotRemoved()))));
-					// 		location.reload();
-					// 	})
-					// 	.appendContent('save')
-					// )
 					.appendContent(Util.create('button', { class: 'button' })
 						.addEventHandler('click', async function () {
-							await navigator.clipboard.writeText(JSON.stringify(Util.clone(JsonTable.cleanKeys(myTable.getNotRemoved()))));
+							await navigator.clipboard.writeText(JSON.stringify(JsonTable.cleanKeys(myTable.getRemoved(false, myTable.getFiltered()))));
 							alert('data copied to clipboard');
 						})
-						.appendContent('copy to clipboard')
+						.appendContent('copy filtered')
 					),
 				ascending: true,
 				start: 1,
@@ -119,78 +129,47 @@
 				},
 				filterReturnTrueWhenEmpty: true
 			});
-			// let data = await getData();
-			let data = [];
 
 			myTable.setData(data).refreshTable(true);
 		});
 
-		// async function getData() {
-		// 	let result;
-		// 	try {
-		// 		let response = await fetch(api + '/get', {
-		// 			method: 'POST',
-		// 			headers: {
-		// 				'Content-Type': 'application/json'
-		// 			},
-		// 			body: JSON.stringify({ file: path })
-		// 		});
-		// 		let data = null;
-		// 		if (response.ok) {
-		// 			data = (await response.json()).data || null;
-		// 		}
-		// 		result = JSON.parse(data ? decodeBase64Unicode(data) : '[]'); // Decode base64 to text
-		// 	} catch (error) {
-		// 		result = '[]';
-		// 	}
-		// 	return result;
-		// }
 
-		// async function putData(str) {
-		// 	try {
-		// 		let encodedData = encodeBase64Unicode(str); // Encode text to base64
-		// 		let response = await fetch(api + '/put', {
-		// 			method: 'POST',
-		// 			headers: {
-		// 				'Content-Type': 'application/json'
-		// 			},
-		// 			body: JSON.stringify({ file: path, data: encodedData })
-		// 		});
-		// 		if (!response.ok) {
-		// 			throw new Error('Network response was not ok');
-		// 		}
-		// 		return await response.json();
-		// 	} catch (error) {
-		// 		console.error('Error putting data:', error);
-		// 	}
-		// }
-
-		let createTextarea = function (row, col, value) {
+		let createTextarea = function (row, col) {
 			let e;
-			let output = typeof value === 'object' ? JSON.stringify(value, null, "  ") : String(value);
-			e = Util.create('textarea', { style: "white-space: wrap;" })
-				.appendContent((() => {
+			let output = typeof row[col] === 'object'
+				? JSON.stringify(row[col], null, "  ")
+				: String(row[col]);
+			e = Util.create('textarea', { style: "white-space: pre-wrap;" })
+				.appendContentIf((() => {
 					if (output.charAt(0) === '"' && output.charAt(output.length - 1) === '"') {
 						output = output.substring(1, output.length - 1);
 					}
 					return output;
-				})());
+				})(), row[col] != null);
+
+			let adjust = () => {
+				e
+					.css('height', e.entity().value.split('\n').length * 15 + 6 + 'px')
+					.css('height', e.entity().scrollHeight + 4 + 'px');
+			}
+
+			let edit = () => {
+				let v;
+				try {
+					v = JSON.parse(e.val()
+						.replaceAll("\r", "")
+						.replaceAll("\n", "")
+						.replaceAll("\t", ""))
+				} catch (err) {
+					v = e.val();
+				}
+				myTable.editData(row['###row-index'], col, v);
+			}
 
 			e
-				.addEventHandler(['keyup', 'focus', 'blur'], function (event) {
-					e.css('height', '0px').css('height', e.entity().scrollHeight + 2 + 'px');
-				})
-				.addEventHandler('change', function (event) {
-					let v;
-					try {
-						v = JSON.parse(e.val()
-							.replaceAll("\r", "")
-							.replaceAll("\n", "")
-							.replaceAll("\t", ""))
-					} catch (err) {
-						v = e.val();
-					}
-					myTable.editData(row['###row-index'], col, v);
+				.addEventHandler(['blur', 'click', 'focus', 'keyup', 'input'], function (event) {
+					adjust();
+					edit();
 				})
 				.css('resize', 'none')
 				.css('outline', 'none');

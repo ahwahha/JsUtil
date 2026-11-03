@@ -502,13 +502,15 @@ function JsonTable(c = null, kh = null) {
                     )
                     , row => (bool ? !row['###row-inserted'] : true)
                 );
-                for (let item of temp) {
-                    for (let key of Object.keys(item)) {
-                        if (!key.startsWith('###ori-') && item['###ori-' + key]) {
-                            item[key] = item['###ori-' + key];
-                        }
-                    };
-                }
+				if(bool){
+					for (let item of temp) {
+						for (let key of Object.keys(item)) {
+							if (!key.startsWith('###ori-') && item['###ori-' + key]) {
+								item[key] = item['###ori-' + key];
+							}
+						};
+					}
+				}
                 return JsonTable.cleanKeys(temp);
             } else {
                 return null;
