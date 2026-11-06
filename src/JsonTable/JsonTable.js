@@ -502,15 +502,15 @@ function JsonTable(c = null, kh = null) {
                     )
                     , row => (bool ? !row['###row-inserted'] : true)
                 );
-				if(bool){
-					for (let item of temp) {
-						for (let key of Object.keys(item)) {
-							if (!key.startsWith('###ori-') && item['###ori-' + key]) {
-								item[key] = item['###ori-' + key];
-							}
-						};
-					}
-				}
+                if (bool) {
+                    for (let item of temp) {
+                        for (let key of Object.keys(item)) {
+                            if (!key.startsWith('###ori-') && item['###ori-' + key]) {
+                                item[key] = item['###ori-' + key];
+                            }
+                        };
+                    }
+                }
                 return JsonTable.cleanKeys(temp);
             } else {
                 return null;
@@ -1325,16 +1325,20 @@ function JsonTable(c = null, kh = null) {
                     table = output = Util.create('div', { style: Util.objToStyle({ 'position': 'relative', 'width': '100%', 'display': 'flex', 'flex-flow': 'column nowrap', 'justify-content': 'flex-start', 'align-items': 'center', 'row-gap': '3px', 'background-color': '#fff' }) })
                         .appendContent(Util.create('div', { style: Util.objToStyle({ 'width': '100%;' }) }).appendContent(tableSettings['label']))
                         .appendContent(
-                            controlGroup = Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap-reverse', 'justify-content': 'flex-start', 'align-items': 'flex-start', 'column-gap': '3px' }) })
+                            controlGroup = Util.create('div', { style: Util.objToStyle({ 'width': '100%', 'display': 'flex', 'flex-flow': 'row wrap-reverse', 'justify-content': 'flex-end', 'align-items': 'flex-start', 'column-gap': '3px' }) })
                                 .appendContent(paginationGroup = createPaginationGroup())
                                 .appendContent(Util.create('div', { style: 'flex:1' }))
                                 .appendContent(
                                     Util.create('div', { style: Util.objToStyle(tableSettings['actionsGroupStyle']) }).appendContent(
                                         Util.create('div', { style: Util.objToStyle({ display: 'flex', 'flex-flow': (edited ? "column" : "row") + ' wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
                                             .appendContentIf(createSelectingGroup(), tableSettings['showSelectingGroup'])
-                                            .appendContent(createEditedGroup())
-                                            .appendContent(createResetFiltersButton())
-                                            .appendContent(createRefreshTableButton())
+                                            .appendContentIf(createResetFiltersButton(), !edited)
+                                            .appendContentIf(createRefreshTableButton(), !edited)
+                                            .appendContentIf(Util.create('div', { style: Util.objToStyle({ display: 'flex', 'flex-flow': 'row wrap', 'justify-content': 'flex-start', 'align-items': 'flex-end', 'column-gap': '3px' }) })
+                                                .appendContentIf(createEditedGroup())
+                                                .appendContent(createResetFiltersButton())
+                                                .appendContent(createRefreshTableButton())
+                                                , edited)
                                     )
                                 )
                         )

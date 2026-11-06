@@ -989,6 +989,17 @@ Util.deferExec = function (delay = 100) {
     });
 };
 
+Util.loadScript = function (path, host) {
+    return new Promise((res) => {
+        let s = Util.create('script', { src: path }).addEventHandler('load', () => {
+            res();
+            s.remove();
+        });
+        if (host instanceof HTMLElement) host = new Util(host);
+        host.appendContent(s);
+    });
+}
+
 Util.prototype.debounce = function (func, delay) {
     let context = this;
     if (context['###timeout']) { clearTimeout(context['###timeout']); }

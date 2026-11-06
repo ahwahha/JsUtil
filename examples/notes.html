@@ -3,13 +3,13 @@
 <head>
 	<script>
 		let data = [];
-		
+
 		const columnSetting = [
 			{
 				"header": "sel.",
 				"data": "###row-selected",
 				"rowsStyle": { "width": "1%", "padding": "0px 10px" },
-				"modifier": function (row) { return myTable.createSelectBox(row); },
+				"modifier": function (row) { return table.createSelectBox(row); },
 				"sortable": true,
 				"filterEditable": true
 			},
@@ -52,7 +52,7 @@
 				"header": "del.",
 				"data": "###row-removed",
 				"rowsStyle": { "width": "1%", "padding": "0px 10px" },
-				"modifier": function (row) { return myTable.createRemoveBox(row); }
+				"modifier": function (row) { return table.createRemoveBox(row); }
 			}
 		];
 	</script>
@@ -99,20 +99,20 @@
 	</style>
 	<script>
 
+		var table, container, b;
 		Util.loaded(async () => {
-			myTable = new JsonTable();
-			myTable.setContainer(Util.get('#container'));
-			myTable.setTableSettings({
+			table = new JsonTable(container = Util.get('#container'), b = Util.get('body')[0]);
+			table.setTableSettings({
 				columns: columnSetting,
 				label: Util.create('span')
 					.appendContent('Notes: ')
 					.appendContent(Util.create('button', { id: 'insert', class: 'button' })
 						.appendContent('Insert row')
-						.addEventHandler('click', () => { myTable.insertData({ 'k': '', 'v': '' }).refreshTable(true); })
+						.addEventHandler('click', () => { table.insertData({ 'k': '', 'v': '' }).refreshTable(true); })
 					)
 					.appendContent(Util.create('button', { class: 'button' })
 						.addEventHandler('click', async function () {
-							await navigator.clipboard.writeText(JSON.stringify(JsonTable.cleanKeys(myTable.getRemoved(false, myTable.getFiltered()))));
+							await navigator.clipboard.writeText(JSON.stringify(JsonTable.cleanKeys(table.getRemoved(false, table.getFiltered()))));
 							alert('data copied to clipboard');
 						})
 						.appendContent('copy filtered')
@@ -130,7 +130,41 @@
 				filterReturnTrueWhenEmpty: true
 			});
 
-			myTable.setData(data).refreshTable(true);
+			table.setData(data).refreshTable(true);
+
+			let flush = () => { document.activeElement.blur(); };
+			let save = async (preserve) => {
+				flush(); await table.shieldOn();
+				try {
+					await updateData(preserve);
+					table.setData(await getData())
+				} catch (error) {
+					alert(error);
+				}
+				table.refreshTable(false).shieldOff(); adjustTextarea();
+			}
+			let refresh = async () => { flush(); await table.shieldOn(); table.refreshTable(false).shieldOff(); };
+			b.removeAllEventHandlers().commands(20, [
+				{
+					command: 'logout', function: async () => {
+						flush(); await table.shieldOn();
+						if (confirm('Confirm log out?')) {
+							document.location.href = window.location.origin + '/logout';
+						} else {
+							await table.shieldOff();
+						}
+					}
+				}
+			]).addEventHandler('keydown', async (event) => {
+				if (event.key === 'Escape' && !event.isComposing) {
+					await refresh();
+				}
+			}).holdKeys([
+				{ keySet: ['Alt', 'Shift', 'S'], handler: async () => { if (await checkStatus()) { await save(); } } },
+				{ keySet: ['Alt', 'Shift', 'W'], handler: async () => { if (await checkStatus() && confirm('Confirm saving changes without preserving old data?')) { await save(false); } } },
+				{ keySet: ['Alt', 'Shift', 'R'], handler: refresh }
+			]);
+
 		});
 
 
@@ -163,7 +197,7 @@
 				} catch (err) {
 					v = e.val();
 				}
-				myTable.editData(row['###row-index'], col, v);
+				table.editData(row['###row-index'], col, v);
 			}
 
 			e
