@@ -38,7 +38,6 @@ function JsonTable(c = null, kh = null) {
         start: 1,
         defaultStart: 1,
         end: 10,
-        defaultEnd: 10,
         maxRows: 100,
         tableClass: '',
         buttonClass: '',
@@ -1084,8 +1083,8 @@ function JsonTable(c = null, kh = null) {
         try {
             if (tableSettings != null) {
                 let length = tableSettings['end'] - tableSettings['start'] + 1;
-                let start = getFiltered().length === 0 ? 0 : tableSettings['start'];
-                let end = Math.max(length, tableSettings['defaultEnd']);
+                let start = 1;
+                let end = start + length - 1;
                 tableSettings['start'] = start;
                 tableSettings['end'] = end;
                 setStart(start);
