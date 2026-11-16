@@ -16,6 +16,8 @@ function JsonTable(c = null, kh = null) {
     let edited = false;
     let inserted = false;
     let insertCount = 0;
+    let oriStart = 0;
+    let oriEnd = 0;
     let tableDefaultSettings = {
         label: "",
         columns: [
@@ -38,7 +40,6 @@ function JsonTable(c = null, kh = null) {
         start: 1,
         defaultStart: 1,
         end: 10,
-        defaultEnd: 10,
         maxRows: 100,
         tableClass: '',
         buttonClass: '',
@@ -328,6 +329,9 @@ function JsonTable(c = null, kh = null) {
                 tableSettings['columns'][i] = { ...tableDefaultSettings.columns[0], ...tableSettings['columns'][i] };
                 tableSettings['columns'][i]['ori-filter'] = tableSettings['columns'][i]['filter'];
             }
+
+            oriStart = tableSettings['start'];
+            oriEnd = tableSettings['end'];
 
             return this;
         } catch (error) {
@@ -1082,15 +1086,8 @@ function JsonTable(c = null, kh = null) {
 
     let resetPageNumbers = function () {
         try {
-            if (tableSettings != null) {
-                let length = tableSettings['end'] - tableSettings['start'] + 1;
-                let start = getFiltered().length === 0 ? 0 : tableSettings['start'];
-                let end = Math.max(length, tableSettings['defaultEnd']);
-                tableSettings['start'] = start;
-                tableSettings['end'] = end;
-                setStart(start);
-                setEnd(end);
-            }
+            setStart(oriStart);
+            setEnd(oriEnd);
             return this;
         } catch (err) {
             throw new Error("error caught @ resetPageNumbers() - " + err);
