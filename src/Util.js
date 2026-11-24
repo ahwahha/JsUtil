@@ -807,6 +807,26 @@ Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'ha
     return output;
 }
 
+Util.fetch = function ({ url, ...options }) {
+    const headers = new Headers(options.headers);
+    for (const key of Object.keys(options)) {
+        if (key.startsWith('h_')) {
+            headers.set(key.slice(2), options[key]);
+            delete options[key];
+        }
+    }
+    return fetch(url, { ...options, headers });
+}
+
+Util.objs2fd = function (objects) {
+    return objects.reduce((formData, object) => {
+        Object.entries(object).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
+        return formData;
+    }, new FormData());
+}
+
 Util.prototype.appendMovableDiv = function (content) {
     this.css('position', 'relative')
         .appendContent(Util.createMovableDiv(content));
