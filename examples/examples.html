@@ -49,21 +49,21 @@
         ]
 
         Util.loaded(() => {
-            b = Util.get('body')[0].css('margin', '0px').css('padding', '0px').holdKeys();
+            b = Util.get('body')[0].style('margin', '0px').style('padding', '0px').holdKeys();
 
             Util.get('#main')
-                .css('height', '100%')
-                .css('position', 'relative')
-                .css('margin', '0px')
-                .css('padding', '0px')
-                .css('overflow', 'hidden')
+                .style('height', '100%')
+                .style('position', 'relative')
+                .style('margin', '0px')
+                .style('padding', '0px')
+                .style('overflow', 'hidden')
                 .appendContent(
                     vertical_divs = Util.createSplittedDiv(Util.directions.down, '28px', true, !true)
-                        .css('height', '100%')
+                        .style('height', '100%')
                 );
 
             vertical_divs.a
-                .css('transition', 'height, 0.3s')
+                .style('transition', 'height, 0.3s')
                 .appendContent(
                     Util.create('div', { style: "padding: 5px; display:flex; flex-flow: row nowrap; justify-content:flex-start; align-items: center; gap: 5px;" })
                         .appendContent(
@@ -72,34 +72,34 @@
                 );
 
             vertical_divs.b
-                .css('display', 'flex')
-                .css('flex-direction', 'column')
+                .style('display', 'flex')
+                .style('flex-direction', 'column')
                 .appendContent(
                     horizontal_divs = Util.createSplittedDiv(Util.directions.right, '150px', true, !true)
-                        .css('flex', 1)
+                        .style('flex', 1)
                 );
 
 
             horizontal_divs.a
-                .css('transition', 'width 0.3s')
-                .css('position', 'relative')
+                .style('transition', 'width 0.3s')
+                .style('position', 'relative')
                 .appendContent(
                     Util.createMenu(Util.getHierarchicalTree(menuItems, 'id', 'parent'))
-                        .css('position', 'absolute')
-                        .css('width', '150px')
-                        .css('height', '100%')
-                        .css('overflow', 'auto')
+                        .style('position', 'absolute')
+                        .style('width', '150px')
+                        .style('height', '100%')
+                        .style('overflow', 'auto')
                 );
 
             horizontal_divs.b
-                .css('position', 'relative')
+                .style('position', 'relative')
                 .appendContent(
                     main_frame = Util.create('iframe', { srcdoc: '<html><body>Welcome</body></html>' })
-                        .css('width', '100%')
-                        .css('border', 'none')
-                        .css('position', 'absolute')
-                        .css('height', '100%')
-                        .css('overflow', 'auto')
+                        .style('width', '100%')
+                        .style('border', 'none')
+                        .style('position', 'absolute')
+                        .style('height', '100%')
+                        .style('overflow', 'auto')
                 );
 
         });

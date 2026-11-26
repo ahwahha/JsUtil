@@ -57,7 +57,7 @@ Util.styleToObj = function (style) {
     var output = null;
     try {
         output = {};
-        var styles = style.split(';');
+        var styles = style? style.split(';') : [];
         styles.forEach(function (style) {
             if (style.trim()) {
                 var parts = style.split(':');
@@ -329,7 +329,7 @@ Util.createFileGroup = function (name = '', initial, max, fileElementProps = {})
         .addEventHandler('click', (event) => {
             if (max == null || files.entity().children.length < max) {
                 files.appendContent(
-                    Util.createFileElement(name, fileElementProps).css('width', '100%').css('padding-bottom', '3px')
+                    Util.createFileElement(name, fileElementProps).style('width', '100%').style('padding-bottom', '3px')
                 );
             }
         });
@@ -343,7 +343,7 @@ Util.createFileGroup = function (name = '', initial, max, fileElementProps = {})
     }).observe(files.entity(), { attributes: !true, childList: true, subtree: true })
 
     for (let i = 0; i < initial; i++) {
-        files.appendContent(Util.createFileElement(name, fileElementProps).css('width', '100%').css('padding-bottom', '3px'));
+        files.appendContent(Util.createFileElement(name, fileElementProps).style('width', '100%').style('padding-bottom', '3px'));
     }
 
     e = Util.create('div').appendContent(
@@ -482,9 +482,9 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
             'align-items': 'stretch'
         })
     })
-        .css('flex-flow', (direction % 2 === 0 ? 'column' : 'row') + ' nowrap')
-        .css('justify-content', (direction % 3 === 0 ? 'flex-end' : 'flex-start'))
-        .css('flex-direction', (direction % 2 === 0 ? 'column' : 'row') + (direction % 3 === 0 ? '-reverse' : ''));
+        .style('flex-flow', (direction % 2 === 0 ? 'column' : 'row') + ' nowrap')
+        .style('justify-content', (direction % 3 === 0 ? 'flex-end' : 'flex-start'))
+        .style('flex-direction', (direction % 2 === 0 ? 'column' : 'row') + (direction % 3 === 0 ? '-reverse' : ''));
 
     let a = Util.create('div', {
         style: Util.objToStyle({
@@ -494,7 +494,7 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
             'overflow': 'hidden'
         })
     })
-        .css((direction % 2 === 0 ? 'height' : 'width'), firstSpan)
+        .style((direction % 2 === 0 ? 'height' : 'width'), firstSpan)
 
     let b = Util.create('div', {
         style: Util.objToStyle({
@@ -516,7 +516,7 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
             'background-image': 'linear-gradient(to ' + (direction % 2 === 0 ? 'bottom' : 'right') + ', #eee, #eee, #f5f5f5, #ffffff, #f5f5f5, #eee, #eee)'
         })
     })
-        .css((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px')
+        .style((direction % 2 === 0 ? 'height' : 'width'), !adjustable ? '4px' : '8px')
 
     let overlay;
     if (adjustable) {
@@ -524,9 +524,9 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
             let isCollapsed = false;
             divider.addEventHandler('click', (e) => {
                 if (!isCollapsed) {
-                    a.css((direction % 2 === 0 ? 'height' : 'width'), '0px');
+                    a.style((direction % 2 === 0 ? 'height' : 'width'), '0px');
                 } else {
-                    a.css((direction % 2 === 0 ? 'height' : 'width'), firstSpan);
+                    a.style((direction % 2 === 0 ? 'height' : 'width'), firstSpan);
                 }
                 isCollapsed = !isCollapsed;
             });
@@ -544,7 +544,7 @@ Util.createSplittedDiv = function (direction, firstSpan, adjustable, drag) {
                         })
                         .addEventHandler('mousemove', (e) => {
                             if (divider['hold']) {
-                                a.css((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
+                                a.style((direction % 2 === 0 ? 'height' : 'width'), (a.entity()[(direction % 2 === 0 ? 'offsetHeight' : 'offsetWidth')] + (direction % 3 === 0 ? '-1' : '1') * (direction % 2 === 0 ? e.clientY : e.clientX) - (direction % 3 === 0 ? '-1' : '1') * divider['hold'][(direction % 2 === 0 ? 'y' : 'x')]) + 'px');
                                 divider['hold'][(direction % 2 === 0 ? 'y' : 'x')] = (direction % 2 === 0 ? e.clientY : e.clientX);
                             }
                         })
@@ -784,7 +784,7 @@ Util.createMenu = function (trees = [], prop_label = 'label', prop_handler = 'ha
             .appendContent(Util.create('div').appendContent(node[prop_label] ?? '---'))
             .appendContent(Util.create('div', { style: "position: absolute; left: 0px; top: 0px; height: 100%; width: 100%; z-index: 9999;" }))
             .addEventHandlerIf('click', node[prop_handler], null, typeof node[prop_handler] == 'function')
-            .addEventHandlerIf('click', function () { childrenContainer.css('display', childrenContainer.css('display') === 'none' ? 'unset' : 'none'); }, null, haveChildren);
+            .addEventHandlerIf('click', function () { childrenContainer.style('display', childrenContainer.style('display') === 'none' ? 'unset' : 'none'); }, null, haveChildren);
         if (typeof node[prop_handler] == 'function') {
             label.addEventHandler('click', node[prop_handler], null);
         } else if (Array.isArray(node[prop_handler])) {
@@ -828,7 +828,7 @@ Util.objs2fd = function (objects) {
 }
 
 Util.prototype.appendMovableDiv = function (content) {
-    this.css('position', 'relative')
+    this.style('position', 'relative')
         .appendContent(Util.createMovableDiv(content));
     return this;
 };
@@ -848,14 +848,14 @@ Util.prototype.parent = function () {
 
 Util.prototype.hide = function () {
     if (this['_entity']) {
-        this.css('display', 'none');
+        this.style('display', 'none');
     }
     return this;
 };
 
 Util.prototype.show = function () {
     if (this['_entity']) {
-        this.css('display', 'unset');
+        this.style('display', 'unset');
     }
     return this;
 };
@@ -985,8 +985,8 @@ Util.prototype.drag = function (target) {
                 })
                 .addEventHandler('mousemove', (e) => {
                     if (this['hold']) {
-                        target.css('left', target.entity().offsetLeft + e.clientX - this['hold']['x'] + 'px');
-                        target.css('top', target.entity().offsetTop + e.clientY - this['hold']['y'] + 'px');
+                        target.style('left', target.entity().offsetLeft + e.clientX - this['hold']['x'] + 'px');
+                        target.style('top', target.entity().offsetTop + e.clientY - this['hold']['y'] + 'px');
                         this['hold']['x'] = e.clientX;
                         this['hold']['y'] = e.clientY;
                     }
@@ -1156,7 +1156,7 @@ Util.prototype.prop = function (name, assignment) {
     }
 };
 
-Util.prototype.css = function (name, assignment) {
+Util.prototype.style = function (name, assignment) {
     if (name == null) {
         return this.attr('style');
     } else {

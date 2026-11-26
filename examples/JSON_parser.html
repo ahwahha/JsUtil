@@ -10,16 +10,16 @@
 
 		let dv, unindented, indented;
 
-		Util.get('#main').css('height','100%').appendContent(dv = Util.createSplittedDiv(Util.directions.down, '150px', true, true));
+		Util.get('#main').style('height','100%').appendContent(dv = Util.createSplittedDiv(Util.directions.down, '150px', true, true));
 
-		dv.css('height','100%')
-		dv['a'].css('display', 'flex').css('flex-flow', 'column nowrap')
+		dv.style('height','100%')
+		dv['a'].style('display', 'flex').style('flex-flow', 'column nowrap')
 			.appendContent(Util.create('div').appendContent('Unindented JSON'))
-			.appendContent(unindented = Util.create('textarea', { id: 'unindented' }).css('margin-bottom', '5px').css('outline', 'none').css('flex', '1'));
+			.appendContent(unindented = Util.create('textarea', { id: 'unindented' }).style('margin-bottom', '5px').style('outline', 'none').style('flex', '1'));
 
-		dv['b'].css('display', 'flex').css('flex-flow', 'column nowrap')
-			.appendContent(Util.create('div').appendContent('Indented JSON').css('margin-top', '5px'))
-			.appendContent(indented = Util.create('textarea', { id: 'indented' }).css('outline', 'none').css('flex', '1'))
+		dv['b'].style('display', 'flex').style('flex-flow', 'column nowrap')
+			.appendContent(Util.create('div').appendContent('Indented JSON').style('margin-top', '5px'))
+			.appendContent(indented = Util.create('textarea', { id: 'indented' }).style('outline', 'none').style('flex', '1'))
 
 		function update(source, target, wrap) {
 			let text = source.value;

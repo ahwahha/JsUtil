@@ -19,7 +19,7 @@
 				"rowsStyle": { "width": "25%", "padding": "2px" },
 				"modifier": function (row) {
 					return createTextarea(row, 'k', row.k)
-						.css('width', '100%');
+						.style('width', '100%');
 				}
 			},
 			{
@@ -31,7 +31,7 @@
 						? Util.create('span', { style: 'width:100%; display: flex; flex-flow: row wrap; align-items: center;' })
 							.appendContent(
 								createTextarea(row, 'v')
-									.css('flex', '1')
+									.style('flex', '1')
 									.attr('disabled', row.deprecated_at ? '' : 'unset')
 							).appendContent(
 								Util.create('span', { class: 'button', style: 'height:18px;' })
@@ -44,7 +44,7 @@
 									], 250)
 							)
 						: createTextarea(row, 'v')
-							.css('width', '100%')
+							.style('width', '100%')
 							.attr('disabled', row.deprecated_at ? '' : 'unset');
 				}
 			},
@@ -183,8 +183,8 @@
 
 			let adjust = () => {
 				e
-					.css('height', e.entity().value.split('\n').length * 15 + 6 + 'px')
-					.css('height', e.entity().scrollHeight + 4 + 'px');
+					.style('height', e.entity().value.split('\n').length * 15 + 6 + 'px')
+					.style('height', e.entity().scrollHeight + 4 + 'px');
 			}
 
 			let edit = () => {
@@ -205,8 +205,8 @@
 					adjust();
 					edit();
 				})
-				.css('resize', 'none')
-				.css('outline', 'none');
+				.style('resize', 'none')
+				.style('outline', 'none');
 
 			return e;
 		};

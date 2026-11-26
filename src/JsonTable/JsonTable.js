@@ -1272,7 +1272,7 @@ function JsonTable(c = null, kh = null) {
                                                         t = Util.create('textarea', { style: Util.objToStyle({ ...rowsStyle(col), ...tableSettings.editedStyle }) }).attr('readonly', '')
                                                             .appendContent('(' + (typeof oriData === 'string' ? '"' + oriData + '"' : JSON.stringify(oriData)) + ')')
                                                             .addEventHandler(['focus', 'blur'], () => {
-                                                                t.css('height', '0px').css('height', t.entity().scrollHeight + 2 + 'px')
+                                                                t.style('height', '0px').style('height', t.entity().scrollHeight + 2 + 'px')
                                                             }),
                                                         showOri
                                                     )
@@ -1358,9 +1358,9 @@ function JsonTable(c = null, kh = null) {
                                 .appendContent(paginationGroup = createPaginationGroup()
                                 )
                         )
-                        .css('position', 'relative')
+                        .style('position', 'relative')
                         .appendContent(shield = Util.create('span', { style: "position:absolute; left: 0px; top: 0px; width: 100%; height:100%; z-index: " + (tableSettings['overlayZIndex'] + 2) + "; display:none;" })
-                            .css('background-color', 'hsla(0, 100%, 0%, 0.1)')
+                            .style('background-color', 'hsla(0, 100%, 0%, 0.1)')
                         );
                 } catch (e) {
                     throw '@ output: ' + e

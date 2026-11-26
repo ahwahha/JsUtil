@@ -126,7 +126,7 @@ Gets or sets an attribute.
 
 Returns: If getting, returns attribute value; if setting, returns `this`
 
-**`.css(name, assignment)`**
+**`.style(name, assignment)`**
 
 Gets or sets a CSS style property.
 
@@ -205,8 +205,8 @@ element.show();
 element.hide();
 element.attr('data-id', '123');
 let dataId = element.attr('data-id');
-element.css('color', 'red');
-let color = element.css('color');
+element.style('color', 'red');
+let color = element.style('color');
 ```
 
 #### Event Handling
