@@ -3,7 +3,7 @@ function Util(entity) {
     if (entity != null) {
         if (typeof entity == 'string') {
             return Util.get(entity);
-        } else if (entity instanceof HTMLElement) {
+        } else if (entity.ownerDocument && entity.ownerDocument.defaultView && entity instanceof entity.ownerDocument.defaultView.HTMLElement) {
             this['_entity'] = entity;
             return this;
         } else if (entity instanceof Util) {
